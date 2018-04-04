@@ -1,0 +1,28 @@
+Package: cpue.rfmo
+Type: Package
+Title: Functions for Analysing  RFMO CPUE Data  
+Version: 0.1.0
+Authors@R: person("Simon", "Hoyle", email = "simon.hoyle@gmail.com", role = c("aut","cre"))
+Description: Code for loading, standardizing, and plotting tuna longline CPUE data for RFMOs such as the IOTC.  
+Imports:
+    beanplot,
+    boot,
+    cluster,
+    date,
+    data.table,
+    dplyr,
+    graphics,
+    grDevices,
+    lubridate,
+    lunar,
+    mapdata,
+    maps,
+    maptools,
+    mgcv,
+    nFactors,
+    splines,
+    stats
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1

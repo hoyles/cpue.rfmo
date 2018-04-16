@@ -28,7 +28,7 @@ library("readxl")
 # install.packages("devtools")
 library(devtools)
 # This new library replaces the 'support functions.r' file.
-#install_github("hoyles/cpue.rfmo")
+install_github("hoyles/cpue.rfmo")
 
 library("cpue.rfmo")
 

@@ -136,6 +136,7 @@ dataclean_JPIO <- function(dat, checktg = F, allHBF = F) {
 #' The function sets up variables and removes bad data. Originally developed for Korean data in the IO.
 #' @param dat Input dataset
 #' @param yearlim Upper boundary for time period.
+#' @param splist List of species codes
 #' @return Modified dataset.
 #'
 dataclean_KR <- function(dat, yearlim = 2016, splist) {

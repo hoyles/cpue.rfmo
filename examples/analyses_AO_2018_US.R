@@ -1,10 +1,14 @@
-projdir <- "~/ICCAT/2018_CPUE/"
-jpdir <- paste0(projdir, "JP/")
-datadir1 <- paste0(jpdir, "data/catch_effort/")
-jalysis_dir <- paste0(jpdir, "analyses/")
-jpfigs <- paste0(jpdir, "figures/")
+projdir <- "~/ICCAT/2018_Bigeye/"
+usdir <- paste0(projdir, "US/")
+datadir1 <- paste0(usdir, "Data/")
+usalysis_dir <- paste0(usdir, "analyses/")
+usfigs <- paste0(usdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-setwd(jalysis_dir)
+dir.create(usdir)
+dir.create(usalysis_dir)
+dir.create(usfigs)
+
+setwd(usalysis_dir)
 library("date")
 library("splines")
 library("maps")
@@ -18,11 +22,12 @@ library("plyr")
 library("dplyr")
 library("dtplyr")
 library("tm")
+library("readxl")
 
-install.packages("devtools")
+#install.packages("devtools")
 library(devtools)
 # This new library replaces the 'support functions.r' file.
-install_github("hoyles/cpue.rfmo")
+#install_github("hoyles/cpue.rfmo")
 
 library("cpue.rfmo")
 
@@ -31,45 +36,45 @@ library("cpue.rfmo")
 
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
-nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
-      "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid")
-wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
-cc <- "iiiiiiiciiiiiiiiiiiiicci"
-posses <- cumsum(c(1,wdths))
-cc <- "iiiiiiiciiiiiiiiiiiiicci"
-cbind(nms,wdths,unlist(strsplit(cc,"")))
+nms <- c("bsh","sma","por","op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
+      "hbf","hooks","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid","qtr")
+# BSH	SMA	POR	op_yr	op_mon	op_day	lat	latcode	lon	loncode	callsign	hbf	alb	bet	yft	swo	mls	bum	blm	sas	shk	prefecture	vesselname	logbookid	qtr
 
-# the following two lines can be used to check the data format.
-# chk <- readLines(paste0(datadir1,"/JPNLL_20170524.dat"))
-# chk[10240:10242]
-
-# Check the first 20 rows
-a <- read_fwf(file=paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+# wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
+# cc <- "iiiiiiiciiiiiiiiiiiiicci"
+# posses <- cumsum(c(1,wdths))
+# cc <- "iiiiiiiciiiiiiiiiiiiicci"
+# cbind(nms,wdths,unlist(strsplit(cc,"")))
+#
+# # the following two lines can be used to check the data format.
+# # chk <- readLines(paste0(datadir1,"/usNLL_20170524.dat"))
+# # chk[10240:10242]
+#
+# # Check the first 20 rows
+a <- read.csv(paste0(datadir1,"/USLLV1.2simon.csv"));gc()
+str(a)
+cbind(names(a), nms)
 names(a) <- nms
-a
+head(a)
 
-# If good, load the whole file
-dat5216 <- read_fwf(file=paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types=cc)
-problems(dat5216) # Check any problems. Some of those reported are not important.
-names(dat5216) <- nms
 table(dat5216$trip_st==0,dat5216$op_yr) # Check for the timing of missign trip_start variables
 table(dat5216$op_yr)
 
 # Prepare the data
 rawdat <- dat5216
-pd1 <- dataprep_JPIO(rawdat) # No changes between IO and AO functions
+pd1 <- dataprep_USIO(rawdat) # No changes between IO and AO functions
 pd2 <- setup_AO_regions(pd1, regB=T) # Later will also need YFT regions, and possibly alternative BET regions
 
 # Clean the data
-clndat <- dataclean_JPIO(rawdat)
-prepdat1 <- dataprep_JPIO(clndat)
+clndat <- dataclean_USIO(rawdat)
+prepdat1 <- dataprep_USIO(clndat)
 prepdat <- setup_AO_regions(prepdat1, regB=T) # Later will also need YFT regions, and possibly alternative BET regions
 save(pd1, pd2, prepdat, file="prepdat.RData")
 
 dat <- make_clid(prepdat)
 dat <- make_lbidmon(dat)
-save(dat,file="JPdat.RData")
-load(file="JPdat.RData")
+save(dat,file="USdat.RData")
+load(file="USdat.RData")
 
 
 # ===================================================================================
@@ -324,13 +329,13 @@ library("beanplot")
 library("cpue.rfmo")
 
 projdir <- "~/ICCAT/2018_CPUE/"
-jpdir <- paste0(projdir, "JP/")
-datadir1 <- paste0(jpdir, "data/")
-jalysis_dir <- paste0(jpdir, "analyses/")
+usdir <- paste0(projdir, "US/")
+datadir1 <- paste0(usdir, "data/")
+usalysis_dir <- paste0(usdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
-clusdir <- paste0(jpdir, "clustering/")
+clusdir <- paste0(usdir, "clustering/")
 setwd(clusdir)
-load(file=paste0(jalysis_dir,"JPdat.RData"))
+load(file=paste0(usalysis_dir,"USdat.RData"))
 str(dat)
 
 # Remove redundant datasets, if present. Don't worry if not.
@@ -344,7 +349,7 @@ str(dat[,allabs])
 
 
 nclB=c(4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
-flag="JP"
+flag="US"
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 r=4
 
@@ -360,7 +365,7 @@ for(r in 1:length(nclB)) {
 # Japan only, no clusters, HBF
 #
 
-resdir <- paste0(jalysis_dir,"std_nocl_JPonly_hbf/")
+resdir <- paste0(usalysis_dir,"std_nocl_USonly_hbf/")
 dir.create(resdir)
 setwd(resdir)
 
@@ -382,7 +387,7 @@ for(runsp in c("bet")) {
   dohbf <- runpars[[runsp]]$dohbf
   cltype <- runpars[[runsp]]$cltype
   jdat <- data.frame()
-  for(flag in c("JP")) {
+  for(flag in c("US")) {
     for(r in runpars[[runsp]]$doregs) {
       load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep="_"),".RData"))
       dataset$flag <- flag
@@ -403,7 +408,7 @@ for(runsp in c("bet")) {
       if(nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,60)
       glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs, minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
       if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,60)
-      a <- jdat[jdat$vessid != "JP1",]
+      a <- jdat[jdat$vessid != "US1",]
       glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs, minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
       if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,60)
       wtt.all   <- mk_wts(glmdat,wttype="area")

@@ -6,7 +6,7 @@
 #' @param alldat Deprecated.
 #' @return Modified dataset.
 #'
-dataprep_KRSBT <- function(dat, alldat = F) {
+dataprep_KRSBT <- function(dat, alldat = F ,splist) {
  dat$dmy <- as.Date(dat$DATE)
  dat$hbf <- round(dat$hooks/dat$floats, 0)
  dat$lat <- dat$Lat01
@@ -38,7 +38,7 @@ dataprep_KRSBT <- function(dat, alldat = F) {
 #' @param alldat Deprecated.
 #' @return Modified dataset.
 #'
-dataprep_KR <- function(dat, alldat = F) {
+dataprep_KR <- function(dat, splist) {
  dat$dmy <- as.Date(dat$DATE)
  dat$hbf <- round(dat$hooks/dat$floats, 0)
  dat$moon <- lunar.illumination(dat$dmy)
@@ -48,6 +48,7 @@ dataprep_KR <- function(dat, alldat = F) {
  dat$lat[dat$NS == 2] <- (dat$Lat01[dat$NS == 2] + 1) * -1
  dat$lon[dat$EW == 2] <- 360 - (dat$Long01[dat$EW == 2] + 1)
  dat <- dat[dat$lon >= 0, ]
+ dat$lon[dat$lon > 180] <- dat$lon[dat$lon > 180] - 360
  dat <- dat[dat$lat < 29, ]
 
  dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
@@ -55,12 +56,12 @@ dataprep_KR <- function(dat, alldat = F) {
 
  dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
- dat$vessid <- as.factor(as.numeric(dat$VESSEL_NAME))
+# dat$vessid <- as.factor(as.numeric(dat$VESSEL_NAME))
  dat$vessid <- as.factor(as.numeric(as.factor(dat$VESSEL_NAME)))
  # dat$vessid <- as.factor(as.numeric(dat$VESSEL_CD))
  dat$tripidmon <- paste(dat$vessid, dat$op_yr, dat$op_mon)
- dat$Totalx <- with(dat, alb + bet + yft + sbt + sfa + mls + bum + blm + swo + sha + skj + oth)
- dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
+ dat$Totalx <- apply(dat[,splist], 1, sum, na.rm = TRUE)
+ dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum, na.rm = TRUE)
  return(dat)
 }
 

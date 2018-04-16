@@ -1,10 +1,12 @@
-projdir <- "~/ICCAT/2018_CPUE/"
+projdir <- "~/ICCAT/2018_Bigeye/"
 
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")
 kralysis_dir <- paste0(krdir, "analyses/")
 krfigs <- paste0(krdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
+dir.create(kralysis_dir)
+dir.create(krfigs)
 setwd(kralysis_dir)
 
 library("date")
@@ -20,11 +22,13 @@ library("plyr")
 library("dplyr")
 library("dtplyr")
 library("tm")
+library("readxl")
 
-install.packages("devtools")
+
+# install.packages("devtools")
 library(devtools)
 # This new library replaces the 'support functions.r' file.
-install_github("hoyles/cpue.rfmo")
+#install_github("hoyles/cpue.rfmo")
 
 library("cpue.rfmo")
 
@@ -33,23 +37,30 @@ library("cpue.rfmo")
 
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
-rawdat <- read.csv(paste0(datadir,"IO KOR LL OP data_20170629.csv"), header = TRUE, stringsAsFactors = FALSE)
+#rawdat <- read.csv(paste0(datadir,"KR_AO_LL_DB_20180413.csv"), header = TRUE, stringsAsFactors = FALSE)
+coltypes <- c("text","date",rep("numeric",20))
+rawdat <- read_excel(paste0(datadir,"KR_AO_LL_DB_20180413.xlsx"), sheet="DB", col_types = coltypes)
 
 # check the data
 str(rawdat)
-kr_splist <- c("alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj","swo","yft")
-a <- c("op_yr","op_mon","VESSEL_CD","VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks","floats",kr_splist,"Total")
+kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","whm","yft")
+a <- c("VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks","floats",kr_splist,"Total")
 cbind(names(rawdat),a)
 names(rawdat) <- a
 head(rawdat)
 str(rawdat)
 
+
 # Prepare and clean the data
-prepdat <- dataprep_KR(rawdat)
+rawdat$op_yr <- year(rawdat$DATE)
+rawdat$op_mon <- month(rawdat$DATE)
+prepdat <- dataprep_KR(rawdat, splist = kr_splist)
 head(prepdat)
+
 prepdat2 <- setup_AO_regions(prepdat,  regB=T)
 head(prepdat2)
-dat <- dataclean_KR(prepdat2, yearlim = 2017)
+prepdat2 <- as.data.frame(prepdat2)
+dat <- dataclean_KR(prepdat2, yearlim = 2018, splist = kr_splist)
 save(prepdat,dat,file="KRdat.RData")
 
 
@@ -68,14 +79,9 @@ table(dat$op_yr,(dat$hooks > 0))
 # Sets per day
 windows(width=15,height=9)
 hist(prepdat$dmy,breaks="days",freq=T,xlab="Date",main="Sets per day")
-savePlot(file="sets_per_day.png",type="png")
+savePlot(filename = "sets_per_day.png",type = "png")
 table(prepdat$dmy)
 
-with(dat[dat$op_yr %in% c(1984:1985),] ,hist(dmy,breaks="days",freq=T,xlab="Date",main="Sets per day"))
-with(dat[dat$dmy > as.Date("1982-1-1") & dat$dmy < as.Date("1985-2-1"),] ,hist(dmy,breaks="days",freq=T,xlab="Date",main="Sets per day"))
-with(dat[dat$dmy > as.Date("1984-1-1") & dat$dmy < as.Date("1985-2-1"),] ,table(dmy))
-a <- dat[dat$dmy >= as.Date("1984-02-29") & dat$dmy < as.Date("1984-03-13") & !is.na(dat$dmy),]
-a[order(a$dmy),]
 a <- dat[grep("ZA240",dat$VESSEL_CD),]
 plot(a$lon,a$lat,type="b")
 text(jitter(a$lon),jitter(a$lat),a$dmy)
@@ -95,41 +101,44 @@ savePlot("Hook histogram.png",type="png")
 hist(prepdat$floats, nclass=200)   # ask if the sets with 1200 floats are reasonable
 savePlot("floats histogram.png",type="png")
 
-table(prepdat$alb)   # ask if the set with 488 alb
-table(prepdat$bet)   # ask if the set with 334 bet
-table(prepdat$blm)   # ask if the set with 58 blm
-table(prepdat$bum)   # ask if the set with 122
-table(prepdat$skj)   # ask if the set with 107
-table(prepdat$pbf)   # ask if the sets with any pbf
-table(prepdat$sha)   # ask if the majority of sets with 0 sha
-table(prepdat$mls)   # ask if the set with 371
-table(prepdat$sbt)   # ask if the set with 164
-table(prepdat$yft)   # ask if the set with 917
-table(prepdat$sfa)   # ask if the sets with 330
+table(dat$alb)   # ask if the set with 488 alb
+table(dat$bet)   # ask if the set with 334 bet
+table(dat$bft)   # ask if the set with 164
+table(dat$blm)   # ask if the set with 58 blm
+table(dat$bum)   # ask if the set with 122
+table(dat$skj)   # ask if the set with 107
+table(dat$sha)   # ask if the majority of sets with 0 sha
+table(dat$mls)   # ask if the set with 371
+table(dat$whm)   # ask if the set with 371
+table(dat$yft)   # ask if the set with 917
+table(dat$sfa)   # ask if the sets with 330
 table(prepdat$floats,useNA="always")  # 6408 with NA! All in 1973-75
 table(is.na(prepdat$floats),prepdat$op_yr,useNA="always")  # 6408 with NA!
 table(round(prepdat$hbf,0),prepdat$op_yr,useNA="always")  # Looks like 1971-76 have few sets with full data and may not be usable
 a <- table(prepdat$op_yr,round(prepdat$hbf,0),useNA="always")
 write.csv(a,"table hbf by year.csv")
 
+# a <- dat
+# a$lon5[a$lon5 > 180] <- a$lon5[a$lon5 > 180] - 360
 a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm=T)
+
 windows(width=11,height=9)
-symbols(x=a[,2],y=a[,1],circles=.0002*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude")
-map(add=T,interior=F,fill=T)
+symbols(x=a[,2],y=a[,1],circles=.001*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude")
+map("world",add=T,interior=F,fill=T)
 savePlot(file="map_hooks.png",type="png")
 
 table(dat$EW) # Some data with 2
 a <- log(table(dat$lon,dat$lat))
 windows(width=15,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+map("worldHires",add=T, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 # But also some data near Indonesia, Cambodia, & on land in Africa
 savePlot("Setmap_logscale.png",type="png")
 
 a <- tapply(dat$regB,list(dat$lon,dat$lat),mean)
 windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=2:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:4)
+map("worldHires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 savePlot("regbet.png",type="png")
 
 # Plot grid squares with sets by region, for each regional structure
@@ -141,25 +150,25 @@ plot(tapply(dat$yrqtr,dat$yrqtr,mean),tapply(dat$lat,dat$yrqtr,mean),xlab="yr",y
 plot(tapply(dat$lon,dat$yrqtr,mean),tapply(dat$yrqtr,dat$yrqtr,mean),ylab="yr",xlab="Mean longitude")
 savePlot("mean_fishing_location 1.png",type="png")
 
-write.csv(table(round(dat$hbf,0),dat$regY,useNA="always"),file="hbf by region.csv")
-write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regY,useNA="always"),file="hbf by region by 5 years.csv")
+write.csv(table(round(dat$hbf,0),dat$regB,useNA="always"),file="hbf by region.csv")
+write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA="always"),file="hbf by region by 5 years.csv")
 
 windows(20,20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(y in seq(1975,2015,5)) {
   a <- dat[floor(dat$yrqtr/5)*5==y & dat$lon < 125 & dat$lat < 25,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean,na.rm=T)
-  image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",ylim=c(-45,25))
+  image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",ylim=c(-45,40))
   contour(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,add=T,levels=seq(0,26,2))
-  map("world2",add=TRUE, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+  map("world",add=TRUE, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 }
 savePlot("mean_HBF.png",type="png")
 windows(20,20);par(mfrow=c(2,2))
-for(y in c(1975,1985,1995,2005)) {
+for(y in c(1978,1988,1998,2008)) {
   a <- dat[dat$yrqtr>y & dat$yrqtr < y+10  & dat$lon < 125,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean)
-  image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",xlim=c(20,125),ylim=c(-45,25))
+  image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",xlim=c(-80,20),ylim=c(-45,40))
   contour(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,add=T,levels=seq(0,26,1),col="dark blue")
-  map("world2",add=T, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+  map("world",add=T, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 }
 savePlot("mean_HBF_10yr.png",type="png")
 
@@ -171,7 +180,7 @@ write.csv(table(dat$lat5,dat$lon5,5*floor(dat$yrqtr/5)),file="ops by lat-long-5y
 
 # data exploration
 library(rpart)
-a <- dat[dat$regY%in% c(2,5),]
+a <- dat[dat$regB%in% c(2,5),]
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks

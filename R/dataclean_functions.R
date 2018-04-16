@@ -20,30 +20,34 @@ dataclean <- function(dat, checktg = F, allHBF = F) {
     dat$hbf <- as.numeric(dat$hbf)
     # dat$tonnage <- as.numeric(dat$tonnage)
     dat$hooks <- as.numeric(dat$hooks)
-    dat$alb <- as.numeric(dat$alb)
-    dat$bet <- as.numeric(dat$bet)
-    dat$yft <- as.numeric(dat$yft)
-    dat$swo <- as.numeric(dat$swo)
-    dat$sbt <- as.numeric(dat$sbt)
-    dat$blm <- as.numeric(dat$blm)
-    dat$bum <- as.numeric(dat$bum)
-    dat$mls <- as.numeric(dat$mls)
-    if (sum(is.na(dat$alb)) > 0)
-        dat[is.na(dat$alb), ]$alb <- 0
-    if (sum(is.na(dat$bet)) > 0)
-        dat[is.na(dat$bet), ]$bet <- 0
-    if (sum(is.na(dat$yft)) > 0)
-        dat[is.na(dat$yft), ]$yft <- 0
-    if (sum(is.na(dat$swo)) > 0)
-        dat[is.na(dat$swo), ]$swo <- 0
-    if (sum(is.na(dat$sbt)) > 0)
-        dat[is.na(dat$sbt), ]$sbt <- 0
-    if (sum(is.na(dat$blm)) > 0)
-        dat[is.na(dat$blm), ]$blm <- 0
-    if (sum(is.na(dat$bum)) > 0)
-        dat[is.na(dat$bum), ]$bum <- 0
-    if (sum(is.na(dat$mls)) > 0)
-        dat[is.na(dat$mls), ]$mls <- 0
+    # dat$alb <- as.numeric(dat$alb)
+    # dat$bet <- as.numeric(dat$bet)
+    # dat$yft <- as.numeric(dat$yft)
+    # dat$swo <- as.numeric(dat$swo)
+    # dat$sbt <- as.numeric(dat$sbt)
+    # dat$blm <- as.numeric(dat$blm)
+    # dat$bum <- as.numeric(dat$bum)
+    # dat$mls <- as.numeric(dat$mls)
+    # if (sum(is.na(dat$alb)) > 0)
+    #     dat[is.na(dat$alb), ]$alb <- 0
+    # if (sum(is.na(dat$bet)) > 0)
+    #     dat[is.na(dat$bet), ]$bet <- 0
+    # if (sum(is.na(dat$yft)) > 0)
+    #     dat[is.na(dat$yft), ]$yft <- 0
+    # if (sum(is.na(dat$swo)) > 0)
+    #     dat[is.na(dat$swo), ]$swo <- 0
+    # if (sum(is.na(dat$sbt)) > 0)
+    #     dat[is.na(dat$sbt), ]$sbt <- 0
+    # if (sum(is.na(dat$blm)) > 0)
+    #     dat[is.na(dat$blm), ]$blm <- 0
+    # if (sum(is.na(dat$bum)) > 0)
+    #     dat[is.na(dat$bum), ]$bum <- 0
+    # if (sum(is.na(dat$mls)) > 0)
+    #     dat[is.na(dat$mls), ]$mls <- 0
+    for (sp in splist) {
+      dat[,sp] <- as.numeric(dat[,sp])
+      if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
+    }
     dat <- dat[!is.na(dat$hooks), ]
     dat <- dat[dat$hooks < 10000, ]  # clean up outliers
     dat <- dat[dat$hooks > 200, ]
@@ -134,33 +138,37 @@ dataclean_JPIO <- function(dat, checktg = F, allHBF = F) {
 #' @param yearlim Upper boundary for time period.
 #' @return Modified dataset.
 #'
-dataclean_KR <- function(dat, yearlim = 2016) {
+dataclean_KR <- function(dat, yearlim = 2016, splist) {
     # hist(dat$hbf, nclass = 400)
-    if (sum(is.na(dat$alb)) > 0)
-        dat[is.na(dat$alb), ]$alb <- 0
-    if (sum(is.na(dat$bet)) > 0)
-        dat[is.na(dat$bet), ]$bet <- 0
-    if (sum(is.na(dat$blm)) > 0)
-        dat[is.na(dat$blm), ]$blm <- 0
-    if (sum(is.na(dat$bum)) > 0)
-        dat[is.na(dat$bum), ]$bum <- 0
-    if (sum(is.na(dat$mls)) > 0)
-        dat[is.na(dat$mls), ]$mls <- 0
-    if (sum(is.na(dat$oth)) > 0)
-        dat[is.na(dat$oth), ]$oth <- 0
-    # if (sum(is.na(dat$pbf)) > 0) dat[is.na(dat$pbf), ]$pbf <- 0
-    if (sum(is.na(dat$sbt)) > 0)
-        dat[is.na(dat$sbt), ]$sbt <- 0
-    if (sum(is.na(dat$sfa)) > 0)
-        dat[is.na(dat$sfa), ]$sfa <- 0
-    if (sum(is.na(dat$sha)) > 0)
-        dat[is.na(dat$sha), ]$sha <- 0
-    if (sum(is.na(dat$skj)) > 0)
-        dat[is.na(dat$skj), ]$skj <- 0
-    if (sum(is.na(dat$swo)) > 0)
-        dat[is.na(dat$swo), ]$swo <- 0
-    if (sum(is.na(dat$yft)) > 0)
-        dat[is.na(dat$yft), ]$yft <- 0
+    # if (sum(is.na(dat$alb)) > 0)
+    #     dat[is.na(dat$alb), ]$alb <- 0
+    # if (sum(is.na(dat$bet)) > 0)
+    #     dat[is.na(dat$bet), ]$bet <- 0
+    # if (sum(is.na(dat$blm)) > 0)
+    #     dat[is.na(dat$blm), ]$blm <- 0
+    # if (sum(is.na(dat$bum)) > 0)
+    #     dat[is.na(dat$bum), ]$bum <- 0
+    # if (sum(is.na(dat$mls)) > 0)
+    #     dat[is.na(dat$mls), ]$mls <- 0
+    # if (sum(is.na(dat$oth)) > 0)
+    #     dat[is.na(dat$oth), ]$oth <- 0
+    # # if (sum(is.na(dat$pbf)) > 0) dat[is.na(dat$pbf), ]$pbf <- 0
+    # if (sum(is.na(dat$sbt)) > 0)
+    #     dat[is.na(dat$sbt), ]$sbt <- 0
+    # if (sum(is.na(dat$sfa)) > 0)
+    #     dat[is.na(dat$sfa), ]$sfa <- 0
+    # if (sum(is.na(dat$sha)) > 0)
+    #     dat[is.na(dat$sha), ]$sha <- 0
+    # if (sum(is.na(dat$skj)) > 0)
+    #     dat[is.na(dat$skj), ]$skj <- 0
+    # if (sum(is.na(dat$swo)) > 0)
+    #     dat[is.na(dat$swo), ]$swo <- 0
+    # if (sum(is.na(dat$yft)) > 0)
+    #     dat[is.na(dat$yft), ]$yft <- 0
+    for (sp in splist) {
+      dat[,sp] <- as.numeric(dat[,sp])
+      if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
+    }
     dat <- dat[!is.na(dat$hooks), ]  # Clean up 294 NAs
     dat <- dat[dat$hooks < 5000, ]  # clean up outliers
     # dat <- dat[dat$hooks > 200, ]
@@ -169,7 +177,7 @@ dataclean_KR <- function(dat, yearlim = 2016) {
     dat <- dat[is.na(dat$hbf) == F, ]
     dat <- dat[dat$op_yr > 1976, ]
     dat <- dat[dat$yrqtr < yearlim, ]
-    dat <- dat[dat$EW == 1, ]
+    #dat <- dat[dat$EW == 1, ]
     dat <- dat[dat$hbf >= 5, ]
     return(dat)
 }

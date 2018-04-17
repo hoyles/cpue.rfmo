@@ -73,15 +73,16 @@ dataclean <- function(dat, checktg = F, allHBF = F) {
 #' @param dat Input dataset
 #' @param checktg If TRUE, remove effort identified as not targetng tuna. Not generally used.
 #' @param allHBF Deprecated.
+#' @param splist List of species codes
 #' @return Modified dataset.
 #'
-dataclean_JPIO <- function(dat, checktg = F, allHBF = F) {
+dataclean_JPIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")) {
     dat$op_yr <- as.numeric(dat$op_yr)
     dat$op_mon <- as.numeric(dat$op_mon)
     dat$op_day <- as.numeric(dat$op_day)
     dat <- dat[dat$op_day < 32, ]
     dat <- dat[!is.na(dat$op_day), ]
-    dmy <- as.Date(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+    dmy <- as.Date(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = "-"))
     dat <- dat[!is.na(dmy), ]
     dat$lat <- as.numeric(dat$lat)
     dat <- dat[!is.na(dat$lat), ]
@@ -93,30 +94,10 @@ dataclean_JPIO <- function(dat, checktg = F, allHBF = F) {
     dat$hbf <- as.numeric(dat$hbf)
     # dat$tonnage <- as.numeric(dat$tonnage)
     dat$hooks <- as.numeric(dat$hooks)
-    dat$alb <- as.numeric(dat$alb)
-    dat$bet <- as.numeric(dat$bet)
-    dat$yft <- as.numeric(dat$yft)
-    dat$swo <- as.numeric(dat$swo)
-    dat$sbt <- as.numeric(dat$sbt)
-    dat$blm <- as.numeric(dat$blm)
-    dat$bum <- as.numeric(dat$bum)
-    dat$mls <- as.numeric(dat$mls)
-    if (sum(is.na(dat$alb)) > 0)
-        dat[is.na(dat$alb), ]$alb <- 0
-    if (sum(is.na(dat$bet)) > 0)
-        dat[is.na(dat$bet), ]$bet <- 0
-    if (sum(is.na(dat$yft)) > 0)
-        dat[is.na(dat$yft), ]$yft <- 0
-    if (sum(is.na(dat$swo)) > 0)
-        dat[is.na(dat$swo), ]$swo <- 0
-    if (sum(is.na(dat$sbt)) > 0)
-        dat[is.na(dat$sbt), ]$sbt <- 0
-    if (sum(is.na(dat$blm)) > 0)
-        dat[is.na(dat$blm), ]$blm <- 0
-    if (sum(is.na(dat$bum)) > 0)
-        dat[is.na(dat$bum), ]$bum <- 0
-    if (sum(is.na(dat$mls)) > 0)
-        dat[is.na(dat$mls), ]$mls <- 0
+    for (sp in splist) {
+      dat[,sp] <- as.numeric(dat[,sp])
+      if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
+    }
     dat <- dat[!is.na(dat$hooks), ]
     dat <- dat[dat$hooks < 5000, ]  # clean up outliers
     dat <- dat[dat$hooks > 200, ]

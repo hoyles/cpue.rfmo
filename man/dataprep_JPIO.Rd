@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataprep_functions.R
 \name{dataprep_JPIO}
 \alias{dataprep_JPIO}
-\title{Prepare Japanese longline data.}
+\title{Prepare Japanese longline data for the Indian Ocean.}
 \usage{
 dataprep_JPIO(dat, alldat = T)
 }

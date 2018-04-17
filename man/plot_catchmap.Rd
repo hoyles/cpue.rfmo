@@ -5,7 +5,7 @@
 \title{Plot map of catches or other spatial variable.}
 \usage{
 plot_catchmap(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130),
-  brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "")
+  brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", bgc = "grey")
 }
 \arguments{
 \item{indat}{Input dataset to plot.}
@@ -23,6 +23,8 @@ plot_catchmap(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130),
 \item{brk2}{Transition levels for the contour lines.}
 
 \item{ti}{Title of the plot.}
+
+\item{bgc}{Background color of the plot, defaults to grey.}
 }
 \description{
 Function to plot map of catches or other spatial variable.

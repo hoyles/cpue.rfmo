@@ -38,11 +38,11 @@ library("cpue.rfmo")
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
-      "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid")
-wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
-cc <- "iiiiiiiciiiiiiiiiiiiicci"
+      "hbf","hooks","bft","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid")
+wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
+cc <- "iiiiiiiciiiiiiiiiiiiiicci"
 posses <- cumsum(c(1,wdths))
-cc <- "iiiiiiiciiiiiiiiiiiiicci"
+cc <- "iiiiiiiciiiiiiiiiiiiiicci"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
 # the following two lines can be used to check the data format.
@@ -50,53 +50,55 @@ cbind(nms,wdths,unlist(strsplit(cc,"")))
 # chk[10240:10242]
 
 # Check the first 20 rows
-a <- read_fwf(file=paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+a <- data.frame(read_fwf(file=paste0(datadir1,"/JPNLL_AO_20180417.dat"),fwf_widths(wdths),col_types = cc,n_max = 20));gc()
+cbind(names(a), nms)
 names(a) <- nms
 a
 
 # If good, load the whole file
-dat5216 <- read_fwf(file=paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types=cc)
-problems(dat5216) # Check any problems. Some of those reported are not important.
-names(dat5216) <- nms
-table(dat5216$trip_st==0,dat5216$op_yr) # Check for the timing of missign trip_start variables
-table(dat5216$op_yr)
+dat1 <- data.frame(read_fwf(file=paste0(datadir1,"/JPNLL_AO_20180417.dat"),fwf_widths(wdths),col_types=cc))
+problems(dat1) # Check any problems. Some of those reported are not important.
+names(dat1) <- nms
+table(dat1$trip_st == 0,dat1$op_yr) # Check for the timing of missign trip_start variables
+table(is.na(dat1$trip_st), dat1$op_yr) # Check for the timing of missign trip_start variables
+table(dat1$op_yr)
 
 # Prepare the data
-rawdat <- dat5216
-pd1 <- dataprep_JPIO(rawdat) # No changes between IO and AO functions
-pd2 <- setup_AO_regions(pd1, regB=T) # Later will also need YFT regions, and possibly alternative BET regions
+rawdat <- dat1
+pd1 <- dataprep_JP(rawdat, region = "AO") # No changes between IO and AO functions
+pd2 <- setup_AO_regions(pd1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
+str(pd1)
+str(pd2)
 
 # Clean the data
+str(rawdat)
 clndat <- dataclean_JPIO(rawdat)
-prepdat1 <- dataprep_JPIO(clndat)
-prepdat <- setup_AO_regions(prepdat1, regB=T) # Later will also need YFT regions, and possibly alternative BET regions
-save(pd1, pd2, prepdat, file="prepdat.RData")
+prepdat1 <- dataprep_JP(clndat, region = "AO")
+prepdat <- setup_AO_regions(prepdat1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
+str(prepdat)
+save(pd1, pd2, prepdat, file = "prepdat.RData")
 
-dat <- make_clid(prepdat)
-dat <- make_lbidmon(dat)
-save(dat,file="JPdat.RData")
-load(file="JPdat.RData")
+#dat <- make_clid(prepdat)
+dat <- make_lbidmon(prepdat)
+save(dat,file = "JPdat.RData")
+load(file = "JPdat.RData")
 
 
 # ===================================================================================
 # Plot and explore the data
 # ===================================================================================
 # These plots are for checking the data. Not especially important.
+table(pd1$op_yr)
+table(pd2$op_yr)
 table(dat$op_yr)
+table(clndat$op_yr)
+table(prepdat1$op_yr)
+table(prepdat$op_yr)
 table(is.na(dat$clid))
-table(dat$clid==0)
-a <- table(dat$clid)
-hist(a,nclass=max(a))
-windows(height=10,width=10);par(mfrow=c(3,2))
-max(a[a<100000])
-a1 <- hist(a,nclass=max(a),main="cluster_id frequency",xlab="Sets per cluster_id")
-plot(a1$breaks,c(a1$counts,0)*a1$breaks,xlim=c(0,max(a)),ylim=c(0,2e5),main="set frequency by cluster_id",
-  xlab="Sets per cluster_id",ylab="Number of sets")
 
 xfun <- function(x) sum(x > 0)
 a <- table(dat$vessid,dat$op_yr)
 apply(a,2,xfun)
-
 
 vnm <- (dat$vesselname)
 library("tm")
@@ -105,33 +107,25 @@ tm_map(vnm, function(x) content_transformer(iconv(enc2utf8, sub = "byte")))
 a <- table(dat$vesselname,dat$op_yr)
 apply(a,2,xfun)
 
-# A potentially dodgy callsign?
-a <- dat[dat$tripidmon=="461 1971 1",]
-a <- data.frame(a)
-a[,1:15]
-a <-unique(dat$callsign)
-as.data.frame(dat[match(a,dat$callsign),c("callsign","vessid")])
-table(dat$callsign,useNA="always")
-table(dat$vessid,useNA="always")
 
 # Plot grid squares with sets by region, for each regional structure
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB")]
-windows(width=15,height=10)
-for(fld in c("regB")) {
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
+windows(width = 10,height = 10)
+for (fld in c("regB","regB1")) {
   reg <- with(a0,get(fld))
-  plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
-  text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
-  map(add=T)
-  savePlot(paste0("map_",fld),type="png")
+  plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld)
+  text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
+  map(add = T)
+  savePlot(paste0("map_",fld),type = "png")
 }
 
 # Plot the effect of data cleaning on the number of sets
-regYord <- c(1,2,3)
-windows(height=12,width=12); par(mfcol=c(2,2),mar=c(3,2,2,1))
-for (r in regYord) {
-  llv <- pd2[pd2$regY==r,]
-  yq <- seq(1952.125,2015.875,0.25)
+regBord <- c(1,2,3)
+windows(height=12,width=12); par(mfrow=c(2,2),mar=c(3,2,2,1))
+for (r in regBord) {
+  llv <- pd2[pd2$regB==r,]
+  yq <- seq(1958.125,2017.875,0.25)
   llv$yrqtr <- factor(llv$yrqtr,levels=yq)
   a <- aggregate(hooks ~ lat5 + lon5 + yrqtr,sum,data=llv)
   b <- a[a$hooks > 5000,]
@@ -147,40 +141,43 @@ savePlot(filename="Clean strata hooks",type="png")
 
 # Sets per day and per month
 windows(width=15,height=9)
-hist(prepdat$dmy,breaks="days",freq=T,xlab="Date",main="Sets per day")
-savePlot(file="sets_per_day.png",type="png")
-hist(prepdat$dmy,breaks="months",freq=T,xlab="Date",main="Sets per month")
-savePlot(file="sets_per_month.png",type="png")
+hist(prepdat$dmy,breaks = "days",freq = T,xlab = "Date",main = "Sets per day")
+savePlot(filename = "sets_per_day.png",type = "png")
+hist(prepdat$dmy,breaks = "months",freq = T,xlab = "Date",main = "Sets per month")
+savePlot(filename = "sets_per_month.png",type = "png")
 table(prepdat$dmy)
 
 # Map of hook distribution, all time
-a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm=T)
-windows(width=11,height=9)
-symbols(x=a[,2],y=a[,1],circles=.0002*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude",ylim=c(-50,25),xlim=c(15,145))
-map(add=T,interior=F,fill=T)
-savePlot(file="map_hooks.png",type="png")
+a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm = T)
+windows(width = 11,height = 11)
+symbols(x = a[,2],y = a[,1],circles = .0002*sqrt(a[,3]),inches = F,bg = 2,fg = 2,xlab = "Longitude",ylab = "Latitude",ylim = c(-50,60), xlim = c(-95, 20))
+map(add = T,interior = F,fill = T)
+savePlot(filename = "map_hooks.png",type = "png")
 
 # Histogram of hooks per set
-hist(dat$hooks, nclass=60,xlab="Hooks per set")   # ask if very large # hooks is okay
-savePlot("Hook histogram.png",type="png")
+hist(dat$hooks, nclass = 60,xlab = "Hooks per set")   # ask if very large # hooks is okay
+savePlot("Hook histogram.png",type = "png")
 
 # Check catch distribtions for outliers. Probably no need to remove.
-table(prepdat$alb)   # ask sets with 990 alb
-table(prepdat$bet)   # ask set with 461 bet
-table(prepdat$yft)   # ask set with 1038
-table(prepdat$sbt)   # ask sets with 102 pbf
-#table(prepdat$ott)   # ask sets with 186
-table(prepdat$swo)   # ask sets with 269
-table(prepdat$mls)   # ask set with 454
-table(prepdat$bum)   # ask set with 130
-table(prepdat$blm)   # ask set with 75 blm
-#table(prepdat$otb)   # ask sets with 150
-#table(prepdat$skj)   # ask set with 143
+str(dat)
+str(dat1)
+table(prepdat$alb)
+table(prepdat$bet)
+table(prepdat$yft)
+table(prepdat$sbt)
+table(prepdat$bft)
+#table(prepdat$ott)
+table(prepdat$swo)
+table(prepdat$mls)
+table(prepdat$bum)
+table(prepdat$blm)
+#table(prepdat$otb)
+#table(prepdat$skj)
 #table(prepdat$sha)   # ask majority of sets (=719211) with 0 sha. Also one set with 663
 #table(prepdat$oth)   # ask sets with 3059! But most (=636641) have 0.
-table(prepdat$hbf,useNA="always")  # 6408 with NA! All in 1973-75
+table(prepdat$hbf,useNA = "always")  # 6408 with NA! All in 1973-75
 
-table(dat$hbf,dat$op_yr,useNA="always")  #
+table(dat$hbf,dat$op_yr,useNA = "always")  #
 table(dat$op_yr,is.na(dat$hbf))  #
 
 # Store some results (aggregated to avoid data concerns) for later reporting.
@@ -198,22 +195,16 @@ savePlot("Setmap_logscale.png",type="png")
 
 # Set density map by 1 degree cell
 a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],log(table(lon,lat)))
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab="Longitude",ylab="Latitude",ylim=c(-55,30),xlim=c(15,150))
-map("worldHires",add=T, interior=F,fill=T)
+windows(width=10,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab="Longitude",ylab="Latitude",ylim=c(-55,70),xlim=c(-100,30))
+map("world",add=T, interior=F,fill=T)
 savePlot("Setmap_logscale_1deg.png",type="png")
 
 a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],tapply(regB,list(lon,lat),mean))
-windows(width=15,height=10)
+windows(width=10,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=2:6,xlab="Longitude",ylab="Latitude")
 map("worldHires",add=T, interior=F,fill=T)
 savePlot("regbet.png",type="png")
-
-a <- tapply(dat$regY,list(dat$lon,dat$lat),mean,na.rm=T)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6,xlab="Longitude",ylab="Latitude")
-map("worldHires",add=T, interior=F,fill=T)
-savePlot("regyft.png",type="png")
 
 # Mean fishing location  by yearqtr
 windows(width=15,height=10);par(mfrow=c(1,2))
@@ -233,28 +224,28 @@ plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat5,dat$op_yr,mean),xlab="yr",
 plot(tapply(dat$lon5,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab="yr",xlab="Mean longitude")
 savePlot("mean_fishing_location2.png",type="png")
 
-write.csv(table(round(dat$hbf,0),dat$regY,useNA="always"),file="hbf by region.csv")
-write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regY,useNA="always"),file="hbf by region by 5 years.csv")
+write.csv(table(round(dat$hbf,0),dat$regB,useNA="always"),file="hbf by region.csv")
+write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA="always"),file="hbf by region by 5 years.csv")
 
 # Plot hbf. Change spatial selection criteria for AO.
 windows(20,14);par(mfrow=c(3,3),mar=c(2,2,2,2))
 for(y in seq(1975,2015,5)) {
-  a <- dat[floor(dat$yrqtr/5)*5==y & dat$lon5 < 125 & dat$lat5 < 25,]
+  a <- dat[floor(dat$yrqtr/5)*5==y & dat$lon5 < 125 & dat$lat5 < 55,]
   a <- tapply(a$hbf,list(a$lon5,a$lat5),mean,na.rm=T)
-  image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",ylim=c(-45,25))
+  image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",ylim=c(-50,50))
   contour(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,add=T,levels=seq(0,26,2))
-  map("worldHires",add=T, interior=F,fill=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+  map("world",add=T, interior=F,fill=T)
   }
 savePlot("mean_HBF.png",type="png")
 qqs <- c(0.125,0.375,0.625,0.875)
 for(qq in 1:4) {
   windows(20,14);par(mfrow=c(3,3),mar=c(2,2,2,2),oma=c(0,0,1,0))
   for(y in seq(1975,2015,5)) {
-    a <- dat[dat$yrqtr %in% (qqs[qq]+y:(y+4)) & dat$lon5 < 125 & dat$lat5 < 25,]
+    a <- dat[dat$yrqtr %in% (qqs[qq]+y:(y+4)) & dat$lon5 < 125 & dat$lat5 < 55,]
     a <- tapply(a$hbf,list(a$lon5,a$lat5),mean,na.rm=T)
-    image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",xlim=c(20,120),ylim=c(-45,25))
+    image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,main=y,zlim=c(6,24),col=heat.colors(30),xlab="Lon",ylab="Lat",xlim=c(-100,20),ylim=c(-55,55))
     contour(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,add=T,levels=seq(0,26,2))
-    map("world",add=T, interior=F,fill=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+    map("world",add=T, interior=F,fill=T)
     }
   title(paste("Quarter",qq),outer=T,line=0)
   savePlot(paste0("mean_HBF_q",qq,".png"),type="png")
@@ -269,14 +260,14 @@ write.csv(table(dat$lat5,dat$lon5,5*floor(dat$yrqtr/5)),file="ops by lat-long-5y
 # data exploration
 #install.packages("rpart")
 library("rpart")
-a <- dat[dat$regY%in% c(2,5),]
+a <- dat[dat$regB%in% c(2),]
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
 a$yftcpue <- a$yft/a$hooks
 a$sbtcpue <- a$sbt/a$hooks
 a$swocpue <- a$swo/a$hooks
-#a$othcpue <- a$oth/a$hooks
+a$bftcpue <- a$bft/a$hooks
 a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
@@ -293,7 +284,7 @@ text(simplemod)
 savePlot("Rpart yft cpue",type="png")
 
 library("randomForest") # These take a long time and use a lot of memory, but are useful.
-simplefor <- randomForest(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
+simplefor <- randomForest(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$bftcpue + a$albcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 print(simplefor)
 windows(width=11,height=7)
 plot(importance)
@@ -344,8 +335,8 @@ str(dat)
 rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
 
 gc()
-allsp <- c("alb","bet","yft","swo","mls","bum","blm","sbt")
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","clid","jnt_clid","lbid_mon","moon","alb","bet","yft","swo", "mls","bum","blm","sbt","Total","dmy","lat","lon","lat5","lon5","regB")
+allsp <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",allsp,"Total","dmy","lat","lon","lat5","lon5","regB","regB1")
 dat <- data.frame(dat)
 str(dat[,allabs])
 

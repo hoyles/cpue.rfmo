@@ -4,6 +4,7 @@
 #' The function prepares the Korean SBT data.
 #' @param dat Input dataset
 #' @param alldat Deprecated.
+#' @param splist List of species codes
 #' @return Modified dataset.
 #'
 dataprep_KRSBT <- function(dat, alldat = F ,splist) {
@@ -36,6 +37,7 @@ dataprep_KRSBT <- function(dat, alldat = F ,splist) {
 #' The function prepares Korean longline data for IO analyses.
 #' @param dat Input dataset
 #' @param alldat Deprecated.
+#' @param splist List of species codes
 #' @return Modified dataset.
 #'
 dataprep_KR <- function(dat, splist) {
@@ -65,7 +67,7 @@ dataprep_KR <- function(dat, splist) {
  return(dat)
 }
 
-#' Prepare Japanese longline data.
+#' Prepare Japanese longline data for the Indian Ocean.
 #'
 #' The function prepares Japanese longline data for IO analyses.
 #' @param dat Input dataset
@@ -73,45 +75,99 @@ dataprep_KR <- function(dat, splist) {
 #' @return Modified dataset.
 #'
 dataprep_JPIO <- function(dat, alldat = T) {
- dat <- dat[order(dat$op_yr, dat$op_mon, dat$op_day), ]
- dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
- dat$moon <- lunar.illumination(dat$dmy)
+  dat <- dat[order(dat$op_yr, dat$op_mon, dat$op_day), ]
+  dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+  dat$moon <- lunar.illumination(dat$dmy)
 
- dat$lat_raw <- dat$lat
- dat$lon_raw <- dat$lon
- dat$lat[dat$latcode == 2] <- (dat$lat_raw[dat$latcode == 2] + 1) * -1
- dat$lon[dat$loncode == 2] <- 360 - (dat$lon_raw[dat$loncode == 2] + 1)
- dat <- dat[dat$lon >= 0, ]
+  dat$lat_raw <- dat$lat
+  dat$lon_raw <- dat$lon
+  dat$lat[dat$latcode == 2] <- (dat$lat_raw[dat$latcode == 2] + 1) * -1
+  dat$lon[dat$loncode == 2] <- 360 - (dat$lon_raw[dat$loncode == 2] + 1)
+  dat <- dat[dat$lon >= 0, ]
 
- dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
- dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
+  dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
+  dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
 
 
- dat$callsign[is.na(dat$callsign)] <- ". "
- dat$callsign[dat$callsign == " "] <- ". "
- dat$vessid <- as.numeric(as.factor(paste(dat$callsign)))
- if (alldat == F) { dat <- dat[dat$vessid != 1, ] }
- dat$vessid <- as.numeric(as.factor(dat$vessid))
- dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
+  dat$callsign[is.na(dat$callsign)] <- ". "
+  dat$callsign[dat$callsign == " "] <- ". "
+  dat$vessid <- as.numeric(as.factor(paste(dat$callsign)))
+  if (alldat == F) { dat <- dat[dat$vessid != 1, ] }
+  dat$vessid <- as.numeric(as.factor(dat$vessid))
+  dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
 
- dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
- dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
- dat$Total <- with(dat, alb + bet + yft + sbt + swo + mls + bum + blm)
- dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
+  dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+  dat$Total <- with(dat, alb + bet + yft + sbt + swo + mls + bum + blm)
+  dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
 
- dat$trip_yr <- as.numeric(substr(as.character(dat$trip_st), 1, 4))
- # dat <- dat[dat$trip_yr > 1945 | is.na(dat$trip_yr), ]
+  dat$trip_yr <- as.numeric(substr(as.character(dat$trip_st), 1, 4))
+  # dat <- dat[dat$trip_yr > 1945 | is.na(dat$trip_yr), ]
 
- dat$tripid <- paste(dat$vessid, dat$trip_st, sep = "_")
- dat$tripid[dat$vessid == 1] <- NA
- dat$tripid[dat$trip_st == 0] <- NA
+  dat$tripid <- paste(dat$vessid, dat$trip_st, sep = "_")
+  dat$tripid[dat$vessid == 1] <- NA
+  dat$tripid[dat$trip_st == 0] <- NA
 
- dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
- # a <- table(dat$tripid) dat$sets_per_trip <- NA dat$sets_per_trip <- a[match(dat$tripid, names(a))] noms <- c('vessid', 'yrqtr', 'latlong',
- # 'op_yr', 'op_mon', 'hbf', 'hooks', 'tripid', 'tripidmon', 'trip_yr', 'moon', 'alb', 'bet', 'yft', 'swo', 'mls', 'bum', 'blm', 'sbt', 'Total',
- # 'Total2', 'dmy', 'lat', 'lon', 'lat5', 'lon5', 'regY', 'regY1', 'regB', 'regB1', 'regA', 'regA1', 'regA2', 'regA3') dat <- dat[, noms]
+  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  # a <- table(dat$tripid) dat$sets_per_trip <- NA dat$sets_per_trip <- a[match(dat$tripid, names(a))] noms <- c('vessid', 'yrqtr', 'latlong',
+  # 'op_yr', 'op_mon', 'hbf', 'hooks', 'tripid', 'tripidmon', 'trip_yr', 'moon', 'alb', 'bet', 'yft', 'swo', 'mls', 'bum', 'blm', 'sbt', 'Total',
+  # 'Total2', 'dmy', 'lat', 'lon', 'lat5', 'lon5', 'regY', 'regY1', 'regB', 'regB1', 'regA', 'regA1', 'regA2', 'regA3') dat <- dat[, noms]
 
- return(dat)
+  return(dat)
+}
+
+#' Prepare Japanese longline data.
+#'
+#' The function prepares Japanese longline data for IO and AO analyses.
+#' @param dat Input dataset
+#' @param alldat If FALSE, removes vessels without vessel ID.
+#' @param region Set the region to AO or IO.
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataprep_JP <- function(dat, alldat = T, region = "IO", splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")) {
+  dat <- dat[order(dat$op_yr, dat$op_mon, dat$op_day), ]
+  dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+  dat$moon <- lunar.illumination(dat$dmy)
+
+  dat$lat_raw <- dat$lat
+  dat$lon_raw <- dat$lon
+
+  if (region == "IO") {
+    dat$lat[dat$latcode == 2] <- (dat$lat_raw[dat$latcode == 2] + 1) * -1
+    dat$lon[dat$loncode == 2] <- 360 - (dat$lon_raw[dat$loncode == 2] + 1)
+    dat <- dat[dat$lon >= 0, ]
+  }
+  if (region == "AO") {
+    dat$lat[dat$latcode == 2] <- (dat$lat_raw[dat$latcode == 2] + 1) * -1
+    dat$lon[dat$loncode == 2] <- (dat$lon_raw[dat$loncode == 2] + 1) * -1
+  }
+
+  dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
+  dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
+
+
+  dat$callsign[is.na(dat$callsign)] <- ". "
+  dat$callsign[dat$callsign == " "] <- ". "
+  dat$vessid <- as.numeric(as.factor(paste(dat$callsign)))
+  if (alldat == F) { dat <- dat[dat$vessid != 1, ] }
+  dat$vessid <- as.numeric(as.factor(dat$vessid))
+  dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
+
+  dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+  dat$Total <- apply(dat[, splist], 1, sum)
+  dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
+
+  dat$trip_yr <- as.numeric(substr(as.character(dat$trip_st), 1, 4))
+  # dat <- dat[dat$trip_yr > 1945 | is.na(dat$trip_yr), ]
+
+  dat$tripid <- paste(dat$vessid, dat$trip_st, sep = "_")
+  dat$tripid[dat$vessid == 1] <- NA
+  dat$tripid[dat$trip_st == 0] <- NA
+
+  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  return(dat)
 }
 
 #' Prepare Japanese longline data.
@@ -199,6 +255,7 @@ dataprep <- function(dat, alldat = F) {
 #' The function prepares Taiwanese longline data for IO analyses.
 #' @param dat Input dataset
 #' @param alldat Not used.
+#' @param region IO or AO.
 #' @return Modified dataset.
 #'
 dataprep_TW <- function(dat, alldat = F, region = "IO") {
@@ -438,16 +495,22 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
 #' The function sets up the Atlantic Ocean regions for datasets with lat5 and lon5 variables.
 #' @param dat Input dataset
 #' @param regB If TRUE, set up regB
+#' @param regB1 If TRUE, set up regB1
 #' @return Modified dataset.
 #'
-setup_AO_regions <- function(dat, regB = F) {
-
+setup_AO_regions <- function(dat, regB = F, regB1 = F) {
   # north of 25N, between 25N and 15S, and south of 15S
   if (regB) {
     dat$regB <- 0
-    dat <- mutate(dat, regB = replace(regB, which(lat5 < 40 & lat5 >= 20 & !is.na(lat5)), 1)) %>%
-      mutate(regB = replace(regB, which(lat5 < 20 & lat5 >= -15 & !is.na(lat5)), 2)) %>%
+    dat <- mutate(dat, regB = replace(regB, which(lat5 < 45 & lat5 >= 25 & lon5 < -5 & !is.na(lat5)), 1)) %>%
+      mutate(regB = replace(regB, which(lat5 < 25 & lat5 >= -15 & !is.na(lat5)), 2)) %>%
       mutate(regB = replace(regB, which(lat5 < -15 & lat5 >= -35& !is.na(lat5)), 3))
+  }
+  if (regB1) {
+    dat$regB1 <- 0
+    dat <- mutate(dat, regB1 = replace(regB1, which(lat5 < 40 & lat5 >= 20 & lon5 < -5 & !is.na(lat5)), 1)) %>%
+      mutate(regB1 = replace(regB1, which(lat5 < 20 & lat5 >= -20 & !is.na(lat5)), 2)) %>%
+      mutate(regB1 = replace(regB1, which(lat5 < -20 & lat5 >= -35& !is.na(lat5)), 3))
   }
 
   return(dat)

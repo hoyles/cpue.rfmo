@@ -11,7 +11,7 @@
 #' @param r Deprecated, not used.
 #'
 boxplots_CL <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, lat5 = F, regtype = regtype, r = r) {
-    dev.new(30, 20)
+    windows(30, 20)
     par(mfrow = c(2, 3), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
     wd = table(dat[, cl])
     boxplot(dat$op_yr ~ dat[, cl], width = wd, main = "Year", outline = outL, pars = list(boxwex = 1))
@@ -43,7 +43,7 @@ boxplots_CL <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, lat5 =
 #' @param r Deprecated, not used.
 #'
 boxplots_CL_bean <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, lat5 = F, regtype = regtype, r = r) {
-    dev.new(30, 20)
+    windows(30, 20)
     par(mfrow = c(2, 3), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
     wd = table(dat[, cl])
     beanplot(dat$op_yr ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), ylim = c(min(dat$op_yr, na.rm = T) - 0.5, max(dat$op_yr, na.rm = T) + 0.5), log = "",
@@ -83,7 +83,7 @@ boxplots_CL_bean <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, l
 boxplots_PCA <- function(dat, nPCA = 3, ti = "", dohbf = T, lat5 = F, regtype = "regY", r = r) {
     for (ppc in paste0("PC", 1:nPCA)) {
         pp <- with(dat, get(ppc))
-        dev.new(width = 30, height = 20)
+        windows(width = 30, height = 20)
         par(mfrow = c(2, 3))
         boxplot(pp ~ yrqtr, data = dat, main = "YQ")
         if (lat5) {
@@ -116,13 +116,13 @@ boxplots_PCA <- function(dat, nPCA = 3, ti = "", dohbf = T, lat5 = F, regtype = 
 #'
 boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
     if (nsp == 8)
-        dev.new(30, 20)
+        windows(30, 20)
     par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
     if (nsp == 12)
-        dev.new(30, 20)
+        windows(30, 20)
     par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
     if (nsp == 13)
-        dev.new(30, 20)
+        windows(30, 20)
     par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
     wd = table(dat[, cl])
     for (sp in allsp) {
@@ -146,15 +146,15 @@ boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regty
 #'
 boxplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
     if (nsp == 8) {
-        dev.new(30, 20)
+        windows(30, 20)
         par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
     }
     if (nsp == 12) {
-        dev.new(30, 20)
+        windows(30, 20)
         par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
     }
     if (nsp == 13) {
-        dev.new(30, 20)
+        windows(30, 20)
         par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
     }
     wd = table(dat[, cl])
@@ -185,15 +185,15 @@ boxplots_spPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype =
         if (length(bk) == length(unique(bk)))
             ppq <- cut(pp, breaks = bk) else ppq <- cut(pp, breaks = 11)
         if (nsp == 8) {
-            dev.new(30, 20)
+            windows(30, 20)
             par(mfrow = c(2, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
         }
         if (nsp == 12) {
-            dev.new(30, 20)
+            windows(30, 20)
             par(mfrow = c(3, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
         }
         if (nsp == 13) {
-            dev.new(30, 20)
+            windows(30, 20)
             par(mfrow = c(3, 5), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
         }
         for (sp in allsp) {
@@ -221,15 +221,15 @@ boxplots_spTPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype 
         pp <- with(dat, get(ppc))
         ppq <- cut(pp, breaks = quantile(pp, seq(0, 1, length.out = 11), include.lowest = TRUE))
         if (nsp == 8) {
-            dev.new(30, 20)
+            windows(30, 20)
             par(mfrow = c(2, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
         }
         if (nsp == 12) {
-            dev.new(30, 20)
+            windows(30, 20)
             par(mfrow = c(3, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
         }
         if (nsp == 13) {
-            dev.new(30, 20)
+            windows(30, 20)
             par(mfrow = c(3, 5), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
         }
         for (sp in allsp) {
@@ -254,7 +254,7 @@ boxplots_spTPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype 
 boxplots_TPCA <- function(dat, nPCA = 6, ti = "", dohbf = T, lat5 = F, regtype = "regY", r = r) {
     for (ppc in paste0("TPC", 1:nPCA)) {
         pp <- with(dat, get(ppc))
-        dev.new(20, 14)
+        windows(20, 14)
         par(mfrow = c(2, 4), oma = c(0, 0, 2, 0))
         boxplot(pp ~ yrqtr, data = dat, main = "YQ")
         if (lat5) {
@@ -284,7 +284,7 @@ boxplots_TPCA <- function(dat, nPCA = 6, ti = "", dohbf = T, lat5 = F, regtype =
 #' @param r Deprecated, not used.
 #'
 mapPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r) {
-    dev.new(20, 14)
+    windows(20, 14)
     par(mfrow = c(2, 2))
     for (ppc in paste0("PC", 1:nPCA)) {
         pp <- with(ddd, get(ppc))
@@ -315,7 +315,7 @@ mapPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r) {
 #' @param r Deprecated, not used.
 #'
 mapTPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r) {
-    dev.new(20, 14)
+    windows(20, 14)
     par(mfrow = c(2, 2))
     for (ppc in paste0("TPC", 1:nPCA)) {
         pp <- with(ddd, get(ppc))
@@ -349,15 +349,15 @@ mapTPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r) {
 #'
 beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
     if (nsp == 8) {
-        dev.new(30, 20)
+        windows(30, 20)
         par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
     }
     if (nsp == 12) {
-        dev.new(30, 20)
+        windows(30, 20)
         par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
     }
     if (nsp == 13) {
-        dev.new(30, 20)
+        windows(30, 20)
         par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
     }
     wd = table(dat[, cl])
@@ -384,11 +384,11 @@ beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
 #'
 map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "regY", ncl, r = r) {
     if (ncl <= 4) {
-        dev.new(20, 14)
+        windows(20, 14)
         par(mfrow = c(2, 2), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
     }
     if (ncl %in% c(5, 6)) {
-        dev.new(20, 20)
+        windows(20, 20)
         par(mfrow = c(3, 2), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
     }
     for (clx in 1:ncl) {

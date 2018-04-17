@@ -4,12 +4,14 @@
 \alias{dataprep_TW}
 \title{Prepare Taiwanese longline data.}
 \usage{
-dataprep_TW(dat, alldat = F)
+dataprep_TW(dat, alldat = F, region = "IO")
 }
 \arguments{
 \item{dat}{Input dataset}
 
 \item{alldat}{Not used.}
+
+\item{region}{IO or AO.}
 }
 \value{
 Modified dataset.

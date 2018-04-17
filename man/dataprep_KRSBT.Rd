@@ -10,6 +10,8 @@ dataprep_KRSBT(dat, alldat = F, splist)
 \item{dat}{Input dataset}
 
 \item{alldat}{Deprecated.}
+
+\item{splist}{List of species codes}
 }
 \value{
 Modified dataset.

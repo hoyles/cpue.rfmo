@@ -47,132 +47,177 @@ plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY") {
 #' @param tcol Text colour.
 #'
 plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", newm = T, lwdm = 3, axes = T, tcol = "red") {
-    lims <- uselims
-    if (newm) {
-        plot(1, 1, yaxt = "n", xaxt = "n", type = "n", xlim = c(lims[1], lims[2]), ylim = c(lims[3], lims[4]), ylab = "", xlab = "", bg = "lightblue")
-        polygon(c(lims[1] - 5, lims[2] + 5, lims[2] + 5, lims[1] - 5), c(lims[3] - 5, lims[3] - 5, lims[4] + 5, lims[4] + 5), col = "lightblue")
-    }
-    if (sp == "ALB") {
-        lines(c(34.5, 44.2), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(49, 120), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
-        xoffset <- 5
-        yoffset <- 2.5
-        text(115 + xoffset, -11 - yoffset, "N", col = tcol, cex = 1.5)
-        text(115 + xoffset, -40 - yoffset, "S", col = tcol, cex = 1.5)
-    }
-    if (sp %in% c("YFT")) {
-        lines(c(20, 120), c(-40, -40), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(20, 20), c(-40, -35), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 40), c(-40, -30), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 40), c(-10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(60, 60), c(-30, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(75, 75), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(120, 120), c(-40, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 60), c(-30, -30), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(60, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 60), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        text(67.5, 15, "R1", col = tcol, cex = 1.5)
-        text(57.5, -2.5, "R2", col = tcol, cex = 1.5)
-        text(52.5, -27.5, "R3", col = tcol, cex = 1.5)
-        text(82.5, -27.5, "R4", col = tcol, cex = 1.5)
-        text(85, -2.5, "R5", col = tcol, cex = 1.5)
-        text(90, 15, "R6", col = tcol, cex = 1.5)
-    }
-    if (sp %in% c("YFT2")) {
-        lines(c(20, 120), c(-40, -40), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(20, 20), c(-40, -35), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 40), c(-40, -30), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 40), c(-10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(60, 60), c(-30, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(75, 75), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(120, 120), c(-40, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 60), c(-30, -30), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(60, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 60), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 75), c(0, 0), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        text(62.5, 17.5, "R1", col = tcol, cex = 1.5)
-        text(57.5, 2.5, "R2N", col = tcol, cex = 1.5)
-        text(57.5, -7.5, "R2S", col = tcol, cex = 1.5)
-        text(52.5, -27.5, "R3", col = tcol, cex = 1.5)
-        text(82.5, -27.5, "R4", col = tcol, cex = 1.5)
-        text(85, -2.5, "R5", col = tcol, cex = 1.5)
-        text(90, 17.5, "R6", col = tcol, cex = 1.5)
-    }
-    if (sp %in% c("BET")) {
-        lines(c(20, 120), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(80, 80), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(120, 120), c(-35, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(47, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(35, 45), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
-        # lines(c(45, 45), c( -20, -15), lwd = lwdm, col = 'slate grey', lty = 1)
-        lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        text(65, 0, "R1", col = tcol, cex = 1.5)
-        text(90, 0, "R2", col = tcol, cex = 1.5)
-        text(70, -30, "R3", col = tcol, cex = 1.5)
-    }
-    if (sp %in% c("BET3")) {
-        lines(c(20, 120), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(80, 80), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(120, 120), c(-35, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(47, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(35, 45), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
-        # lines(c(45, 45), c( -20, -15), lwd = lwdm, col = 'slate grey', lty = 1)
-        lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 80), c(0, 0), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        text(57.5, 2.5, "R1N", col = tcol, cex = 1.5)
-        text(67.5, -2.5, "R1S", col = tcol, cex = 1.5)
-        text(87.5, -2.5, "R2", col = tcol, cex = 1.5)
-        text(72.5, -27.5, "R3", col = tcol, cex = 1.5)
-    }
-    if (sp %in% c("BETcore", "YFTcore")) {
-        lines(c(20, 140), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(20, 125.5), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(20, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-        lines(c(80, 80), c(10, -15), lwd = lwdm, col = "slate grey", lty = 1)
-        xoffset <- 5
-        yoffset <- 2.5
-        text(115 + xoffset, -11 - yoffset, "N", col = tcol, cex = 1.5)
-        text(115 + xoffset, -40 - yoffset, "S", col = tcol, cex = 1.5)
-    }
-    map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
-    if (axes) {
-        box(lwd = 3)
-        axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)
-        axis(2, at = seq(lims[3], lims[4], by = 5), labels = F)
-        latseq <- seq(lims[3] + 10, lims[4] - 10, by = 10)
-        latseq2 <- as.character(latseq)
-        lonseq <- seq(lims[1] + 20, lims[2] - 10, by = 20)
-        lonseq2 <- as.character(lonseq)
-        latseq2[latseq < 0] <- paste(abs(latseq[latseq < 0]), "S", sep = "")
-        latseq2[latseq > 0] <- paste(latseq[latseq > 0], "N", sep = "")
-        lonseq2[lonseq < 180] <- paste(lonseq2[lonseq < 180], "E", sep = "")
-        lonseq2[lonseq > 180] <- paste(360 - lonseq[lonseq > 180], "W", sep = "")
-        axis(2, at = latseq, labels = latseq2, cex.axis = 0.75)
-        axis(1, at = lonseq, labels = lonseq2, cex.axis = 0.75)
-    }
-    mtext(side = 3, line = 0.5, plot_title, font = 2, cex = 1.1)
+  lims <- uselims
+  if (newm) {
+    plot(1, 1, yaxt = "n", xaxt = "n", type = "n", xlim = c(lims[1], lims[2]), ylim = c(lims[3], lims[4]), ylab = "", xlab = "", bg = "lightblue")
+    polygon(c(lims[1] - 5, lims[2] + 5, lims[2] + 5, lims[1] - 5), c(lims[3] - 5, lims[3] - 5, lims[4] + 5, lims[4] + 5), col = "lightblue")
+  }
+  if (sp == "ALB") {
+    lines(c(34.5, 44.2), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(49, 120), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
+    xoffset <- 5
+    yoffset <- 2.5
+    text(115 + xoffset, -11 - yoffset, "N", col = tcol, cex = 1.5)
+    text(115 + xoffset, -40 - yoffset, "S", col = tcol, cex = 1.5)
+  }
+  if (sp %in% c("YFT")) {
+    lines(c(20, 120), c(-40, -40), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(20, 20), c(-40, -35), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 40), c(-40, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 40), c(-10, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(60, 60), c(-30, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(75, 75), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-40, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 60), c(-30, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(60, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 60), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    text(67.5, 15, "R1", col = tcol, cex = 1.5)
+    text(57.5, -2.5, "R2", col = tcol, cex = 1.5)
+    text(52.5, -27.5, "R3", col = tcol, cex = 1.5)
+    text(82.5, -27.5, "R4", col = tcol, cex = 1.5)
+    text(85, -2.5, "R5", col = tcol, cex = 1.5)
+    text(90, 15, "R6", col = tcol, cex = 1.5)
+  }
+  if (sp %in% c("YFT2")) {
+    lines(c(20, 120), c(-40, -40), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(20, 20), c(-40, -35), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 40), c(-40, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 40), c(-10, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(60, 60), c(-30, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(75, 75), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-40, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 60), c(-30, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(60, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 60), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 75), c(0, 0), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    text(62.5, 17.5, "R1", col = tcol, cex = 1.5)
+    text(57.5, 2.5, "R2N", col = tcol, cex = 1.5)
+    text(57.5, -7.5, "R2S", col = tcol, cex = 1.5)
+    text(52.5, -27.5, "R3", col = tcol, cex = 1.5)
+    text(82.5, -27.5, "R4", col = tcol, cex = 1.5)
+    text(85, -2.5, "R5", col = tcol, cex = 1.5)
+    text(90, 17.5, "R6", col = tcol, cex = 1.5)
+  }
+  if (sp %in% c("BET")) {
+    lines(c(20, 120), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(80, 80), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-35, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(47, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(35, 45), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
+    # lines(c(45, 45), c( -20, -15), lwd = lwdm, col = 'slate grey', lty = 1)
+    lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    text(65, 0, "R1", col = tcol, cex = 1.5)
+    text(90, 0, "R2", col = tcol, cex = 1.5)
+    text(70, -30, "R3", col = tcol, cex = 1.5)
+  }
+  if (sp %in% c("BET3")) {
+    lines(c(20, 120), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(80, 80), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-35, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(47, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(35, 45), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
+    # lines(c(45, 45), c( -20, -15), lwd = lwdm, col = 'slate grey', lty = 1)
+    lines(c(110, 130), c(-10, -10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 80), c(0, 0), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    text(57.5, 2.5, "R1N", col = tcol, cex = 1.5)
+    text(67.5, -2.5, "R1S", col = tcol, cex = 1.5)
+    text(87.5, -2.5, "R2", col = tcol, cex = 1.5)
+    text(72.5, -27.5, "R3", col = tcol, cex = 1.5)
+  }
+  if (sp %in% c("BETcore", "YFTcore")) {
+    lines(c(20, 140), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(20, 125.5), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(20, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(80, 80), c(10, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    xoffset <- 5
+    yoffset <- 2.5
+    text(115 + xoffset, -11 - yoffset, "N", col = tcol, cex = 1.5)
+    text(115 + xoffset, -40 - yoffset, "S", col = tcol, cex = 1.5)
+  }
+  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
+  if (axes) {
+    box(lwd = 3)
+    axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)
+    axis(2, at = seq(lims[3], lims[4], by = 5), labels = F)
+    latseq <- seq(lims[3] + 10, lims[4] - 10, by = 10)
+    latseq2 <- as.character(latseq)
+    lonseq <- seq(lims[1] + 20, lims[2] - 10, by = 20)
+    lonseq2 <- as.character(lonseq)
+    latseq2[latseq < 0] <- paste(abs(latseq[latseq < 0]), "S", sep = "")
+    latseq2[latseq > 0] <- paste(latseq[latseq > 0], "N", sep = "")
+    lonseq2[lonseq < 180] <- paste(lonseq2[lonseq < 180], "E", sep = "")
+    lonseq2[lonseq > 180] <- paste(360 - lonseq[lonseq > 180], "W", sep = "")
+    axis(2, at = latseq, labels = latseq2, cex.axis = 0.75)
+    axis(1, at = lonseq, labels = lonseq2, cex.axis = 0.75)
+  }
+  mtext(side = 3, line = 0.5, plot_title, font = 2, cex = 1.1)
+}
+
+#' Map of the Atlantic Ocean.
+#'
+#' Function to make a map of the Atlantic Ocean, with regional boundaries.
+#' @param plot_title Plot title.
+#' @param uselims Latitudes and Longitudes for the edges of the map.
+#' @param sp Region type code for the region boundaries.
+#' @param newm If TRUE, create a new plot, otherwise add boundaries etc to existing plot.
+#' @param lwdm Line width for boundaries.
+#' @param axes If TRUE, create x and y axes.
+#' @param tcol Text colour.
+#'
+plot_AO <- function(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "BET", newm = T, lwdm = 3, axes = T, tcol = "red") {
+  lims <- uselims
+  if (newm) {
+    plot(1, 1, yaxt = "n", xaxt = "n", type = "n", xlim = c(lims[1], lims[2]), ylim = c(lims[3], lims[4]), ylab = "", xlab = "", bg = "lightblue")
+    polygon(c(lims[1] - 5, lims[2] + 5, lims[2] + 5, lims[1] - 5), c(lims[3] - 5, lims[3] - 5, lims[4] + 5, lims[4] + 5), col = "lightblue")
+  }
+  if (sp %in% c("BET")) {
+    lines(c(-80, -10), c(45, 45), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(-100, -10), c(25, 25), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(-50, 20), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(-60, 20), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
+    text(-30, 35, "R1", col = tcol, cex = 1.5)
+    text(-20, 0, "R2", col = tcol, cex = 1.5)
+    text(-10, -25, "R3", col = tcol, cex = 1.5)
+  }
+  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
+  if (axes) {
+    box(lwd = 3)
+    axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)
+    axis(2, at = seq(lims[3], lims[4], by = 5), labels = F)
+    latseq <- seq(lims[3] + 10, lims[4] - 10, by = 10)
+    latseq2 <- as.character(latseq)
+    lonseq <- seq(lims[1] + 20, lims[2] - 10, by = 20)
+    lonseq2 <- as.character(lonseq)
+    latseq2[latseq < 0] <- paste(abs(latseq[latseq < 0]), "S", sep = "")
+    latseq2[latseq > 0] <- paste(latseq[latseq > 0], "N", sep = "")
+    lonseq2[lonseq < 180] <- paste(lonseq2[lonseq < 180], "E", sep = "")
+    lonseq2[lonseq > 180] <- paste(360 - lonseq[lonseq > 180], "W", sep = "")
+    axis(2, at = latseq, labels = latseq2, cex.axis = 0.75)
+    axis(1, at = lonseq, labels = lonseq2, cex.axis = 0.75)
+  }
+  mtext(side = 3, line = 0.5, plot_title, font = 2, cex = 1.1)
 }
 
 #' Make effects plot for a glm object.
@@ -194,7 +239,7 @@ plot_effects <- function(model, indat, addmain = F, addbranch = F, addalb = F, a
     nfigs <- 6 + addmain + addbranch + addalb + addother
     mf <- switch(nfigs - 5, c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    dev.new(height = hw[1], width = hw[2])
+    windows(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
     pr <- pred$fit
     prse <- pred$se.fit
@@ -295,7 +340,7 @@ plot_effects <- function(model, indat, addmain = F, addbranch = F, addalb = F, a
 #'
 plot.agg.slope.ratio <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2", fname = NULL, addrate = T) {
     # agg goes first, op goes second
-    dev.new(height = 16, width = 14)
+    windows(height = 16, width = 14)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     myr <- aggyr[match(opyr, aggyr)]
     coefs1 <- coefs1[match(opyr, aggyr)]
@@ -330,7 +375,7 @@ plot.agg.slope.ratio <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coef
 #'
 plot.agg.slope.ratio_2000 <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2") {
     # agg goes first, op goes second
-    dev.new(height = 14, width = 12)
+    windows(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     myr <- aggyr[match(opyr, aggyr)]
     coefs1 <- coefs1[match(opyr, aggyr)]
@@ -365,7 +410,7 @@ plot.res <- function(summ1, summ2, name1, name2) {
     coefs2 <- get.summ.coefs(summ2, nyrs)
     yrs <- rownames(summ1$coefficients)[grep("yrqtr", rownames(summ1$coefficients))]
     yrs <- c(1980.25, as.numeric(substring(yrs, 17)))
-    dev.new(height = 13, width = 11)
+    windows(height = 13, width = 11)
     par(mfrow = c(2, 1), mar = c(5, 4, 1, 2))
     plot.slope.ratio(coefs1, coefs2, yrs, "")
     plot(yrs, coefs1, type = "l", ylab = "Relative abundance estimate", xlab = "Year", ylim = c(0, 2.5))
@@ -383,7 +428,7 @@ plot.res <- function(summ1, summ2, name1, name2) {
 #'
 plot.slope.ratio <- function(coefs1, coefs2, yr, titl) {
     # base goes first, boat goes second
-    dev.new(height = 14, width = 12)
+    windows(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     plot(yr, coefs1/coefs2, xlim = c(1976, 2010), ylim = c(0, 2), xlab = "Year", ylab = "Ratio of coefficients")
     title(main = titl, cex.main = 1.2)
@@ -409,7 +454,7 @@ plot.slope.ratio <- function(coefs1, coefs2, yr, titl) {
 #'
 plot.slope.ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
     # base goes first, boat goes second
-    dev.new(height = 14, width = 12)
+    windows(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     yy <- c(yr1, yr2)
     yr <- seq(min(yy), max(yy), 0.25)
@@ -439,12 +484,15 @@ plot.slope.ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
 #' @param brk Transition levels for the image colours.
 #' @param brk2 Transition levels for the contour lines.
 #' @param ti Title of the plot.
+#' @param bgc Background color of the plot, defaults to grey.
 #'
-plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "") {
+plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", bgc = "grey") {
     plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
     indat <- cbind(indat, vbl)
     indat <- indat[indat$lon <= 140, ]
     a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lon, lat), sum))
+    usr <- par('usr')
+    rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, levels = brk2)
     map(database = "world", add = T, interior = F, fill = T)
@@ -553,7 +601,7 @@ plot_effects_IO <- function(model, indat, dovess = T, addcl = F, addpca = F, ti 
     nfigs = 3 + 2 * dovess + docl + addpca + dohbf
     mf <- switch(nfigs - 2, c(2, 2), c(2, 2), c(2, 3), c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    dev.new(height = hw[1], width = hw[2])
+    windows(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
 
     coefs <- glm.coefs(model, indat)
@@ -671,7 +719,7 @@ plot_effects_IO_old <- function(model, indat, dovess = T, addcl = F, addpca = F,
         nfigs <- 5 + addpca
     mf <- switch(nfigs - 4, c(2, 3), c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    dev.new(height = hw[1], width = hw[2])
+    windows(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
     pr <- pred$fit
     prse <- pred$se.fit
@@ -817,7 +865,7 @@ plot_effects_IOx <- function(model, indat, dovess = T, addcl = F, addpca = F, ti
         nfigs <- 5 + addpca
     mf <- switch(nfigs - 4, c(2, 3), c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    dev.new(height = hw[1], width = hw[2])
+    windows(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
     pr <- pred$fit
     prse <- pred$se.fit

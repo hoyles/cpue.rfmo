@@ -4,7 +4,8 @@
 \alias{dataclean_JPIO}
 \title{Clean data.}
 \usage{
-dataclean_JPIO(dat, checktg = F, allHBF = F)
+dataclean_JPIO(dat, checktg = F, allHBF = F, splist = c("bft", "sbt",
+  "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "shk"))
 }
 \arguments{
 \item{dat}{Input dataset}
@@ -12,6 +13,8 @@ dataclean_JPIO(dat, checktg = F, allHBF = F)
 \item{checktg}{If TRUE, remove effort identified as not targetng tuna. Not generally used.}
 
 \item{allHBF}{Deprecated.}
+
+\item{splist}{List of species codes}
 }
 \value{
 Modified dataset.

@@ -127,7 +127,7 @@ PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp) {
     setpcs <- pcs[match(dat2$TRIP_NUM, tpagg$TRIP_NUM), ]
     eigtp = summary(pca)$sdev^2  # get Eigenvalue
     OCtesttp = nScree(eigtp)  # run Optimal Coordinates test
-    dev.new()
+   windows()
     plotnScree(OCtesttp)
     par(col = "black")
     savePlot(Screeplotname, type = "png")
@@ -158,7 +158,7 @@ PCA_by_set <- function(datr, Screeplotname = "screeplot set", allsp) {
     pcs <- data.frame(pr_pca[, 1:nspec])
     eig = summary(pca)$sdev^2  # get Eigenvalue
     OCtest = nScree(eig)  # run Optimal Coordinates test
-    dev.new()
+    windows()
     plotnScree(OCtest)
     par(col = "black")
     savePlot(Screeplotname, type = "png")
@@ -178,14 +178,13 @@ PCA_by_set <- function(datr, Screeplotname = "screeplot set", allsp) {
 #' @param tripid Name of variable used to aggreate for trip-level clustering.
 #' @param fname File name header for saving plots.
 #' @param regtype Region type code.
-#' @param allsp All the species codes.
 #' @return A list of four objects: d, the normalised trip-level dataset; fit, the hclust results; clarax, the clara trip level results; setdat, all the clustering results, as additional columns added to the input dataset.
 #'
-make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid = "tripid", fname = "", regtype = "regY", allsp) {
+make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid = "tripid", fname = "", regtype = "regY") {
     setdat$TRIP_NUM <- as.vector(setdat[, tripid])
-    spec_dat <- setdat[, allsp]  #extract catch composition
+    spec_dat <- setdat[, spp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
-    nspec <- length(allsp)
+    nspec <- length(spp)
     dat2 <- setdat[spec_dat$sum > 0, ]
     mmult_dat <- spec_dat[spec_dat$sum > 0, ]
     clus_dat <- mmult_dat[, 1:nspec]/mmult_dat$sum  # raw proportions
@@ -208,7 +207,7 @@ make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid 
     if (setclust) {
         dset <- dist(aset, method = "euclidean")  # distance matrix
         fitset <- hclust(dset, method = "ward.D")
-        dev.new()
+        windows()
         plot(fitset, labels = FALSE, hang = -1, main = paste(titx, "set"))  # display dendogram  #looks like 3 (or 4)
         grpset <- cutree(fitset, k = ncl)  # cut tree into ncl clusters
         print(table(grpset))

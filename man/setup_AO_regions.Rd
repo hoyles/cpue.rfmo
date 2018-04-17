@@ -4,12 +4,14 @@
 \alias{setup_AO_regions}
 \title{Set up Atlantic Ocean regions}
 \usage{
-setup_AO_regions(dat, regB = F)
+setup_AO_regions(dat, regB = F, regB1 = F)
 }
 \arguments{
 \item{dat}{Input dataset}
 
 \item{regB}{If TRUE, set up regB}
+
+\item{regB1}{If TRUE, set up regB1}
 }
 \value{
 Modified dataset.

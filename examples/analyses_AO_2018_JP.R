@@ -321,12 +321,13 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_CPUE/"
+projdir <- "~/ICCAT/2018_Bigeye/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 clusdir <- paste0(jpdir, "clustering/")
+dir.create(clusdir)
 setwd(clusdir)
 load(file=paste0(jalysis_dir,"JPdat.RData"))
 str(dat)

@@ -115,16 +115,23 @@ boxplots_PCA <- function(dat, nPCA = 3, ti = "", dohbf = T, lat5 = F, regtype = 
 #' @param allsp Vector of species to use in the cluster plots.
 #'
 boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
-    if (nsp == 8)
-        windows(30, 20)
+  if (nsp == 8) {
+    windows(30, 20)
     par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
-    if (nsp == 12)
-        windows(30, 20)
+  }
+  if (nsp %in% 9) {
+    windows(30, 20)
+    par(mfrow = c(3, 3), mar = c(3, 3, 3, 3))
+  }
+  if (nsp %in% 10:12) {
+    windows(30, 20)
     par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
-    if (nsp == 13)
-        windows(30, 20)
+  }
+  if (nsp %in% 13:15) {
+    windows(30, 20)
     par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
-    wd = table(dat[, cl])
+  }
+  wd = table(dat[, cl])
     for (sp in allsp) {
         boxplot(dat[, sp]/dat$hooks ~ dat[, cl], width = wd, main = sp, outline = outL, pars = list(boxwex = 1))
     }
@@ -145,19 +152,23 @@ boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regty
 #' @param allsp Vector of species to use in the cluster plots.
 #'
 boxplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
-    if (nsp == 8) {
-        windows(30, 20)
-        par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
-    }
-    if (nsp == 12) {
-        windows(30, 20)
-        par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
-    }
-    if (nsp == 13) {
-        windows(30, 20)
-        par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
-    }
-    wd = table(dat[, cl])
+  if (nsp == 8) {
+    windows(30, 20)
+    par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
+  }
+  if (nsp %in% 9) {
+    windows(30, 20)
+    par(mfrow = c(3, 3), mar = c(3, 3, 3, 3))
+  }
+  if (nsp %in% 10:12) {
+    windows(30, 20)
+    par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
+  }
+  if (nsp %in% 13:15) {
+    windows(30, 20)
+    par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
+  }
+  wd = table(dat[, cl])
     for (sp in allsp) {
         boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = sp, outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
     }
@@ -185,16 +196,20 @@ boxplots_spPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype =
         if (length(bk) == length(unique(bk)))
             ppq <- cut(pp, breaks = bk) else ppq <- cut(pp, breaks = 11)
         if (nsp == 8) {
-            windows(30, 20)
-            par(mfrow = c(2, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
+          windows(30, 20)
+          par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
         }
-        if (nsp == 12) {
-            windows(30, 20)
-            par(mfrow = c(3, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
+        if (nsp %in% 9) {
+          windows(30, 20)
+          par(mfrow = c(3, 3), mar = c(3, 3, 3, 3))
         }
-        if (nsp == 13) {
-            windows(30, 20)
-            par(mfrow = c(3, 5), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
+        if (nsp %in% 10:12) {
+          windows(30, 20)
+          par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
+        }
+        if (nsp %in% 13:15) {
+          windows(30, 20)
+          par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
         }
         for (sp in allsp) {
             boxplot(dat[, sp]/dat$Total ~ ppq, main = sp, outline = outL, ylim = c(0, 1))
@@ -221,16 +236,20 @@ boxplots_spTPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype 
         pp <- with(dat, get(ppc))
         ppq <- cut(pp, breaks = quantile(pp, seq(0, 1, length.out = 11), include.lowest = TRUE))
         if (nsp == 8) {
-            windows(30, 20)
-            par(mfrow = c(2, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
+          windows(30, 20)
+          par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
         }
-        if (nsp == 12) {
-            windows(30, 20)
-            par(mfrow = c(3, 4), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
+        if (nsp %in% 9) {
+          windows(30, 20)
+          par(mfrow = c(3, 3), mar = c(3, 3, 3, 3))
         }
-        if (nsp == 13) {
-            windows(30, 20)
-            par(mfrow = c(3, 5), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
+        if (nsp %in% 10:12) {
+          windows(30, 20)
+          par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
+        }
+        if (nsp %in% 13:15) {
+          windows(30, 20)
+          par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
         }
         for (sp in allsp) {
             boxplot(dat[, sp]/dat$Total ~ ppq, main = sp, outline = outL, ylim = c(0, 1))
@@ -352,12 +371,16 @@ beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
         windows(30, 20)
         par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
     }
-    if (nsp == 12) {
-        windows(30, 20)
-        par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
-    }
-    if (nsp == 13) {
-        windows(30, 20)
+  if (nsp %in% 9) {
+    windows(30, 20)
+    par(mfrow = c(3, 3), mar = c(3, 3, 3, 3))
+  }
+  if (nsp %in% 10:12) {
+    windows(30, 20)
+    par(mfrow = c(3, 4), mar = c(3, 3, 3, 3))
+  }
+  if (nsp %in% 13:15) {
+    windows(30, 20)
         par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
     }
     wd = table(dat[, cl])

@@ -1,10 +1,15 @@
-projdir <- "~/ICCAT/2018_CPUE/"
+projdir <- "~/ICCAT/2018_Bigeye/"
 twdir <- paste0(projdir, "TW/")
-datadir1 <- paste0(twdir, "data/catch_effort/")
+datadir1 <- paste0(twdir, "data/")
 twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-setwd(jalysis_dir)
+dir.create(twdir)
+dir.create(datadir1)
+dir.create(twalysis_dir)
+dir.create(twfigs)
+
+setwd(twalysis_dir)
 library("date")
 library("splines")
 library("maps")
@@ -19,7 +24,7 @@ library("dplyr")
 library("dtplyr")
 library("tm")
 
-install.packages("devtools")
+#install.packages("devtools")
 library(devtools)
 # This new library replaces the 'support functions.r' file.
 install_github("hoyles/cpue.rfmo")
@@ -32,34 +37,40 @@ library("cpue.rfmo")
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 
-nms2 <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo",
-          "mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w",
-          "mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target",
-          "NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd",
-          "op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
-
+nms2 <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
 wdths2 <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
 cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
+cbind(nms2,wdths2,cc2)
+sum(wdths2)
+
+nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
+wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
+cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccc"
+sum(wdths2)
+length(wdths2)
+
 
 # Check data loading
-a <- read_fwf(file=paste0(datadir,"/LOG2005.IND"),fwf_widths(wdths2),col_types=cc2,n_max=20);gc()
+a <- read_fwf(file=paste0(datadir1,"/LOG1981A.ATL"),fwf_widths(wdths2),col_types=cc2,n_max=20);gc()
 names(a) <- nms2
+a <- data.frame(a)
 a
 cbind(nms2,wdths2,cumsum(c(wdths2)),unlist(strsplit(cc2,"")))
 
 # Load data
-yy <- 1979:2016;yy <- paste0("/LOG",yy,".IND")
+yy <- 1981:2017;yy <- paste0("/LOG",yy,"A.ATL")
 readfun1 <- function(ff) {
-  read_fwf(paste0(datadir,ff),fwf_widths(wdths2),col_types=cc2)
+  read_fwf(paste0(datadir1,ff),fwf_widths(wdths2),col_types=cc2)
 }
 a <- lapply(yy,readfun1)
 system.time({ dat1 <- ldply(a, data.frame) })
 names(dat1) <- nms2
 save(dat1,file="dat1.RData")
-load(paste0(twylisis_dir, "dat1.RData"))
+load(paste0(twalysis_dir, "dat1.RData"))
 
 # Check data
 str(dat1)
+summary(dat1)
 table(dat1$op_yr)
 table(is.na(dat1$embark_yr),dat1$op_yr)
 table(is.na(dat1$debark_yr),dat1$op_yr)
@@ -71,14 +82,20 @@ table(is.na(dat1$hbf),dat1$op_yr)
 table(dat1$op_yr,dat1$op_yr==1)
 
 # Prepare data
-prepdat1 <- dataprep_TW(dat1)
-prepdat <- setup_AO_regions(prepdat1,  regB=T)
+prepdat1 <- dataprep_TW(dat1, region = "AO")
+prepdat <- setup_AO_regions(prepdat1,  regB = T)
 datold <- dataclean_TW(prepdat)
-save(datold,file="TWdat_old.RData")
-dat <- dataclean_TW(prepdat,rmssp=T)
-save(dat,file="TWdat.RData")
-load(file="TWdat.RData")
+save(datold,file = "TWdat_old.RData")
+dat <- dataclean_TW(prepdat,rmssp = T)
+save(dat,file = "TWdat.RData")
+load(file = "TWdat.RData")
 getwd()
+
+dim(dat1)
+dim(prepdat1)
+dim(prepdat)
+dim(dat)
+dim(datold)
 
 # Check data
 table(dat$op_lon,dat$lon,useNA="always")
@@ -87,7 +104,7 @@ table(dat$lon,useNA="always")
 
 # Data map
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regB","regY1","regB1","regB2","regA","regA1","regA2","regA3","regA4","regA5")]
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB")]
 windows(width=15,height=10)
 for(fld in c("regB")) {
   reg <- with(a0,get(fld))
@@ -100,29 +117,39 @@ for(fld in c("regB")) {
 table(is.na(dat$embark_dmy),dat$op_yr)
 head(dat)
 
-table(prepdat$alb)   # ask sets with 910 alb
-table(prepdat$bet)   # ask set with 461 bet
-table(prepdat$yft)   # ask set with 1038
-table(prepdat$sbt)   # ask set with 380
-table(prepdat$ott)   # ask sets with 186
-table(prepdat$swo)   # ask sets with 269
-table(prepdat$mls)   # ask set with 454
-table(prepdat$bum)   # ask set with 130
-table(prepdat$blm)   # ask set with 75 blm
-table(prepdat$otb)   # ask sets with 150
-table(prepdat$skj)   # ask set with 143
-table(prepdat$sha)   # ask majority of sets (=719211) with 0 sha. Also one set with 663
-table(prepdat$oth)   # ask sets with 3059! But most (=636641) have 0.
-table(prepdat$hbf,useNA="always")  # 6408 with NA! All in 1973-75
-table(prepdat$hbf,prepdat$yr,useNA="always")  #
-a <- table(dat$yr,round(dat$hbf,0),useNA="always")
+table(prepdat$alb)
+prepdat[prepdat$alb==3450,]
+table(prepdat$bet)
+prepdat[prepdat$bet == 1429,]
+prepdat[prepdat$bet == 1704,]
+prepdat[prepdat$bet == 1173,]
+prepdat[prepdat$bet > 1000,] # Sets with v large catches are aggregated, note no. of hooks.
+table(dat$bet)
+table(prepdat$yft)
+table(prepdat$sbt)
+table(prepdat$pbf)
+table(prepdat$whm)
+table(dat1$whm)
+table(prepdat$ott)
+table(prepdat$swo)
+table(prepdat$mls)
+table(prepdat$bum)
+table(prepdat$blm)
+table(prepdat$otb)
+table(prepdat$skj)
+table(prepdat$sha)   # majority of sets (=719211) with 0 sha. Also one set with 663
+table(prepdat$oth)   # set with 2002.
+prepdat[prepdat$oth > 1800,]
+table(prepdat$hbf,useNA = "always")
+table(prepdat$hbf,prepdat$yr,useNA = "always")
+a <- table(dat$yr,round(dat$hbf,0),useNA = "always")
 write.csv(a,"table hbf by year.csv")
 
 
 # Plot and explore data
 #install.packages("rpart")
 library(rpart)
-a <- dat[dat$regY%in% c(2,5),]
+a <- dat[dat$regB %in% c(1:3),]
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
@@ -134,7 +161,7 @@ a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
 simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
-windows(width=11,height=7)
+windows(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
 
@@ -159,7 +186,7 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_CPUE/"
+projdir <- "~/ICCAT/2018_Bigeye/"
 twdir <- paste0(projdir, "TW/")
 datadir1 <- paste0(twdir, "data/catch_effort/")
 twalysis_dir <- paste0(twdir, "analyses/")
@@ -167,18 +194,15 @@ twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 
 clustdir <- paste0(twdir,"clustering/")
+dir.create(clustdir)
 setwd(clustdir)
-load(file="../analyses/TWdat.RData")
+load(file = "../analyses/TWdat.RData")
 
 allsp <- c("alb","bet","yft","ott","swo","mls","bum","blm","otb","skj","sha","oth","sbt")
 
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5","alb","bet","yft","ott","swo",
-            "mls","bum","blm","otb","skj","sha","oth","sbt","Total","alb_w","bet_w","yft_w",
-            "ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sbt_w","sst","dmy",
-            "embark_dmy","debark_dmy","op_start_dmy","op_end_dmy","lat","lon","lat5","lon5",
-            "regY","regY2","regB","regB3","regB2","regA","regA1","regA2","regA3","regA4","regA5")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5","alb","bet","yft","ott","swo","mls","bum","blm","otb","skj","sha","oth","sbt","Total","alb_w","bet_w","yft_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sbt_w","sst","dmy","lat","lon","lat5","lon5","regB")
 
-table(dat$regY,dat$lon5)
+table(dat$regB,dat$lon5)
 
 ##########
 # All years included, YFT regions
@@ -236,7 +260,7 @@ load(file=paste0(twylisis_dir, "TWdat.RData"))
 allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5","alb","bet","yft","ott","swo",
             "mls","bum","blm","otb","skj","sha","oth","sbt","Total","alb_w","bet_w","yft_w",
             "ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sbt_w","sst","dmy",
-            "embark_dmy","debark_dmy","op_start_dmy","op_end_dmy","lat","lon","lat5","lon5","regY","regB","regY","regB","regY1","regB1","regA","regA1","regA2","regA3")
+            "embark_dmy","debark_dmy","op_start_dmy","op_end_dmy","lat","lon","lat5","lon5","regB")
 dat <- data.frame(dat)
 
 clkeepCN_B <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4,5)))

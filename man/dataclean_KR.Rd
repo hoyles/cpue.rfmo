@@ -4,12 +4,14 @@
 \alias{dataclean_KR}
 \title{Clean data.}
 \usage{
-dataclean_KR(dat, yearlim = 2016)
+dataclean_KR(dat, yearlim = 2016, splist)
 }
 \arguments{
 \item{dat}{Input dataset}
 
 \item{yearlim}{Upper boundary for time period.}
+
+\item{splist}{List of species codes}
 }
 \value{
 Modified dataset.

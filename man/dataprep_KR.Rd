@@ -4,7 +4,7 @@
 \alias{dataprep_KR}
 \title{Prepare Korean longline data.}
 \usage{
-dataprep_KR(dat, alldat = F)
+dataprep_KR(dat, splist)
 }
 \arguments{
 \item{dat}{Input dataset}

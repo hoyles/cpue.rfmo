@@ -201,7 +201,7 @@ dataprep <- function(dat, alldat = F) {
 #' @param alldat Not used.
 #' @return Modified dataset.
 #'
-dataprep_TW <- function(dat, alldat = F) {
+dataprep_TW <- function(dat, alldat = F, region = "IO") {
  dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
  makedmy <- function(yy, mm, dd) {
  a = paste(yy, mm, dd, sep = " - ")
@@ -225,12 +225,19 @@ dataprep_TW <- function(dat, alldat = F) {
  levels(dat$tonnage) <- levs[match(a, levs[, 1]), 2]
  # table(dat$tonnage, substring(dat$callsign, 1, 1)) table(dat$NS, useNA = 'always') table(dat$EW, useNA = 'always')
 
- dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] <- (dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] + 1) * -1
- dat$lon[is.na(dat$EW) == F & dat$EW == 2] <- 360 - (dat$lon[is.na(dat$EW) == F & dat$EW == 2] + 1)
- dat <- dat[is.na(dat$lon) | dat$lon >= 10, ]
- dat <- dat[is.na(dat$lon) | dat$lon < 130, ]
- dat <- dat[is.na(dat$lat) | dat$lat < 29, ]
-
+   if(region == "IO") {
+     dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] <- (dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] + 1) * -1
+     dat$lon[is.na(dat$EW) == F & dat$EW == 2] <- 360 - (dat$lon[is.na(dat$EW) == F & dat$EW == 2] + 1)
+     dat <- dat[is.na(dat$lon) | dat$lon >= 10, ]
+     dat <- dat[is.na(dat$lon) | dat$lon < 130, ]
+     dat <- dat[is.na(dat$lat) | dat$lat < 29, ]
+   }
+ if(region == "AO") {
+#   browser()
+   dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] <- (dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] + 1) * -1
+   dat$lon[is.na(dat$EW) == F & dat$EW == 2] <- 360 - (dat$lon[is.na(dat$EW) == F & dat$EW == 2] + 1)
+   dat$lon[!is.na(dat$lon) & dat$lon > 180] <- dat$lon[!is.na(dat$lon) & dat$lon > 180] - 360
+ }
  la <- as.integer(substring(dat$op_area, 1, 2))
  lo <- as.integer(substring(dat$op_area, 3, 4))
  dat$lat5 <- 5 * (la - 73)/2 + 2.5

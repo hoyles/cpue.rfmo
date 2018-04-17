@@ -4,7 +4,7 @@
 \alias{dataprep_KRSBT}
 \title{Prepare Korean SBT data.}
 \usage{
-dataprep_KRSBT(dat, alldat = F)
+dataprep_KRSBT(dat, alldat = F, splist)
 }
 \arguments{
 \item{dat}{Input dataset}

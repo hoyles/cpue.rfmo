@@ -1,9 +1,15 @@
-projdir <- "~/ICCAT/2018_CPUE/"
+projdir <- "~/ICCAT/2018_Bigeye/"
 jpdir <- paste0(projdir, "JP/")
-datadir1 <- paste0(jpdir, "data/catch_effort/")
+datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
 jpfigs <- paste0(jpdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
+
+dir.create(jpdir)
+dir.create(datadir1)
+dir.create(jalysis_dir)
+dir.create(jpfigs)
+
 setwd(jalysis_dir)
 library("date")
 library("splines")
@@ -19,10 +25,10 @@ library("dplyr")
 library("dtplyr")
 library("tm")
 
-install.packages("devtools")
+#install.packages("devtools")
 library(devtools)
 # This new library replaces the 'support functions.r' file.
-install_github("hoyles/cpue.rfmo")
+#install_github("hoyles/cpue.rfmo")
 
 library("cpue.rfmo")
 

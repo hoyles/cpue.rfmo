@@ -260,7 +260,7 @@ write.csv(table(dat$lat5,dat$lon5,5*floor(dat$yrqtr/5)),file="ops by lat-long-5y
 # data exploration
 #install.packages("rpart")
 library("rpart")
-a <- dat[dat$regB%in% c(2),]
+a <- dat[dat$regB %in% c(2),]
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
@@ -288,8 +288,8 @@ simplefor <- randomForest(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$bf
 print(simplefor)
 windows(width=11,height=7)
 plot(importance)
-text(varImpPlot,main=NULL)
-savePlot("Rforest bet cpue",type="png")
+text(varImpPlot,main = NULL)
+savePlot("Rforest bet cpue",type = "png")
 simplefor <- randomForest(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$betcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 print(simplefor)
 windows(width=11,height=7)

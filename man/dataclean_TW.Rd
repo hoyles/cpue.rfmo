@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataclean_functions.R
 \name{dataclean_TW}
 \alias{dataclean_TW}
-\title{Clean data.}
+\title{Clean TW data.}
 \usage{
 dataclean_TW(dat1, rmssp = F)
 }

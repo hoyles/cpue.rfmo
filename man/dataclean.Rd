@@ -4,7 +4,7 @@
 \alias{dataclean}
 \title{Clean data.}
 \usage{
-dataclean(dat, checktg = F, allHBF = F)
+dataclean(dat, checktg = F, allHBF = F, splist)
 }
 \arguments{
 \item{dat}{Input dataset}

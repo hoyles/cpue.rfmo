@@ -5,7 +5,7 @@
 \title{Principal components analysis of species composition by 'trip'
 Run PCA at the trip level using normalised species composition data.}
 \usage{
-PCA_by_trip(datr, Screeplotname = "screeplot set", allsp)
+PCA_by_trip(datr, Screeplotname = "screeplot set", allsp, clustid)
 }
 \arguments{
 \item{datr}{The input dataset.}

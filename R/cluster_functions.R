@@ -13,11 +13,12 @@
 #' @param flag Fleet code to use in figure titles.
 #' @param cllist cllist
 #' @param fnhead File name head
+#' @param ll5 If TRUE, ll5 variables are used instead of 1 degree versions
 #' @param covarnames Names of covariates to return with dataset.
 #' @return The original dataset with added columns for the clusters and PCAs;
 #'
 clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP",
-    cllist = NA, fnhead = "", covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon",
+    cllist = NA, fnhead = "", ll5=F, covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon",
         "op_yr", "op_mon")) {
     datr <- ddd[with(ddd, get(regtype)) == r, allabs]
     datr$reg <- datr[, regtype]
@@ -32,12 +33,12 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
         datr$blm[1] <- 1
 
     pcaset <- PCA_by_set(datr, Screeplotname = paste0(fnhead, " ", "screeplot set"), allsp)
-    pcatrp <- PCA_by_trip(datr, Screeplotname = paste0(fnhead, " ", "screeplot trip"), allsp)
+    pcatrp <- PCA_by_trip(datr, Screeplotname = paste0(fnhead, " ", "screeplot trip"), allsp, clustid = clustid)
     #################### Clustering
     datr <- data.frame(datr)
     cldat <- make_clusters(setdat = data.frame(datr), spp = allsp, ncl = ncl, titx = paste0(flag, " ", regtype, r, " "), setclust = F, tripid = clustid,
         fname = fnhead, regtype = regtype)
-    plot_km_deviance_trip(ddd = datr, allsp, r = r, ti = fnhead, regtype = regtype)
+    plot_km_deviance_trip(ddd = datr, allsp, r = r, ti = fnhead, regtype = regtype, tripid = clustid)
 
     # outputs
     datprop <- cldat$setdat
@@ -62,7 +63,6 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
     a6$ctype <- "clrset"
     a <- rbind(a1, a2, a3, a4, a5, a6)
     write.csv(a, file = paste(fnhead, "cluster proportions", clustid, ".csv", sep = "_"))
-    ll5 <- F
     dbh <- T
 
     ###### Create datasets ###################################################### covarnames <- c('yrqtr', 'latlong', 'hooks', 'hbf', 'vessid', 'callsign',
@@ -111,13 +111,13 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
 #' @param allsp Species codes / variable names to use in the PCA.
 #' @return A list of two objects based on standard PCA and binomial PCA.
 #'
-PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp) {
+PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp, clustid) {
     spec_dat <- datr[, allsp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
     nspec <- length(allsp)
     dat2 <- datr[spec_dat$sum > 0, ]
     mmult_dat <- spec_dat[spec_dat$sum > 0, ]
-    dat2$TRIP_NUM <- dat2$tripidmon
+    dat2$TRIP_NUM <- dat2[,clustid]
     tpagg <- aggregate_by_trip(dat2, allsp)
     pca_tpdat <- (sqrt(sqrt(tpagg[, allsp])))  ## prepare species composition for PCA
     pca <- prcomp(pca_tpdat, scale = T)  #run PCA

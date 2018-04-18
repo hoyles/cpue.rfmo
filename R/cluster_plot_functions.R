@@ -25,7 +25,7 @@ boxplots_CL <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, lat5 =
     boxplot(dat$hooks ~ dat[, cl], width = wd, main = "Hooks", outline = outL, pars = list(boxwex = 1))
     if (dohbf)
         boxplot(dat$hbf ~ dat[, cl], width = wd, main = "HBF", outline = outL, pars = list(boxwex = 1))
-    boxplot(dat$op_mon ~ dat[, cl], width = wd, main = "Months", outline = outL, pars = list(boxwex = 1))
+    if (!is.null(dat$op_mon)) boxplot(dat$op_mon ~ dat[, cl], width = wd, main = "Months", outline = outL, pars = list(boxwex = 1))
     title(paste(gsub("_", " ", ti), cl), outer = T, line = 1, cex.main = 1.5)
     savePlot(paste0(ti, "_boxplots_CL", cl, ".png"), type = "png")
 }
@@ -64,7 +64,7 @@ boxplots_CL_bean <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, l
     if (dohbf)
         beanplot(dat$hbf ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), ylim = c(min(dat$hbf, na.rm = T) - 0.5, max(dat$hbf, na.rm = T) + 0.5), log = "",
             main = "HBF")
-    beanplot(dat$op_mon ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), log = "", main = "Months", ylim = c(0.5, 12.5))
+    if (!is.null(dat$op_mon)) beanplot(dat$op_mon ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), log = "", main = "Months", ylim = c(0.5, 12.5))
     title(paste(gsub("_", " ", ti), cl), outer = T, line = 1, cex.main = 1.5)
     savePlot(paste0(ti, "_boxplots_CL", cl, "_bean.png"), type = "png")
 }

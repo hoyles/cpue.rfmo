@@ -6,8 +6,9 @@
 \usage{
 clust_PCA_run(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T,
   clustid = "tripidmon", allclust = F, flag = "JP", cllist = NA,
-  fnhead = "", covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid",
-  "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr", "op_mon"))
+  fnhead = "", ll5 = F, covarnames = c("yrqtr", "latlong", "hooks", "hbf",
+  "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr",
+  "op_mon"))
 }
 \arguments{
 \item{r}{The region number.}
@@ -33,6 +34,8 @@ clust_PCA_run(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T,
 \item{cllist}{cllist}
 
 \item{fnhead}{File name head}
+
+\item{ll5}{If TRUE, ll5 variables are used instead of 1 degree versions}
 
 \item{covarnames}{Names of covariates to return with dataset.}
 }

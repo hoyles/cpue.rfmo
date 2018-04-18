@@ -23,9 +23,10 @@ plot_km_deviance <- function(dat, allsp, r, ti, regtype = "regY") {
 #' @param r Region number to use as a plotting label.
 #' @param ti Use in the plot filename.
 #' @param regtype Not used.
+#' @param tripid Defines the variable to use as trip identifier
 #'
-plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY") {
-    ddd$TRIP_NUM <- ddd$tripidmon
+plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY", tripid="tripidmon") {
+    ddd$TRIP_NUM <- ddd[,tripid]
     indat <- aggregate_by_trip(ddd, allsp)
     a <- indat[, allsp]
     # a <- scale(indat[, allsp])

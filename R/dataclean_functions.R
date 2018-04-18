@@ -6,7 +6,7 @@
 #' @param allHBF Deprecated.
 #' @return Modified dataset.
 #'
-dataclean <- function(dat, checktg = F, allHBF = F) {
+dataclean <- function(dat, checktg = F, allHBF = F, splist) {
     dat$op_yr <- as.numeric(dat$op_yr)
     dat$op_mon <- as.numeric(dat$op_mon)
     dat$op_day <- as.numeric(dat$op_day)
@@ -186,7 +186,7 @@ dataclean_TW_std <- function(dat1, doHBF = F) {
     return(dat1)
 }
 
-#' Clean data.
+#' Clean TW data.
 #'
 #' The function sets up variables and removes bad data. Originally developed for Taiwanese data in the IO.
 #' @param dat1 Input dataset
@@ -213,3 +213,33 @@ dataclean_TW <- function(dat1, rmssp = F) {
     # dat1$hbf <- as.factor(as.character(dat1$hbf))
     return(dat1)
 }
+
+#' Clean US data.
+#'
+#' The function sets up variables and removes bad data.
+#' @param dat Input dataset
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataclean_USAO <- function(dat, splist = c("bft","alb","bet","yft","swo","mls","bum", "bsh", "sma", "por"))
+  {
+    dat$op_yr <- as.numeric(dat$op_yr)
+    dat$op_mon <- as.numeric(dat$op_mon)
+    dat$op_day <- as.numeric(dat$op_day)
+    dat$lat <- as.numeric(dat$lat)
+    dat <- dat[!is.na(dat$lat), ]
+    dat <- dat[!is.na(dat$lon), ]
+    dat$lon <- as.numeric(dat$lon)
+    dat$hbf <- as.numeric(dat$hbf)
+    dat$hooks <- as.numeric(dat$hooks)
+    for (sp in splist) {
+      dat[,sp] <- as.numeric(dat[,sp])
+      if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
+    }
+    dim(dat)
+    # dat <- dat[dat$hooks < 5000, ]
+    #  dat <- dat[dat$hooks > 200, ]
+    #  dat <- dat[(!is.na(dat$hbf) & dat$hbf < 26) | (dat$op_yr <
+    #     1976 & is.na(dat$hbf)), ]
+    return(dat)
+  }

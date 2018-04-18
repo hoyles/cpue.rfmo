@@ -231,11 +231,11 @@ setwd(clustdir)
 
 load(file=paste0(kralysis_dir, "KRdat.RData"))
 
-allsp <- c("alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj","swo","yft")
+kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","whm","yft")
+allsp <- kr_splist
 
 allabs <- c("op_yr","op_mon","VESSEL_CD","VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks",
-            "floats","alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj",
-            "swo","yft","Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon",
+            "floats",allsp, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon",
             "regY","regY2","regB","regB2", "regB3")
 
 dat <- data.frame(dat)
@@ -248,7 +248,7 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=1
 
 regtype="regB"
-for(r in 1:length(nclB2)) {
+for(r in 1:length(nclB)) {
   fnh <- paste(flag,regtype,r,sep="_")
   dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclB2[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
   save(dataset,file=paste0(fnh,".RData"))

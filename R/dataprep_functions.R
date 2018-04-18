@@ -516,3 +516,26 @@ setup_AO_regions <- function(dat, regB = F, regB1 = F) {
   return(dat)
 }
 
+#' Prepare US longline data.
+#'
+#' The function prepares US longline data. Developed for AO analyses.
+#' @param dat Input dataset
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataprep_US <- function(dat, splist) {
+  dat$qtr <- case_when(
+    dat$qtr == "Jan-Mar" ~ 0.125,
+    dat$qtr == "Apr-Jun" ~ 0.375,
+    dat$qtr == "Jul-Sep" ~ 0.625,
+    dat$qtr == "Oct-Dec" ~ 0.875)
+  dat$yrqtr <- dat$op_yr + dat$qtr
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+
+  dat$vessid <- as.factor(as.numeric(as.factor(dat$callsign)))
+  dat$tripid <- dat$tripidmon <- paste(dat$vessid, dat$trip_st)
+  dat$Total <- apply(dat[,splist], 1, sum, na.rm = TRUE)
+  dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum, na.rm = TRUE)
+  return(dat)
+}
+

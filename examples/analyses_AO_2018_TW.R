@@ -10,6 +10,7 @@ dir.create(twalysis_dir)
 dir.create(twfigs)
 
 setwd(twalysis_dir)
+
 library("date")
 library("splines")
 library("maps")
@@ -27,7 +28,7 @@ library("tm")
 #install.packages("devtools")
 library(devtools)
 # This new library replaces the 'support functions.r' file.
-install_github("hoyles/cpue.rfmo")
+#install_github("hoyles/cpue.rfmo")
 
 library("cpue.rfmo")
 
@@ -69,22 +70,25 @@ save(dat1,file="dat1.RData")
 load(paste0(twalysis_dir, "dat1.RData"))
 
 # Check data
-str(dat1)
-summary(dat1)
-table(dat1$op_yr)
-table(is.na(dat1$embark_yr),dat1$op_yr)
-table(is.na(dat1$debark_yr),dat1$op_yr)
-table(is.na(dat1$op_start_yr),dat1$op_yr)
-table(is.na(dat1$op_end_yr),dat1$op_yr)
-table(is.na(dat1$target),dat1$op_yr)
-table(is.na(dat1$op_lon),dat1$op_yr)
-table(is.na(dat1$hbf),dat1$op_yr)
-table(dat1$op_yr,dat1$op_yr==1)
+# str(dat1)
+# summary(dat1)
+# table(dat1$op_yr)
+# table(is.na(dat1$embark_yr),dat1$op_yr)
+# table(is.na(dat1$debark_yr),dat1$op_yr)
+# table(is.na(dat1$op_start_yr),dat1$op_yr)
+# table(is.na(dat1$op_end_yr),dat1$op_yr)
+# table(is.na(dat1$target),dat1$op_yr)
+# table(is.na(dat1$op_lon),dat1$op_yr)
+# table(is.na(dat1$hbf),dat1$op_yr)
+# table(dat1$op_yr,dat1$op_yr==1)
+
+
 
 # Prepare data
 prepdat1 <- dataprep_TW(dat1, region = "AO")
-prepdat <- setup_AO_regions(prepdat1,  regB = T)
-datold <- dataclean_TW(prepdat)
+prepdat <- setup_AO_regions(prepdat1,  regB = TRUE, regB1 = TRUE)
+splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")
+datold <- dataclean_TW(prepdat, splist = splist)
 save(datold,file = "TWdat_old.RData")
 dat <- dataclean_TW(prepdat,rmssp = T)
 save(dat,file = "TWdat.RData")
@@ -104,9 +108,9 @@ table(dat$lon,useNA="always")
 
 # Data map
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB")]
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
+for(fld in c("regB","regB1")) {
 windows(width=15,height=10)
-for(fld in c("regB")) {
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
   text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
@@ -198,25 +202,34 @@ dir.create(clustdir)
 setwd(clustdir)
 load(file = "../analyses/TWdat.RData")
 
-allsp <- c("alb","bet","yft","ott","swo","mls","bum","blm","otb","skj","sha","oth","sbt")
+allsp <- c("alb","bet","yft","ott","swo","mls","bum","otb")
 
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5","alb","bet","yft","ott","swo","mls","bum","blm","otb","skj","sha","oth","sbt","Total","alb_w","bet_w","yft_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sbt_w","sst","dmy","lat","lon","lat5","lon5","regB")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",allsp,"Total","sst","dmy","lat","lon","lat5","lon5","regB")
 
 table(dat$regB,dat$lon5)
+windows(12,12); par(mfrow = c(4,3), mar = c(4,2,3,1))
+for(sp in allsp) plot(sort(unique(dat$op_yr)),tapply(dat[,sp], dat$op_yr, mean), main=sp)
 
 ##########
 # All years included, YFT regions
 rm(datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2)
 
-nclB2=c(5,5,5)
+nclB=c(3,3,4)
 flag="TW"
-r=2
+
+str(dat)
+head(dat[,allsp])
+lna <- function(x) sum(is.na(x)==TRUE)
+apply(dat[dat$regB==1,allsp], 2, lna)
+
+dat[is.na(dat$oth),]
+
 
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 regtype="regB"
-for(r in c(1,5)) {
+for(r in c(1,2,3)) {
   fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclB3[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
+  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclB[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
   save(dataset,file=paste0(fnh,".RData"))
 }
 

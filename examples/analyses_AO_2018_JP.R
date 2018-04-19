@@ -336,11 +336,17 @@ str(dat)
 rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
 
 gc()
-allsp <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas")
+allsp <- c("alb","bet","yft","swo","mls","bum","bft","sbt","sas")
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",allsp,"Total","dmy","lat","lon","lat5","lon5","regB","regB1")
 dat <- data.frame(dat)
 str(dat[,allabs])
 
+for (r in c(1:3)) {
+  windows(12,12); par(mfrow = c(4,3), mar = c(4,2,3,1))
+  a <- dat[dat$regB == r,]
+  for (sp in allsp) plot(sort(unique(a$op_yr)),tapply(a[,sp], a$op_yr, mean), main=sp)
+  title(paste("Region", r ), outer = TRUE)
+}
 
 nclB=c(4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
 flag="JP"

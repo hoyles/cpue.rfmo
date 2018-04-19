@@ -292,7 +292,7 @@ boxplots_TPCA <- function(dat, nPCA = 6, ti = "", dohbf = T, lat5 = F, regtype =
     }
 }
 
-#' Maps of cluster distribution.
+#' Maps of PCA distribution.
 #'
 #' This function plots maps of PCA spatial distribution.
 #' @param ddd Input dataset
@@ -316,14 +316,14 @@ mapPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r) {
         latn <- as.numeric(dimnames(pcm)[[2]]) + 0.5
         image(lonn, latn, pcm)
         contour(lonn, latn, pcm, add = T)
-        map(database = "world2Hires", add = T)
+        map(database = "world", add = T)
         title(ppc, line = -2, cex.main = 1.5)
     }
     title(paste(gsub("_", " ", ti)), outer = T, line = -1, cex.main = 1.5)
     savePlot(paste0(ti, "_map_PCs", ".png"), type = "png")
 }
 
-#' Maps of cluster distribution.
+#' Maps of TCPA distribution.
 #'
 #' This function plots maps of TCPA distribution.
 #' @param ddd Input dataset
@@ -347,7 +347,7 @@ mapTPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r) {
         latn <- as.numeric(dimnames(pcm)[[2]]) + 0.5
         image(lonn, latn, pcm)
         contour(lonn, latn, pcm, add = T)
-        map(database = "world2Hires", add = T)
+        map(database = "world", add = T)
         title(ppc, line = -2, cex.main = 1.5)
     }
     title(paste(regtype, r, ti), outer = T, line = -1, cex.main = 1.5)
@@ -433,7 +433,7 @@ map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "reg
         ylm[1] <- max(ylm[1], -50)
         image(lonn, latn, clm, ylim = ylm)
         contour(lonn, latn, clm, add = T)
-        map(database = "world2", add = T, fill = T)
+        map(database = "world", add = T, fill = T)
         title(paste(cl, clx), line = 0.5, cex.main = 1.5)
     }
     title(paste(gsub("_", " ", ti), "cluster map"), outer = T, line = -2, cex.main = 1.5)

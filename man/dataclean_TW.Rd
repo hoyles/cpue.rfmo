@@ -4,12 +4,15 @@
 \alias{dataclean_TW}
 \title{Clean TW data.}
 \usage{
-dataclean_TW(dat1, rmssp = F)
+dataclean_TW(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott", "swo",
+  "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt"))
 }
 \arguments{
 \item{dat1}{Input dataset}
 
 \item{rmssp}{If TRUE, remove sets that report catch of only one species.}
+
+\item{splist}{List of species codes.}
 }
 \value{
 Modified dataset.

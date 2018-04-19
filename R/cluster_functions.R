@@ -25,11 +25,11 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
     spec_dat <- datr[, allsp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
     datr <- datr[spec_dat$sum > 0, ]
-    if (sum(datr$sbt) == 0)
+    if (sum(datr$sbt, na.rm = T) == 0)
         datr$sbt[1] <- 1
-    if (sum(datr$sfa) == 0)
+    if (sum(datr$sfa, na.rm = T) == 0)
         datr$sfa[1] <- 1
-    if (sum(datr$blm) == 0)
+    if (sum(datr$blm, na.rm = T) == 0)
         datr$blm[1] <- 1
 
     pcaset <- PCA_by_set(datr, Screeplotname = paste0(fnhead, " ", "screeplot set"), allsp)

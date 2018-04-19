@@ -191,9 +191,10 @@ dataclean_TW_std <- function(dat1, doHBF = F) {
 #' The function sets up variables and removes bad data. Originally developed for Taiwanese data in the IO.
 #' @param dat1 Input dataset
 #' @param rmssp If TRUE, remove sets that report catch of only one species.
+#' @param splist List of species codes.
 #' @return Modified dataset.
 #'
-dataclean_TW <- function(dat1, rmssp = F) {
+dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")) {
     # hist(dat1$hbf, nclass = 400)
     dat1 <- dat1[!is.na(dat1$hooks), ]  #
     # hist(dat1$hooks, nclass = 250) dat1 <- dat1[dat1$hooks < 10000, ] # clean up outliers
@@ -207,9 +208,10 @@ dataclean_TW <- function(dat1, rmssp = F) {
     dat1[dat1$hbf %in% c(25), "hbf"] <- 24
     lenzero <- function(x) sum(x > 0)
     if (rmssp) {
-        ssp <- apply(dat1[, c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")], 1, lenzero)
+        ssp <- apply(dat1[, splist], 1, lenzero)
         dat1 <- dat1[ssp > 1, ]
     }
+    dat1 <- dat1[!is.na(dat$yrqtr),]
     # dat1$hbf <- as.factor(as.character(dat1$hbf))
     return(dat1)
 }

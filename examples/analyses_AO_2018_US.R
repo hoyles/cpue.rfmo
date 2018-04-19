@@ -56,16 +56,17 @@ library("cpue.rfmo")
 
 # If good, load the whole file
 #dat5216 <- read_fwf(file=paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types=cc)
-dat1 <- read.csv(paste0(datadir1,"USLLV1.2simonV2.csv"))
+dat1 <- read.csv(paste0(datadir1,"USLLV1.2simonV3.csv"))
 #dat1 <- read.csv("C:/blackdrive/NEWPLL/BETCPUE/USLLV1.2simonV2.csv")
 head(dat1)
 a <- names(dat1)
-nms <- c("bsh", "sma", "por", "trip_st", "op_yr", "op_mon", "op_day", "lat","latcode", "lon", "loncode", "callsign", "hbf", "alb", "bet", "yft", "swo", "mls", "bum","blm","sas", "shk", "prefecture", "vesselname", "logbookid", "qtr","SST","hooks")
+nms <- c("bsh", "sma", "por", "lon", "lat", "moon", "yrqtr2", "latlong2", "op_yr", "op_mon", "op_day", "latcode", "loncode", "callsign", "hbf", "bft", "alb", "bet", "yft", "swo", "mls", "bum","blm","trip_st", "sas", "shk", "prefecture", "vesselname", "logbookid", "qtr","SST","hooks","Total")
 cbind(a, nms)
+a == nms
 names(dat1) <- nms
 
-splist <- c("alb", "bet", "yft", "swo", "mls", "bum", "bsh", "sma", "por")
-nms2 <- c("trip_st", "op_yr", "op_mon", "op_day", "lat", "lon", "callsign", "hbf", splist, "qtr","SST","hooks")
+splist <- c("bft", "alb", "bet", "yft", "swo", "mls", "bum", "bsh", "sma", "por")
+nms2 <- c("trip_st", "op_yr", "op_mon", "op_day", "lat", "lon", "callsign", "hbf", splist, "qtr","SST","hooks","moon")
 rawdat <- dat1[,nms2]
 head(rawdat)
 
@@ -134,7 +135,7 @@ windows(width=11,height=9)
 symbols(x=a[,2],y=a[,1],circles=.0002*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude",
 ylim=c(-50,60),xlim=c(-105,10))
 map(add=T,interior=F,fill=T)
-savePlot(file="map_hooks.png",type ="png")
+savePlot(filename = "map_hooks.png",type = "png")
 
 # Histogram of hooks per set
 table(dat$hooks[dat$hooks > 1000])
@@ -166,7 +167,8 @@ write.csv(a,"table hbf by year.csv")
 a <- log(table(dat$lon5,dat$lat5))
 windows(width=13,height=10)
 image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,xlab="Longitude",ylab="Latitude",
-col = rev(heat.colors(12) ) )
+      col = rev(heat.colors(12) ) )
+contour(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,xlab="Longitude",ylab="Latitude", add = TRUE)
 map("world",add=T, interior=T,fill=T)
 savePlot("Setmap_logscale.png",type="png")
 
@@ -340,7 +342,7 @@ dat$tripid <- paste(dat$vessid,year(a),week(a), sep="_")
 dat$tripidmon <- paste(dat$vessid,year(a),month(a), sep="_")
 
 gc()
-allsp <- c("alb","bet","yft","swo","mls","bum","bsh","sma","por")
+allsp <- c("alb","bft","bet","yft","swo","mls","bum","bsh","sma")
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon",allsp,"Total","lat","lon","lat5","lon5","regB", "regB1")
 dat <- data.frame(dat)
 str(dat[,allabs])
@@ -358,6 +360,12 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=1
 names(dat)
 
+for (r in c(2,1)) {
+  windows(12,12); par(mfrow = c(4,3), mar = c(4,2,3,1))
+  a <- dat[dat$regB == r,]
+  for (sp in allsp) plot(sort(unique(a$op_yr)),tapply(a[,sp], a$op_yr, mean), main=sp)
+  title(paste("Region", r ), outer = TRUE)
+}
 
 regtype="regB"
 for(r in 2:1) {

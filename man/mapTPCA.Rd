@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_plot_functions.R
 \name{mapTPCA}
 \alias{mapTPCA}
-\title{Maps of cluster distribution.}
+\title{Maps of TCPA distribution.}
 \usage{
 mapTPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r)
 }

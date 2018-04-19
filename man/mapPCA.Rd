@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_plot_functions.R
 \name{mapPCA}
 \alias{mapPCA}
-\title{Maps of cluster distribution.}
+\title{Maps of PCA distribution.}
 \usage{
 mapPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r)
 }

@@ -171,18 +171,18 @@ dataclean_KR <- function(dat, yearlim = 2016, splist) {
 #' @param doHBF If TRUE, remove HBF > 25.
 #' @return Modified dataset.
 #'
-dataclean_TW_std <- function(dat1, doHBF = F) {
+dataclean_TW_std <- function(dat1, doHBF = F, splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")) {
     dat1 <- dat1[!is.na(dat1$hooks), ]
     dat1 <- dat1[dat1$hooks < 10000, ]
     dat1 <- dat1[dat1$hooks > 1000, ]
     dat1 <- dat1[dat1$yft + dat1$bet + dat1$alb > 0, ]
     if (doHBF)
         dat1 <- dat1[dat1$hbf <= 25, ]
-    lenzero <- function(x) sum(x > 0)
-    ssp <- apply(dat1[, c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")], 1, lenzero)
+    lenzero <- function(x) sum(x > 0, na.rm = TRUE)
+    ssp <- apply(dat1[, splist], 1, lenzero)
     dat1 <- dat1[ssp > 1, ]
     remvec <- c("G")
-    dat1 <- dat1[-grep(remvec, dat1$rem), ]
+    if (length(grep(remvec, dat1$rem)) > 0) dat1 <- dat1[-grep(remvec, dat1$rem), ]
     return(dat1)
 }
 
@@ -195,14 +195,9 @@ dataclean_TW_std <- function(dat1, doHBF = F) {
 #' @return Modified dataset.
 #'
 dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")) {
-    # hist(dat1$hbf, nclass = 400)
     dat1 <- dat1[!is.na(dat1$hooks), ]  #
-    # hist(dat1$hooks, nclass = 250) dat1 <- dat1[dat1$hooks < 10000, ] # clean up outliers
-    dat1 <- dat1[dat1$hooks < 4500, ]  # clean up outliers
-    # dat1 <- dat1[dat1$hooks < 5000, ] # clean up outliers
+    dat1 <- dat1[dat1$hooks < 5000, ]  # clean up outliers
     dat1 <- dat1[dat1$hooks > 200, ]
-    # dat1 <- dat1[dat1$yft < 750, ] dat1 <- dat1[dat1$bet < 250, ] dat1 <- dat1[dat1$alb < 250, ] dat1 <- dat1[is.na(dat1$hbf) == F, ] dat1 <-
-    # dat1[dat1$op_yr > 1976, ] dat1 <- dat1[dat1$yrqtr < 2017, ] dat1 <- dat1[dat1$EW == 1, ] dat1 <- dat1[dat1$hooks >= 1000, ]
     dat1[dat1$hbf %in% c(35, 155, 20000), "hbf"] <- 15
     dat1[dat1$hbf %in% c(26, 30), "hbf"] <- 20
     dat1[dat1$hbf %in% c(25), "hbf"] <- 24
@@ -212,7 +207,6 @@ dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott",
         dat1 <- dat1[ssp > 1, ]
     }
     dat1 <- dat1[!is.na(dat$yrqtr),]
-    # dat1$hbf <- as.factor(as.character(dat1$hbf))
     return(dat1)
 }
 

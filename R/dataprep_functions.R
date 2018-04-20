@@ -258,75 +258,78 @@ dataprep <- function(dat, alldat = F) {
 #' @param region IO or AO.
 #' @return Modified dataset.
 #'
-dataprep_TW <- function(dat, alldat = F, region = "IO") {
- dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
- makedmy <- function(yy, mm, dd) {
- a = paste(yy, mm, dd, sep = " - ")
- a1 <- gsub(" ", "", a)
- a2 <- ymd(a1)
- return(a2)
- }
- dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
- dat$debark_dmy <- makedmy(dat$debark_yr, dat$debark_mn, dat$debark_dd)
- dat$op_start_dmy <- makedmy(dat$op_start_yr, dat$op_start_mn, dat$op_start_dd)
- dat$op_end_dmy <- makedmy(dat$op_end_yr, dat$op_end_mn, dat$op_end_dd)
+dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")) {
+   splist_w <- paste0(splist, "_w")
+   dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+   makedmy <- function(yy, mm, dd) {
+     if(sum(!is.na(yy)) > 0) {
+       a = paste(yy, mm, dd, sep = " - ")
+       a1 <- gsub(" ", "", a)
+       a2 <- ymd(a1)
+     } else a2 <- yy
+     return(a2)
+   }
+    dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
+   dat$debark_dmy <- makedmy(dat$debark_yr, dat$debark_mn, dat$debark_dd)
+   dat$op_start_dmy <- makedmy(dat$op_start_yr, dat$op_start_mn, dat$op_start_dd)
+   dat$op_end_dmy <- makedmy(dat$op_end_yr, dat$op_end_mn, dat$op_end_dd)
 
- # hist(dat$op_start_dmy, breaks = 'months')
- dat$lat <- dat$op_lat
- dat$lon <- dat$op_lon
+   # hist(dat$op_start_dmy, breaks = 'months')
+   dat$lat <- dat$op_lat
+   dat$lon <- dat$op_lon
 
- dat$tonnage <- as.factor(substring(dat$callsign, 1, 1))
- a <- levels(dat$tonnage)
- levs <- cbind(c("0", "1", "2", "3", "4", "5", "6", "7", "8"), c(" < 5", "5 -10", "10 -20", "20 -50", "50 -100", "100 -200", "200 -500", "500 -1000",
- " >= 1000"))
- levels(dat$tonnage) <- levs[match(a, levs[, 1]), 2]
- # table(dat$tonnage, substring(dat$callsign, 1, 1)) table(dat$NS, useNA = 'always') table(dat$EW, useNA = 'always')
+   dat$tonnage <- as.factor(substring(dat$callsign, 1, 1))
+   a <- levels(dat$tonnage)
+   levs <- cbind(c("0", "1", "2", "3", "4", "5", "6", "7", "8"), c(" < 5", "5 -10", "10 -20", "20 -50", "50 -100", "100 -200", "200 -500", "500 -1000",
+   " >= 1000"))
+   levels(dat$tonnage) <- levs[match(a, levs[, 1]), 2]
+   # table(dat$tonnage, substring(dat$callsign, 1, 1)) table(dat$NS, useNA = 'always') table(dat$EW, useNA = 'always')
 
-   if(region == "IO") {
+     if(region == "IO") {
+       dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] <- (dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] + 1) * -1
+       dat$lon[is.na(dat$EW) == F & dat$EW == 2] <- 360 - (dat$lon[is.na(dat$EW) == F & dat$EW == 2] + 1)
+       dat <- dat[is.na(dat$lon) | dat$lon >= 10, ]
+       dat <- dat[is.na(dat$lon) | dat$lon < 130, ]
+       dat <- dat[is.na(dat$lat) | dat$lat < 29, ]
+     }
+   if(region == "AO") {
      dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] <- (dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] + 1) * -1
      dat$lon[is.na(dat$EW) == F & dat$EW == 2] <- 360 - (dat$lon[is.na(dat$EW) == F & dat$EW == 2] + 1)
-     dat <- dat[is.na(dat$lon) | dat$lon >= 10, ]
-     dat <- dat[is.na(dat$lon) | dat$lon < 130, ]
-     dat <- dat[is.na(dat$lat) | dat$lat < 29, ]
+     dat$lon[!is.na(dat$lon) & dat$lon > 180] <- dat$lon[!is.na(dat$lon) & dat$lon > 180] - 360
    }
- if(region == "AO") {
-#   browser()
-   dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] <- (dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] + 1) * -1
-   dat$lon[is.na(dat$EW) == F & dat$EW == 2] <- 360 - (dat$lon[is.na(dat$EW) == F & dat$EW == 2] + 1)
-   dat$lon[!is.na(dat$lon) & dat$lon > 180] <- dat$lon[!is.na(dat$lon) & dat$lon > 180] - 360
- }
- la <- as.integer(substring(dat$op_area, 1, 2))
- lo <- as.integer(substring(dat$op_area, 3, 4))
- dat$lat5 <- 5 * (la - 73)/2 + 2.5
- dat$lat5[la%%2 == 0] <- -(5 * (la[la%%2 == 0] - 74))/2 - 2.5 #
+   la <- as.integer(substring(dat$op_area, 1, 2))
+   lo <- as.integer(substring(dat$op_area, 3, 4))
+   dat$lat5 <- 5 * (la - 73)/2 + 2.5
+   dat$lat5[la%%2 == 0] <- -(5 * (la[la%%2 == 0] - 74))/2 - 2.5 #
 
- dat$lon5 <- -(5 * (lo - 1)/2 + 2.5)
- dat$lon5[lo%%2 == 0] <- 5 * (lo[lo%%2 == 0] - 2)/2 + 2.5
- # Indian ocean regions for YFT and BET?
+   dat$lon5 <- -(5 * (lo - 1)/2 + 2.5)
+   dat$lon5[lo%%2 == 0] <- 5 * (lo[lo%%2 == 0] - 2)/2 + 2.5
+   # Indian ocean regions for YFT and BET?
 
- dat$bt1 <- !(is.na(dat$bait1) | dat$bait1 == 0)
- dat$bt2 <- !(is.na(dat$bait2) | dat$bait2 == 0)
- dat$bt3 <- !(is.na(dat$bait3) | dat$bait3 == 0)
- dat$bt4 <- !(is.na(dat$bait4) | dat$bait4 == 0)
- dat$bt5 <- !(is.na(dat$bait5) | dat$bait5 == 0)
+   dat$bt1 <- !(is.na(dat$bait1) | dat$bait1 == 0)
+   dat$bt2 <- !(is.na(dat$bait2) | dat$bait2 == 0)
+   dat$bt3 <- !(is.na(dat$bait3) | dat$bait3 == 0)
+   dat$bt4 <- !(is.na(dat$bait4) | dat$bait4 == 0)
+   dat$bt5 <- !(is.na(dat$bait5) | dat$bait5 == 0)
 
- dat$vessid <- as.factor(as.numeric(as.factor(dat$callsign)))
- dat$tripid <- as.factor(paste(dat$vessid, dat$op_start_dmy))
- dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
- dat$moon <- lunar.illumination(dat$dmy)
+   dat$vessid <- as.factor(as.numeric(as.factor(dat$callsign)))
+   dat$tripid <- as.factor(paste(dat$vessid, dat$op_start_dmy))
+   dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
+   dat$moon <- lunar.illumination(dat$dmy)
 
- dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
- dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
- dat$sbt <- dat$sbf + dat$pbf
- dat$sbt_w <- dat$sbf_w + dat$pbf_w
- dat$Total <- with(dat, alb + bet + yft + pbf + sbf + ott + swo + mls + bum + blm + otb + skj + sha + oth)
- dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
- noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripid", "tripidmon", "moon", "alb", "bet",
- "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt", "Total", "Total2", "alb_w", "bet_w", "yft_w", "ott_w", "swo_w",
- "mls_w", "bum_w", "blm_w", "otb_w", "skj_w", "sha_w", "oth_w", "sbt_w", "sst", "bt1", "bt2", "bt3", "bt4", "bt5", "hookdp", "target", "rem",
- "dmy", "embark_dmy", "debark_dmy", "op_start_dmy", "op_end_dmy", "lat", "lon", "lat5", "lon5", "oil", "foc")
- dat <- dat[, noms]
- return(dat)
+   dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
+   dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+   if(region == "IO") {
+     dat$sbt <- dat$sbf + dat$pbf
+     dat$sbt_w <- dat$sbf_w + dat$pbf_w
+     splist <- splist[splist != "pbf"]
+     splist_w <- splist_w[splist_w != "pbf_w"]
+   }
+   dat$Total <- apply(dat[,splist], 1, sum)
+   dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
+   noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripid", "tripidmon", "moon", splist, "Total", "Total2", splist_w, "sst", "bt1", "bt2", "bt3", "bt4", "bt5", "hookdp", "target", "rem", "dmy", "embark_dmy", "debark_dmy", "op_start_dmy", "op_end_dmy", "lat", "lon", "lat5", "lon5", "oil", "foc")
+   dat <- dat[, noms]
+   return(dat)
 }
 
 #' Prepare the variable lbid_mon.

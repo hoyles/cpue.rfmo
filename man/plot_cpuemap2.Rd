@@ -5,7 +5,7 @@
 \title{Plot map of cpue or the ratio of two other spatial variables.}
 \usage{
 plot_cpuemap2(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120,
-  210), ti = "")
+  210), ti = "", delta = 1)
 }
 \arguments{
 \item{indat}{Input dataset to plot.}
@@ -21,6 +21,8 @@ plot_cpuemap2(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120,
 \item{lonlim}{Longitude limits for plot.}
 
 \item{ti}{Title of the plot.}
+
+\item{delta}{The spatial resolution of the data being used.}
 }
 \description{
 Function to plot map of cpue or other spatial variable. This version has no defined breaks, but ensures that the spatial effects are constrained within the correct 1x1 square.

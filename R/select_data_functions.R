@@ -164,9 +164,10 @@ select_data_IO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2
 #' @param strsmp Unless NA, apply stratified sampling with n = strsmp.
 #' @param yrlims Bounding years for the analysis. Use integer values, because yrqtrs use 0.125 to 0.875.
 #' @param oneflag If not NA, the flag to use in the analysis. Otherwise flags JP, KR, SY, TW are used.
+#' @param minhbf All sets with hbf less than this value are removed.
 #' @return Modified dataset.
 #'
-select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2, maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100, llstrat = 5, addcl = F, cltype = NA, addpca = NA, samp = NA, strsmp = 30, yrlims = NA, oneflag = NA) {
+select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2, maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100, llstrat = 5, addcl = F, cltype = NA, addpca = NA, samp = NA, strsmp = 30, yrlims = NA, oneflag = NA, minhbf = 5) {
   gdat <- indat[indat$reg == runreg, ]
   if (!is.na(yrlims[1]))
     gdat <- gdat[gdat$yrqtr > yrlims[1] & gdat$yrqtr < yrlims[2], ]
@@ -193,7 +194,7 @@ select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtr
       gdat[is.na(gdat$hbf), ]$hbf <- 5
     if (sum(gdat$hbf == 0) > 0)
       gdat[gdat$hbf == 0, ]$hbf <- 5
-    gdat <- gdat[gdat$hbf >= 5, ]
+    gdat <- gdat[gdat$hbf >= minhbf, ]
     if (llstrat != 5)
       gdat$latlong <- paste(llstrat * floor(gdat$lat/llstrat), llstrat * floor(gdat$lon/llstrat), sep = "_")
     if (mt == "deltapos")

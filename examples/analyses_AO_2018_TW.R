@@ -1,6 +1,6 @@
 projdir <- "~/ICCAT/2018_Bigeye/"
 twdir <- paste0(projdir, "TW/")
-datadir1 <- paste0(twdir, "data/")
+datadir1 <- paste0(twdir, "data/Simon_new data_April 20/")
 twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -38,13 +38,7 @@ library("cpue.rfmo")
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 
-nms2 <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
-wdths2 <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
-cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
-cbind(nms2,wdths2,cc2)
-sum(wdths2)
-
-nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
+nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","bft_w","sbt_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
 wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
 cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccc"
 sum(wdths2)
@@ -66,7 +60,7 @@ readfun1 <- function(ff) {
 a <- lapply(yy,readfun1)
 system.time({dat1 <- ldply(a, data.frame)})
 names(dat1) <- nms2
-save(dat1,file = "dat1.RData")
+save(dat1,file = paste0(twalysis_dir, "dat1.RData"))
 load(paste0(twalysis_dir, "dat1.RData"))
 
 # Check data
@@ -85,15 +79,18 @@ load(paste0(twalysis_dir, "dat1.RData"))
 
 
 # Prepare data
-prepdat1 <- dataprep_TW(dat1, region = "AO")
+splist <- c("alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth")
+
+prepdat1 <- dataprep_TW(dat1, alldat = F, region = "AO", splist = splist)
 prepdat <- setup_AO_regions(prepdat1,  regB = TRUE, regB1 = TRUE)
-splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")
-datold <- dataclean_TW(prepdat, splist = splist)
+#splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")
+datold <- dataclean_TW(prepdat, rmssp = F, splist = splist)
 save(datold,file = "TWdat_old.RData")
-dat <- dataclean_TW(prepdat,rmssp = T)
+dat <-    dataclean_TW(prepdat, rmssp = T, splist = splist)
 save(dat,file = "TWdat.RData")
 load(file = "TWdat.RData")
 getwd()
+
 
 dim(dat1)
 dim(prepdat1)
@@ -129,6 +126,9 @@ prepdat[prepdat$bet == 1704,]
 prepdat[prepdat$bet == 1173,]
 prepdat[prepdat$bet > 1000,] # Sets with v large catches are aggregated, note no. of hooks.
 table(dat$bet)
+str(dat)
+table(dat$bft)
+table(dat$sbt)
 table(prepdat$yft)
 table(prepdat$sbt)
 table(prepdat$pbf)

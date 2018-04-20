@@ -510,12 +510,12 @@ plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 1
 #' @param lonlim Longitude limits for plot.
 #' @param ti Title of the plot.
 #'
-plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), ti = "") {
+plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), ti = "", delta=1) {
     plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
     indat <- cbind(indat, vbl)
     indat <- indat[indat$lon <= 140, ]
-    indat$lo <- factor(indat$lon, levels = seq(min(indat$lo, na.rm = T), max(indat$lo, na.rm = T), 1))
-    indat$la <- factor(indat$lat, levels = seq(min(indat$la, na.rm = T), max(indat$la, na.rm = T), 1))
+    indat$lo <- factor(indat$lon, levels = seq(min(indat$lo, na.rm = T), max(indat$lo, na.rm = T), delta))
+    indat$la <- factor(indat$lat, levels = seq(min(indat$la, na.rm = T), max(indat$la, na.rm = T), delta))
     a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lo, la), sum))
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
@@ -557,13 +557,14 @@ plot_cpuemap <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(1
 #' @param latlim Latitude limits for plot.
 #' @param lonlim Longitude limits for plot.
 #' @param ti Title of the plot.
+#' @param delta The spatial resolution of the data being used.
 #'
-plot_cpuemap2 <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120, 210), ti = "") {
+plot_cpuemap2 <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120, 210), ti = "", delta=1) {
     plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
     indat <- cbind(indat, vb1, vb2)
     indat <- indat[indat$lon <= 210, ]
-    indat$lo <- factor(indat$lon, levels = seq(min(indat$lo, na.rm = T), max(indat$lo, na.rm = T), 1))
-    indat$la <- factor(indat$lat, levels = seq(min(indat$la, na.rm = T), max(indat$la, na.rm = T), 1))
+    indat$lo <- factor(indat$lon, levels = seq(min(indat$lo, na.rm = T), max(indat$lo, na.rm = T), delta))
+    indat$la <- factor(indat$lat, levels = seq(min(indat$la, na.rm = T), max(indat$la, na.rm = T), delta))
     a1 <- with(indat[indat$decade == dcd, ], tapply(vb1, list(lo, la), sum)/tapply(vb2, list(lo, la), sum))
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)

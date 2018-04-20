@@ -4,7 +4,8 @@
 \alias{dataclean_TW_std}
 \title{Clean data.}
 \usage{
-dataclean_TW_std(dat1, doHBF = F)
+dataclean_TW_std(dat1, doHBF = F, splist = c("alb", "bet", "yft", "ott",
+  "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt"))
 }
 \arguments{
 \item{dat1}{Input dataset}

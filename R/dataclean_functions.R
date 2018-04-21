@@ -206,7 +206,7 @@ dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott",
         ssp <- apply(dat1[, splist], 1, lenzero)
         dat1 <- dat1[ssp > 1, ]
     }
-    dat1 <- dat1[!is.na(dat$yrqtr),]
+    dat1 <- dat1[!is.na(dat1$yrqtr),]
     return(dat1)
 }
 

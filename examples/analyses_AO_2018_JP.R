@@ -495,3 +495,99 @@ for (runsp in c("bet")) {
     }
 }
 
+#####-----------------------------------
+
+resdir <- paste0(jalysis_dir,"std_cl_JPonly_hbf/")
+dir.create(resdir)
+setwd(resdir)
+
+flag <- "JP"
+runpars <- list()
+runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+use_splist <- c("alb","bet","yft")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
+
+runreg = 1; runsp = "bet"
+keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
+for (runsp in c("bet")) {
+  regtype <- runpars[[runsp]]$regtype
+  clk <- runpars[[runsp]]$clk
+  addcl <- runpars[[runsp]]$addcl
+  dohbf <- runpars[[runsp]]$dohbf
+  cltype <- runpars[[runsp]]$cltype
+  jdat <- data.frame()
+  for (flag in c("JP")) {
+    for (r in runpars[[runsp]]$doregs) {
+      load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep = "_"),".RData"))
+      dataset$flag <- flag
+      jdat <- rbind(jdat,dataset[,stdlabs])
+      rm(dataset)
+    }
+  }
+  jdat <- jdat[jdat$yrqtr < maxyr,]
+  jdat$vessidx <- jdat$vessid
+  jdat$vessid <- paste0(jdat$flag,jdat$vessid)
+  jdat$vessid <- as.factor(jdat$vessid)
+  jdat <- jdat[jdat$yrqtr > 2005 | jdat$flag != "TW",]
+
+  vars <- c("vessid","hooks","yrqtr","latlong","hbf")
+  for (runreg in runpars[[runsp]]$doregs) {
+    minqtrs <- minqtrs_byreg[runreg]
+    glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars, maxqtrs = maxqtrs, minvess = 50, minll = 50, minyrqtr = 50, addcl = addcl, cltype = cltype, addpca = NA, samp = NA, strsmp = NA)
+    if (nrow(glmdat) > 60000) glmdat <- samp_strat_data(glmdat,60)
+    glmdat5279 <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs, minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA,yrlims = c(1952,1980))
+    if (nrow(glmdat5279) > 60000) glmdat5279 <- samp_strat_data(glmdat5279,60)
+    a <- jdat[jdat$vessid != "JP1",]
+    glmdat79nd <- select_data_JointIO(a,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs, minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA,yrlims = c(1979,maxyr))
+    if (nrow(glmdat79nd) > 60000) glmdat79nd <- samp_strat_data(glmdat79nd,60)
+    wtt.all   <- mk_wts(glmdat,wttype = "area")
+    wtt.5279   <- mk_wts(glmdat5279,wttype = "area")
+    wtt.79nd   <- mk_wts(glmdat79nd,wttype = "area")
+    fmla.oplogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = T,nhbf = 3)
+    fmla.oplogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = F,nhbf = 3)
+    fmla.boatlogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = T,nhbf = 3)
+    fmla.boatlogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = F,nhbf = 3)
+    mn <- with(glmdat,0.1* mean(get(runsp)/hooks))
+
+    modlab = "lognC_novess_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    if (lu(glmdat$clust) > 1)
+    { model <- glm(fmla.oplogn,data = glmdat,weights = wtt.all,family = "gaussian");gc() } else
+    { model <- glm(fmla.oplogn_ncl,data = glmdat,weights = wtt.all,family = "gaussian");gc() }
+    summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    modlab = "lognC_boat_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    if (lu(glmdat$clust) > 1)
+    { model <- glm(fmla.boatlogn,data = glmdat,weights = wtt.all,family = "gaussian");gc() } else
+    { model <- glm(fmla.boatlogn_ncl,data = glmdat,weights = wtt.all,family = "gaussian");gc() }
+    summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    modlab = "lognC_novess_5279"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    mn <- with(glmdat5279,0.1* mean(get(runsp)/hooks))
+    if (lu(glmdat5279$clust) > 1)
+    { model <- glm(fmla.oplogn,data = glmdat5279,weights = wtt.5279,family = "gaussian");gc() } else
+    { model <- glm(fmla.oplogn_ncl,data = glmdat5279,weights = wtt.5279,family = "gaussian");gc() }
+    summarize_and_store(mod = model,dat = glmdat5279,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    modlab = "lognC_vessid_79nd"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    mn <- with(glmdat79nd,0.1* mean(get(runsp)/hooks))
+    if (lu(glmdat79nd$clust) > 1)
+    { model <- glm(fmla.boatlogn,    data = glmdat79nd,weights = wtt.79nd,family = "gaussian");gc() } else
+    { model <- glm(fmla.boatlogn_ncl,data = glmdat79nd,weights = wtt.79nd,family = "gaussian");gc() }
+    summarize_and_store(mod = model,dat = glmdat79nd,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    # delta lognormal
+    modlab = "dellog_novess_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg);
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd)
+
+    modlab = "dellog_boat_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd)
+
+    modlab = "dellog_novess_5279"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    do_deltalog(dat = glmdat5279,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd)
+
+    modlab = "dellog_vessid_79nd"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    do_deltalog(dat = glmdat79nd,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd)
+
+    graphics.off()
+  }
+}

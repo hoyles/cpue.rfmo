@@ -27,6 +27,7 @@ tot$tot_hooks <- tot$tot_hooks * 1000
 
 lb$cov_hooks <- lb$lb_hooks / tot$tot_hooks[match(paste(lb$area, lb$yr), paste(tot$area, tot$yr))]
 lb$cov_betn <- lb$lb_betn / tot$tot_betn[match(paste(lb$area, lb$yr), paste(tot$area, tot$yr))]
+cov$JP$area <- lb
 
 
 ## Load TW
@@ -37,18 +38,31 @@ a <- as.data.frame(read_excel(paste0(covdir, "Coverage rate for Taiwanese Atlant
 names(a) <- c("yr", "area", "cov_betn", "cov_hooks")
 cov$TW$area <- a
 
+## Load KR
 a <- as.data.frame(read_excel(paste0(covdir, "KR BET coverage.xlsx"), range = "A4:D41", col_names = FALSE))
 names(a) <- c("yr", "lb_betn", "tot_betn", "cov_betn")
 a$cov_betn <- a$cov_betn / 100
 cov$KR$full <- a
 
+# Plot full
 windows()
 with(cov$JP$full, plot(yr, cov_betn, type = "l", ylim = c(0, 1.5)))
 with(cov$TW$full, lines(yr, cov_betn, type = "l", col = 2))
 with(cov$KR$full, lines(yr, cov_betn, type = "l", col = 3))
 legend("topleft", legend = c("JP","TW","KR", "US"), lty = 1, col = 1:4)
+savePlot("Coverage", type = "png")
 
-with(lb[lb$area==3,], plot(yr, cov_betn, type = "l"))
+# Plot by area
+windows(10,10); par(mfrow = c(2,2), mar = c(3,3,3,1))
+for (r in 1:3) {
+  with(cov$JP$area[cov$JP$area$area==r,], plot(yr, cov_betn, type = "l", ylim = c(0, 1.5), main = paste("Region", r)))
+  with(cov$TW$area[cov$TW$area$area==r,], lines(yr, cov_betn, type = "l", col = 2))
+  if (r == 2) {
+    with(cov$KR$full, lines(yr, cov_betn, type = "l", col = 3))
+    legend("topleft", legend = c("JP","TW","KR", "US"), lty = 1, col = 1:4, horiz = TRUE)
+  }
+}
+savePlot("Coverage by region", type = "png")
 
 
 

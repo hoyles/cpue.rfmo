@@ -304,7 +304,7 @@ dir.create(kralysis_dir)
 dir.create(krfigs)
 setwd(kralysis_dir)
 
-resdir <- paste0(kralysis_dir,"std_cl_KRonly_nohbf/")
+resdir <- paste0(kralysis_dir,"std_cl_KRonly_hbf/")
 dir.create(resdir)
 setwd(resdir)
 
@@ -338,7 +338,7 @@ clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
 clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
 runreg = 1; runsp = "bet"
 

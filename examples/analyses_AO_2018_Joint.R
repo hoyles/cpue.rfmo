@@ -3,8 +3,7 @@
 # Remove TW before 2005
 # Joint standardization
 
-projdir <- "~/ICCAT/2018_CPUE/"
-Rdir <- paste0(projdir, "Rfiles/")
+projdir <- "~/ICCAT/2018_Bigeye/"
 
 cndir <- paste0(projdir, "CN/")
 krdir <- paste0(projdir, "KR/")

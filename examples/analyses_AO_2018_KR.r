@@ -287,44 +287,48 @@ for (r in 2:3) {
 #***********************************************
 
 
-# max number of node points for GAM splines
-kn = 2
-sp = "bet"
-
-# run standardization models for each species
-dataset$y <- dataset[,sp]
-mn <- with(dataset,0.1 * mean(y/hooks))
-
-# fitting year-effect (Nominal CPUE)
-m_base <- gam(log((y/hooks)+mn)~as.factor(yqx),data = dataset,family = gaussian) # runs much faster, and residual distribution looks better
-gam.check(m_base)
-table(dataset$hcltrp, useNA = "always")
-dataset$hcltrp <- as.factor(dataset$hcltrp)
-
-m_gam <- gam(log((y/hooks)+mn)~as.factor(yrqtr) + vessid + latlong + s(hooks,k = 30) + s(hbf,k = 15) + hcltrp,data = dataset,family = gaussian)
-
-windows();par(mfrow = c(2,2))
-gam.check(m_gam);savePlot(paste0("R",r,sp," gamcheck.png"),type = "png")
-windows(width = 20,height = 14)
-plot.gam(m_gam,pages = 1,all.terms = TRUE)
-savePlot(paste0("gamplot_base_R",r,sp,".png"),type = "png")
-graphics.off()
-
-
 ##################################################
 # Korea only, clusters, HBF
 #
 # R2 - 4 clusters. 1=yft+bet, 2=bet+alb, 3=bet, 4=bet+yft+swo. Use 1,2,3,4
 # R3 - 3 or 4 clusters. 1=alb+bet, 2=bet, 3=yft+bet+alb, 4=alb+bft+sfa. Use 1,2,3
 
-resdir <- paste0(kralysis_dir,"std_cl_KRonly_hbf/")
+projdir <- "~/ICCAT/2018_Bigeye/"
+
+krdir <- paste0(projdir, "KR/")
+datadir <- paste0(krdir, "data/")
+kralysis_dir <- paste0(krdir, "analyses/")
+krfigs <- paste0(krdir, "figures/")
+Rdir <- paste0(projdir, "Rfiles/")
+dir.create(kralysis_dir)
+dir.create(krfigs)
+setwd(kralysis_dir)
+
+resdir <- paste0(kralysis_dir,"std_cl_KRonly_nohbf/")
 dir.create(resdir)
 setwd(resdir)
 
+library("date")
+library("splines")
+library("maps")
+library("mapdata")
+library("maptools")
+library("data.table")
+library("lunar")
+library("lubridate")
+library("readr")
+library("plyr")
+library("dplyr")
+library("dtplyr")
+library("tm")
+library("readxl")
 
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
-            "Total","lat","lon","lat5","lon5","reg","flag")
+library(devtools)
 
+library("cpue.rfmo")
+
+splist <- c("alb", "bet", "yft")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks", splist, "hcltrp", "Total","lat","lon","lat5","lon5", "reg", "flag")
 
 #clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
@@ -334,7 +338,7 @@ clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
 clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = FALSE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
 runreg = 1; runsp = "bet"
 
@@ -350,7 +354,7 @@ for (runsp in c("bet")) {
     for (r in runpars[[runsp]]$doregs) {
       load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep = "_"),".RData"))
       dataset$flag <- flag
-      jdat <- rbind(jdat,dataset[,allabs])
+      jdat <- rbind(jdat,dataset[,stdlabs])
       rm(dataset)
     }
   }
@@ -363,8 +367,7 @@ for (runsp in c("bet")) {
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for (runreg in runpars[[runsp]]$doregs) {
     minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs,
-                                  minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA)
+    glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs,minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA)
     if (nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,60)
     a <- jdat[jdat$vessid != "KR1",]
 

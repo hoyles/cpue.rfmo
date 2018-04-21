@@ -203,11 +203,12 @@ dir.create(clustdir_all)
 setwd(clustdir_all)
 load(file = "../analyses/TWdat.RData")
 
-tw_allsp <- c("alb","bet","yft","ott","swo","mls", "blm", "bum", "otb", "skj", "sha", "oth", "sbt")
+tw_allsp <- c("alb","bet","bft","yft","ott","swo","mls", "blm", "bum", "otb", "skj", "sha", "oth", "sbt")
 use_allsp_allyrs <- c("alb","bet","yft","ott","swo","mls","bum","otb")
 
 allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_allyrs,"Total","sst","dmy","lat","lon","lat5","lon5","regB")
 
+flag = "TW"
 for (r in c(1:3)) {
   windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
   a <- dat[dat$regB == r,]
@@ -237,8 +238,7 @@ dir.create(clustdir_2005)
 setwd(clustdir_2005)
 
 use_allsp_2005 <- c("alb","bet","yft","swo","mls", "bum", "otb", "sha", "oth", "sbt")
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_2005,"Total","sst","dmy","lat","lon","lat5","lon5","regB")
-
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_2005,"Total","sst","dmy","lat","lon","lat5","lon5","regB", "regB1")
 dat5 <- dat[dat$yrqtr > 2005,]
 
 for (r in c(1:3)) {
@@ -250,7 +250,7 @@ for (r in c(1:3)) {
 }
 
 nclB = c(4,3,4)
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1")
 regtype = "regB"
 for (r in c(1,2,3)) {
   fnh <- paste(flag,regtype,r,sep = "_")
@@ -271,14 +271,15 @@ for (r in c(1,2,3)) {
 # R3 - Maybe none
 
 
-projdir <- "~/ICCAT/2018_CPUE/"
+projdir <- "~/ICCAT/2018_Bigeye/"
 twdir <- paste0(projdir, "TW/")
-datadir1 <- paste0(twdir, "data/catch_effort/")
+datadir1 <- paste0(twdir, "data/Simon_new data_April 20/")
 twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 
-std_dir <- paste0(twdir,"std/")
+std_dir <- paste0(twdir,"std_cl_TWonly_nohbf/")
+dir.create(std_dir)
 setwd(std_dir)
 
 library("date")
@@ -298,12 +299,11 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-load(file = paste0(twylisis_dir, "TWdat.RData"))
+load(file = paste0(twalysis_dir, "TWdat.RData"))
 
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5","alb","bet","yft","ott","swo",
-            "mls","bum","blm","otb","skj","sha","oth","sbt","Total","alb_w","bet_w","yft_w",
-            "ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sbt_w","sst","dmy",
-            "embark_dmy","debark_dmy","op_start_dmy","op_end_dmy","lat","lon","lat5","lon5","regB")
+use_splist <- use_allsp_2005
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",use_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
+
 dat <- data.frame(dat)
 
 #clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
@@ -314,35 +314,34 @@ clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
 clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 
-runsp <- "bet"; runreg <- 4
-maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5,5,5); keepd <- TRUE
+runsp <- "bet"; runreg <- 2
+maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5); keepd <- TRUE
 for (runsp in c("bet")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
   dohbf <- runpars[[runsp]]$dohbf
   cltype <- runpars[[runsp]]$cltype
-  tdat <- data.frame()
+  jdat <- data.frame()
   for (flag in c("TW")) {
     for (r in runpars[[runsp]]$doregs) {
       load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep = "_"),".RData"))
       dataset$flag <- flag
-      tdat <- rbind(tdat,dataset)
+      jdat <- rbind(jdat,dataset[,stdlabs])
       rm(dataset)
     }
   }
-  tdat <- tdat[tdat$yrqtr < maxyr,]
-  tdat$vessidx <- tdat$vessid
-  tdat$vessid <- paste0(tdat$flag,tdat$vessid)
-  tdat$vessid <- as.factor(tdat$vessid)
+  jdat <- jdat[jdat$yrqtr < maxyr,]
+  jdat$vessidx <- jdat$vessid
+  jdat$vessid <- paste0(jdat$flag,jdat$vessid)
+  jdat$vessid <- as.factor(jdat$vessid)
 
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for (runreg in runpars[[runsp]]$doregs) {
     minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(tdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs,
-                                  minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA)
+    glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs, minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA)
     if (nrow(glmdat) > 60000) glmdat <- samp_strat_data(glmdat,60)
     wtt.all   <- mk_wts(glmdat,wttype = "area")
     fmla.oplogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = T,nhbf = 3)

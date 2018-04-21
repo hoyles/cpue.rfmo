@@ -388,7 +388,7 @@ clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 runpars <- list()
 runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:2, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 
-stdlabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks",use_splist,"lat","lon","lat5","lon5","regB", "regB1","hcltrp","flag")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks",use_splist,"lat","lon","lat5","lon5", "reg", "hcltrp", "flag")
 
 keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
 for (runsp in c("bet")) {
@@ -406,7 +406,6 @@ for (runsp in c("bet")) {
       rm(dataset)
     }
   }
-  jdat$reg <- jdat[,runpars[[runsp]]$regtype]
   jdat <- jdat[jdat$yrqtr < maxyr,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)

@@ -352,7 +352,7 @@ for (r in c(1:3)) {
 }
 
 nclB = c(4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1")
 r = 4
 
 
@@ -387,13 +387,13 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_CPUE/"
+projdir <- "~/ICCAT/2018_Bigeye/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 
-resdir <- paste0(jalysis_dir,"std_nocl_JPonly_hbf/")
+resdir <- paste0(jalysis_dir,"std_cl_JPonly_nohbf/")
 dir.create(resdir)
 setwd(resdir)
 
@@ -404,10 +404,14 @@ clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
 clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
 clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
+flag <- "JP"
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = FALSE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+use_splist <- c("alb","bet","yft")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
-keepd = FALSE; maxyr = 2018; maxqtrs=200; minqtrs_byreg = c(5,5,5);
+runreg = 1; runsp = "bet"
+keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
 for (runsp in c("bet")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
@@ -419,7 +423,7 @@ for (runsp in c("bet")) {
     for (r in runpars[[runsp]]$doregs) {
       load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep = "_"),".RData"))
       dataset$flag <- flag
-      jdat <- rbind(jdat,dataset[,allabs])
+      jdat <- rbind(jdat,dataset[,stdlabs])
       rm(dataset)
     }
   }

@@ -165,9 +165,10 @@ select_data_IO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2
 #' @param yrlims Bounding years for the analysis. Use integer values, because yrqtrs use 0.125 to 0.875.
 #' @param oneflag If not NA, the flag to use in the analysis. Otherwise flags JP, KR, SY, TW are used.
 #' @param minhbf All sets with hbf less than this value are removed.
+#' @param minyqll Sets that are in yqll strata with fewer than minyqll sets are removed.
 #' @return Modified dataset.
 #'
-select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2, maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100, llstrat = 5, addcl = F, cltype = NA, addpca = NA, samp = NA, strsmp = 30, yrlims = NA, oneflag = NA, minhbf = 5) {
+select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2, maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100, llstrat = 5, addcl = F, cltype = NA, addpca = NA, samp = NA, strsmp = 30, yrlims = NA, oneflag = NA, minhbf = 5, minyqll = 1) {
   gdat <- indat[indat$reg == runreg, ]
   if (!is.na(yrlims[1]))
     gdat <- gdat[gdat$yrqtr > yrlims[1] & gdat$yrqtr < yrlims[2], ]
@@ -200,6 +201,10 @@ select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtr
     if (mt == "deltapos")
       gdat <- gdat[gdat[, runsp] > 0, ]
 
+    yqll <- paste(gdat$yrqtr, gdat$latlong)
+    a <- table(yqll)
+    a <- apply(a > minyqll, 1, sum)
+    gdat <- gdat[yqll %in% names(a), ]
     a <- table(gdat$vessid, gdat$yrqtr)
     a <- apply(a > 0, 1, sum)
     a <- a[a >= minqtrs & a <= maxqtrs]  # Vessel fishes in at least 'minqtrs' quarters

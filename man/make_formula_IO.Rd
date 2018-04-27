@@ -5,7 +5,7 @@
 \title{Create formula object to use in the glm.}
 \usage{
 make_formula_IO(runsp, modtype, addboat, dohbf = T, splitboat = F,
-  addcl = F, addpca = NA, nhbf = 6)
+  addcl = F, addpca = NA, nhbf = 6, dohook = TRUE)
 }
 \arguments{
 \item{runsp}{Species of interest.}
@@ -23,6 +23,8 @@ make_formula_IO(runsp, modtype, addboat, dohbf = T, splitboat = F,
 \item{addpca}{Include PCA if TRUE.}
 
 \item{nhbf}{Number of knots in hbf spline, if dohbf is TRUE.}
+
+\item{dohook}{Include a spline on hooks if TRUE.}
 }
 \value{
 Modified dataset.

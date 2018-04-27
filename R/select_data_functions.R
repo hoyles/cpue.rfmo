@@ -224,7 +224,7 @@ select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtr
       gdat <- samp_strat_data(gdat, strsmp)
     gdat$vessid <- as.factor(gdat$vessid)
     gdat$latlong <- as.factor(gdat$latlong)
-    gdat$yrqtr <- as.factor(gdat$yrqtr)
+    gdat$yrqtr <- as.factor(as.character(gdat$yrqtr))
     if (addcl != F)
       gdat$clust <- as.factor(gdat$clust)
   }

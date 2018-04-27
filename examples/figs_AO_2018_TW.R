@@ -7,8 +7,6 @@ Rdir <- paste0(projdir, "Rfiles/")
 
 setwd(twfigs)
 
-
-
 library("date")
 library("splines")
 library("maps")

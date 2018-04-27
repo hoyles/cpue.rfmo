@@ -44,12 +44,27 @@ names(a) <- c("yr", "lb_betn", "tot_betn", "cov_betn")
 a$cov_betn <- a$cov_betn / 100
 cov$KR$full <- a
 
+# Load US
+a <- read.csv(paste0(covdir,"USLLcoverage.csv"))
+a$cov_betn <- a$sumLB / a$TASK1
+# usco <- a[,4]
+# usco[is.na(usco)] <- 0
+# a[,4] <- usco
+names(a)[c(1)] <- c("yr")
+cov$US$full <- a
+
+save(cov, file = "coverage.RData")
+
 # Plot full
-windows()
-with(cov$JP$full, plot(yr, cov_betn, type = "l", ylim = c(0, 1.5)))
-with(cov$TW$full, lines(yr, cov_betn, type = "l", col = 2))
-with(cov$KR$full, lines(yr, cov_betn, type = "l", col = 3))
-legend("topleft", legend = c("JP","TW","KR", "US"), lty = 1, col = 1:4)
+windows(width=10, height = 7)
+with(cov$JP$full, plot(yr, cov_betn, type = "l", lwd=2, ylim = c(0, 1.5), xlab = "Year", ylab = "Coverage"))
+with(cov$TW$full, lines(yr, cov_betn, type = "l", lwd=2, lty = 2, col = 2))
+with(cov$TW$full[cov$TW$full$yr >= 2005,], lines(yr, cov_betn, type = "l", lwd=2, lty = 1, col = 2))
+with(cov$KR$full, lines(yr, cov_betn, type = "l", lwd=2, col = 3, lty = 1))
+#with(cov$US$full, lines(yr, cov_betn, type = "l", lwd=2, col = 4, lty = 2))
+with(cov$US$full[cov$US$full$yr > 1994,], lines(yr, cov_betn, type = "l", lwd=2, col = 4, lty = 1))
+legend("topleft", legend = c("JP","TW","KR", "US"), lty = c(1,1,1,1), lwd = 2, col = 1:4, horiz = TRUE)
+abline(h = 1, lty = 2)
 savePlot("Coverage", type = "png")
 
 # Plot by area

@@ -342,7 +342,7 @@ runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs =
 
 runreg = 1; runsp = "bet"
 
-keepd = FALSE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
+keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
 for (runsp in c("bet")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk

@@ -5,7 +5,7 @@
 \title{Run delta lognormal models.}
 \usage{
 do_deltalog(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp,
-  fname, modlab, keepd = TRUE)
+  fname, modlab, keepd = TRUE, dohook = dohook)
 }
 \arguments{
 \item{dat}{Input dataset.}
@@ -25,6 +25,8 @@ do_deltalog(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp,
 \item{modlab}{Label for plots and filenames.}
 
 \item{keepd}{If FALSE, delete the data from the model object before saving.}
+
+\item{dohook}{Include hooks in the model on the RHS if TRUE.}
 }
 \description{
 The function runs delta lognormal models.

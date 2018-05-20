@@ -61,6 +61,11 @@ doplot_cpue <- function(a,vartype, mfti, regtype, runreg) {
   points(a$yq,a$ll/mean(a$pr,na.rm=T),pch="-",col=2)
   mtext(paste0(regtype," R",runreg),side=3,outer=T,line=-2)
   }
+resdir <- resdirs[7]
+regtype = "regB"
+vartype = "dellog"
+mdn=4
+
 
   for (resdir in resdirs[7]) {
     outdir <- paste0(resdir,"/outputs_test/")
@@ -85,16 +90,18 @@ doplot_cpue <- function(a,vartype, mfti, regtype, runreg) {
                 #      predt <- predict(mod,newdata=nd$newdat
                 if(vartype=="lognC") {
                   xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
+                  xx$cv <- nd$predterms$se.fit[,1]
                   xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
                   xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
                 } else {
                   xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
+                  xx$cv <- nd$predterms$se.fit[,1]
                   xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
                   xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
                 }
                 a <- data.frame(yq=seq(min(xx$yq),max(xx$yq),0.25))
-                a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),3:5])
-                a[,2:4] <- a[,2:4]/mean(a[,2],na.rm=TRUE)
+                a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),3:6])
+                a[,c(2,4,5)] <- a[,c(2,4,5)]/mean(a[,2],na.rm=TRUE)
                 a$yr <- as.factor(floor(a$yq))
                 a$qtr <- as.factor(a$yq - floor(a$yq))
                 doplot_cpue(a,vartype, mfti, regtype, runreg)
@@ -108,15 +115,18 @@ doplot_cpue <- function(a,vartype, mfti, regtype, runreg) {
             if(vartype=="dellog") {
               if(file.exists(paste0(fname,"_pos_",modtype,"_predictions.RData"))) {
                 load(paste0(fname,"_pos_",modtype,"_predictions.RData"))
+#                load(paste0(fname,"_bin_",modtype,"_predictions.RData"))
                 load(paste0(fname,"_",modtype,"_indices.RData"))
-                xx <- data.frame(yq=as.numeric(gsub("yrqtr","",names(coefs.pos))))
+#                xx <- data.frame(yq=as.numeric(gsub("yrqtr","",names(coefs.pos))))
+                xx <- data.frame(yq=as.numeric(as.character(ndpos$newdat$yrqtr)))
                 xx$pr <- pcoefs
+                xx$ln.cv <- ndpos$predterms$se.fit[,1]
                 xx$ll <- exp(log(pcoefs) - 1.96*ndpos$predterms$se.fit[,1])
                 xx$ul <- exp(log(pcoefs) + 1.96*ndpos$predterms$se.fit[,1])
 
                 a <- data.frame(yq=seq(min(xx$yq,na.rm=T),max(xx$yq,na.rm=T),0.25))
-                a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),2:4])
-                a[,2:4] <- a[,2:4]/mean(a[,2],na.rm=TRUE)
+                a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),2:5])
+                a[,c(2,4:5)] <- a[,c(2,4:5)]/mean(a[,2],na.rm=TRUE)
                 a$yr <- as.factor(floor(a$yq))
                 a$qtr <- as.factor(a$yq - floor(a$yq))
                 doplot_cpue(a,vartype, mfti, regtype, runreg)
@@ -341,7 +351,7 @@ resdirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
 
 #topdir <- c(KRdir, JPdir, TWdir, USdir)
 r=2
-fl = c("KR","JP","TW","US","jnt")
+fl = c("KR","JP","TW","US","jnt","jnt","jnt")
 # md <- md5279; nm_dat <- "glmdat5279"; nm_wt <- "wtt.5279"
 # md <- mdtn  ; nm_dat <- "glmdat"    ; nm_wt <- "wtt.all"
 # md <- md79nd; nm_dat <- "glmdat79nd"; nm_wt <- "wtt.79nd"
@@ -350,7 +360,7 @@ for (md in c(md5279, md79nd, mdtn, mdtv)) {
   nm_dat <- switch(md, vessid_79nd = "glmdat79nd", novess_allyrs = "glmdat", boat_allyrs = "glmdat", novess_5279 = "glmdat5279")
   nm_wt <- switch(md, vessid_79nd = "wtt.79nd", novess_allyrs = "wtt.all", boat_allyrs = "wtt.all", novess_5279 = "wtt.5279")
   for (r in 1:3) {
-    for(n in 5) {
+    for(n in 7) {
       rm(mod)
       rm(infve)
       fn <- paste0(resdirs[n],"Joint_regB_R",r,"_lognC_",md,"_model.RData")
@@ -361,7 +371,7 @@ for (md in c(md5279, md79nd, mdtn, mdtv)) {
         assign(nm_wt, mk_wts(mod$data,wttype="area"))
         mn <- with(mod$data,0.1 * mean(get(runsp)/hooks))
         keepd = TRUE
-        setwd(resdirs_flags[n])
+        setwd(resdirs[n])
         infve=Influence$new(mod)
         infve$calc()
         windows()

@@ -114,10 +114,10 @@ a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
 windows(width = 10,height = 10)
 for (fld in c("regB","regB1")) {
   reg <- with(a0,get(fld))
-  plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld)
+  plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld, xlim = c(-100, 50))
   text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
-  map(add = T)
-  savePlot(paste0("map_",fld),type = "png")
+  map(add = T, fill = TRUE)
+  savePlot(paste0("mapf_",fld),type = "png")
 }
 
 # Plot the effect of data cleaning on the number of sets

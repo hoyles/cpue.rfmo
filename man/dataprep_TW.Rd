@@ -14,6 +14,8 @@ dataprep_TW(dat, alldat = F, region = "IO", splist = c("alb", "bet",
 \item{alldat}{Not used.}
 
 \item{region}{IO or AO.}
+
+\item{splist}{Define the species in the dataset}
 }
 \value{
 Modified dataset.

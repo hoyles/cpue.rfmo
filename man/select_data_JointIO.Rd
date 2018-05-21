@@ -7,7 +7,7 @@
 select_data_JointIO(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2,
   maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100,
   llstrat = 5, addcl = F, cltype = NA, addpca = NA, samp = NA,
-  strsmp = 30, yrlims = NA, oneflag = NA, minhbf = 5)
+  strsmp = 30, yrlims = NA, oneflag = NA, minhbf = 5, minyqll = 1)
 }
 \arguments{
 \item{indat}{Input dataset}
@@ -49,6 +49,8 @@ select_data_JointIO(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2,
 \item{oneflag}{If not NA, the flag to use in the analysis. Otherwise flags JP, KR, SY, TW are used.}
 
 \item{minhbf}{All sets with hbf less than this value are removed.}
+
+\item{minyqll}{Sets that are in yqll strata with fewer than minyqll sets are removed.}
 }
 \value{
 Modified dataset.

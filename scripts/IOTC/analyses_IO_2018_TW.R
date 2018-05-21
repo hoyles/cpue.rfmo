@@ -1,7 +1,7 @@
 projdir <- "~/IOTC/2018_CPUE/"
 twdir <- paste0(projdir, "TW/")
 datadir <- paste0(twdir, "data/1979-2017/")
-datadir_oil <- paste0(twdir, "data/revisedoildata/")
+datadir_oil <- paste0(twdir, "data/revisedoildatav2/")
 twylisis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")

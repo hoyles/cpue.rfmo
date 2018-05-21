@@ -256,6 +256,7 @@ dataprep <- function(dat, alldat = F) {
 #' @param dat Input dataset
 #' @param alldat Not used.
 #' @param region IO or AO.
+#' @param splist Define the species in the dataset
 #' @return Modified dataset.
 #'
 dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")) {
@@ -327,7 +328,7 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
    }
    dat$Total <- apply(dat[,splist], 1, sum)
    dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
-   noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripid", "tripidmon", "moon", splist, "Total", "Total2", splist_w, "sst", "bt1", "bt2", "bt3", "bt4", "bt5", "hookdp", "target", "rem", "dmy", "embark_dmy", "debark_dmy", "op_start_dmy", "op_end_dmy", "lat", "lon", "lat5", "lon5", "oil", "foc")
+   noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripid", "tripidmon", "moon", splist, "Total", "Total2", splist_w, "sst", "bt1", "bt2", "bt3", "bt4", "bt5", "hookdp", "target", "rem", "dmy", "embark_dmy", "debark_dmy", "op_start_dmy", "op_end_dmy", "lat", "lon", "lat5", "lon5", "oilv", "foc")
    dat <- dat[, noms]
    return(dat)
 }

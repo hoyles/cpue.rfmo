@@ -1,6 +1,7 @@
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 twdir <- paste0(projdir, "TW/")
-datadir <- paste0(twdir, "data/newfileadd2014-2016/")
+datadir <- paste0(twdir, "data/1979-2017/")
+datadir_oil <- paste0(twdir, "data/1979-2017 including oil fish/")
 twylisis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -24,61 +25,67 @@ library(plyr)
 library(dplyr)
 library(splines)
 
-search()
-source(paste0(Rdir,"support_functions.r"))
+#install.packages("devtools")
+library(devtools)
+# This new library replaces the 'support functions.r' file.
+#install_github("hoyles/cpue.rfmo")
 
-# a <- list.files(pattern="model")
-# f=a[1]
-# for (f in a) {
-#     load(f)
-#     x <- ls()[3]
-#     summ <- summary(get(x))
-#     save(summ,file=paste0("summ",f,".RData") )
-#     rm(summ,x)
-#     ls()
-#     }
+library("cpue.rfmo")
 
-#"alb","bet","yft","sbt",      "swo","mls","bum","blm",      "skj","sha","oth","sfa",
-#"alb","bet","yft","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth",
+#source(paste0(Rdir,"support_functions.r"))
+#xsd # stop!
 
-nms2 <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo",
-          "mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w",
-          "mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target",
-          "NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd",
-          "op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
+# Set up names, since we need the same names across all fleets
+nms <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oilv","foc","rem")
+nms_oil <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","oil","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","oil_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oilv","foc","rem")
 
-#wdths2 <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,8,1,8,1,8,1,8,5,5,8)
-wdths2 <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
-cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
-substr(cc2,47,47)
-a <- read_fwf(file=paste0(datadir,"/LOG2005.IND"),fwf_widths(wdths2),col_types=cc2,n_max=20);gc()
-names(a) <- nms2
-a
-cbind(nms2,wdths2,cumsum(c(wdths2)),unlist(strsplit(cc2,"")))
+wdths <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
+cc <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
+wdths_oil <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
+cc_oil <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
 
-# yy <- 1979:2013;yy <- paste0("/LOG",yy,".ind")
-# readfun1 <- function(ff) {
-#   read.fwf(paste0(datadir1,ff),widths=wdths,col.names=nms,buffersize=200000,stringsAsFactors=F)
-#   }
-# a <- lapply(yy,readfun1)
-# dat1 <- data.frame()
-# for(i in 1:length(yy)) {
-#   dat1 <- rbind(dat1,a[[i]])
-#   print(i)
-#   flush.console()
-#   }
-#save(dat1,file="dat1.RData")
-#load("dat1.RData")
+# Load names and widths provided by TW; compare locations and widths
+ffo <- read.csv(paste0(datadir,"outcodeP2.csv"), stringsAsFactors=FALSE)
+ffo_oil <- read.csv(paste0(datadir_oil,"outcodeP2oil.csv"), stringsAsFactors=FALSE)
+cbind(nms, ffo$item, nms_oil, ffo_oil$item)
+wdths==ffo$width; sum(wdths!=ffo$width)
+wdths_oil==ffo_oil$width; sum(wdths_oil!=ffo_oil$width)
 
-yy <- 1979:2016;yy <- paste0("/LOG",yy,".IND")
+# Load example to check processing
+a <- read_fwf(file=paste0(datadir,"LOG2005.IND"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+names(a); dim(a)
+names(a) <- nms
+head(a)
+cbind(nms,wdths,cumsum(c(wdths)),unlist(strsplit(cc,"")))
+
+a <- read_fwf(file=paste0(datadir_oil,"LOG2005.IND"),fwf_widths(wdths_oil),col_types=cc_oil,n_max=20);gc()
+names(a); dim(a)
+names(a) <- nms_oil
+head(a)
+
+# Load all the files
+yy <- 1979:2017;yy <- paste0("/LOG",yy,".IND")
 readfun1 <- function(ff) {
-  read_fwf(paste0(datadir,ff),fwf_widths(wdths2),col_types=cc2)
+  read_fwf(paste0(datadir,ff),fwf_widths(wdths),col_types=cc)
+}
+readfun_oil <- function(ff) {
+  read_fwf(paste0(datadir_oil,ff),fwf_widths(wdths_oil),col_types=cc_oil)
 }
 a <- lapply(yy,readfun1)
+a_oil <- lapply(yy,readfun_oil)
 system.time({ dat1 <- ldply(a, data.frame) })
-names(dat1) <- nms2
-save(dat1,file="dat1.RData")
+system.time({ dat1_oil <- ldply(a_oil, data.frame) })
+names(dat1) <- nms
+names(dat1_oil) <- nms_oil
+save(dat1,dat1_oil, file="dat1.RData")
 load(paste0(twylisis_dir, "dat1.RData"))
+
+makekey <- function(x) {
+  paste(a$vessid, a$op
+
+}
+
+table(dat1[dat1$op_yr==2017,]$oth)
 
 str(dat1)
 table(dat1$op_yr)
@@ -91,7 +98,12 @@ table(is.na(dat1$op_lon),dat1$op_yr)
 table(is.na(dat1$hbf),dat1$op_yr)
 table(dat1$op_yr,dat1$op_yr==1)
 
-prepdat1 <- dataprep_TW(dat1)
+splist1 <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")
+splist_oil <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt", "oil")
+prepdat1 <- dataprep_TW(dat1, splist = splist1)
+prepdat1_oil <- dataprep_TW(dat1_oil, splist = splist_oil)
+
+
 prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB3=T, regB2=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 datold <- dataclean_TW(prepdat)
 save(datold,file="TWdat_old.RData")

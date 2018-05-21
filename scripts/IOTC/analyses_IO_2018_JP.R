@@ -1,3 +1,4 @@
+# Set up directories
 projdir <- "~/IOTC/2017_CPUE/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/catch_effort/")
@@ -5,6 +6,8 @@ jalysis_dir <- paste0(jpdir, "analyses/")
 jpfigs <- paste0(jpdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 setwd(jalysis_dir)
+
+# Install any missing packages
 #install.packages("date")
 #install.packages("maps")
 #install.packages("mapdata")
@@ -13,6 +16,10 @@ setwd(jalysis_dir)
 #install.packages("lunar")
 #install.packages("dtplyr")
 #install.packages("tm")
+#install.packages("devtools")
+#devtools::install_github("hadley/readr")
+
+# Load packages
 library("date")
 library(splines)
 library("maps")
@@ -20,21 +27,19 @@ library("mapdata")
 library("maptools")
 library("data.table")
 library("lunar")
-#install.packages("devtools")
-#devtools::install_github("hadley/readr")
 library(lubridate)
 library(readr)
 library(plyr)
 library(dplyr)
 library(dtplyr)
 library(tm)
-
-
-
-source(paste0(Rdir,"support_functions.r"))
-xsd # stop!
+library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ignored.
+# source(paste0(Rdir,"support_functions.r"))
+# xsd # stop!
 
 ##################
+
+# Load data. These will need to be changed if the data format changes.
 nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
       "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid")
 wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9)

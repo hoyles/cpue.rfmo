@@ -262,7 +262,7 @@ dataprep <- function(dat, alldat = F) {
 dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")) {
    splist_w <- paste0(splist, "_w")
    dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
-   dat <- dat[!is.na(dat$dmy),]
+   # dat <- dat[!is.na(dat$dmy),]
    # makedmy <- function(yy, mm, dd) {
    #   if(sum(!is.na(yy)) > 0) {
    #     a = paste(yy, mm, dd, sep = " - ")
@@ -272,15 +272,15 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
    #   return(a2)
    # }
    makedmy <- function(yy, mm, dd) {
-     tmp <- data.frame(yy=yy,mm==mm,dd==dd)
-     loc <- !is.na(tmp$yy)
+     tmp <- data.frame(yy=yy,mm=mm,dd=dd)
+     loc <- !(is.na(tmp$yy) | is.na(tmp$mm) | is.na(tmp$dd) | (tmp$yy==0) | (tmp$dd==0) )
      tm2 <- tmp[loc,]
      tm2$a <- paste(tm2$yy, tm2$mm, tm2$dd, sep = " - ")
      tm2$a1 <- gsub(" ", "", tm2$a)
      tm2$a2 <- ymd(tm2$a1)
      tmp$a2 <- NA
      tmp[loc,]$a2 <- tm2$a2
-     return(a2)
+     return(tmp$a2)
    }
    dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
    dat$debark_dmy <- makedmy(dat$debark_yr, dat$debark_mn, dat$debark_dd)
@@ -402,20 +402,20 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
       mutate(regY1 = replace(regY1, which(regY %in% c(5, 6)), 4))
   }
 
-  if (regY2) {
+  if(regY2) {
     dat$regY2 <- 0
-    dat <-
-      mutate(dat, regY2 = replace(regY2, which(lat5 >= 10 & lon5 < 80 & !is.na(lat5)), 1)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 >= 40 & lon5 < 75 & !is.na(lat5)), 2)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < -10 & lat5 >= -15 & lon5 >= 60 & lon5 < 75 & !is.na(lat5)),
-                             2)) %>% mutate(regY2 = replace(regY2, which(lat5 < -10 & lat5 >= -30 & lon5 >= 20 & lon5 < 60 & !is.na(lat5)), 3)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < -30 & lat5 >= -40 & lon5 >= 20 & lon5 < 40 & !is.na(lat5)), 3)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < -15 & lat5 >= -40 & lon5 >= 60 & lon5 < 120 & !is.na(lat5)), 4)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < -30 & lat5 >= -40 & lon5 >= 40 & lon5 < 60 & !is.na(lat5)), 4)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < 10 & lat5 >= -15 & lon5 >= 75 & lon5 < 100 & !is.na(lat5)), 5)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < -5 & lat5 >= -15 & lon5 >= 100 & lon5 < 110 & !is.na(lat5)), 5)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < -10 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)), 5)) %>%
-      mutate(regY2 = replace(regY2, which(lat5 < 30 & lat5 >= 10 & lon5 >= 80 & lon5 < 100 & !is.na(lat5)), 6))
+    dat <- mutate(dat,regY2 = replace(regY2,which(lat5 >=  10 & lon5 < 80 & !is.na(lat5)),1)) %>%
+      mutate(regY2 = replace(regY2,which(lat5 <  10 & lat5 >=    0 & lon5 >= 40 & lon5 < 75 & !is.na(lat5)),7))  %>%
+      mutate(regY2 = replace(regY2,which(lat5 <   0 & lat5 >=  -10 & lon5 >= 40 & lon5 < 75 & !is.na(lat5)),2))  %>%
+      mutate(regY2 = replace(regY2,which(lat5 <  -10 & lat5 >=  -15 & lon5 >= 60 & lon5 < 75 & !is.na(lat5)),2)) %>%
+      mutate(regY2 = replace(regY2,which(lat5 <  -10 & lat5 >= -30 & lon5 >= 20 & lon5 < 60 & !is.na(lat5)),3))  %>%
+      mutate(regY2 = replace(regY2,which(lat5 <  -30 & lat5 >= -40 & lon5 >= 20 & lon5 < 40 & !is.na(lat5)),3))  %>%
+      mutate(regY2 = replace(regY2,which(lat5 <  -15 & lat5 >= -40 & lon5 >= 60 & lon5 < 120 & !is.na(lat5)),4)) %>%
+      mutate(regY2 = replace(regY2,which(lat5 <  -30 & lat5 >= -40 & lon5 >= 40 & lon5 < 60 & !is.na(lat5)),4))  %>%
+      mutate(regY2 = replace(regY2,which(lat5 < 10 & lat5 >= -15 & lon5 >= 75 & lon5 < 100 & !is.na(lat5)),5))   %>%
+      mutate(regY2 = replace(regY2,which(lat5 < -5 & lat5 >= -15 & lon5 >= 100 & lon5 < 110 & !is.na(lat5)),5))  %>%
+      mutate(regY2 = replace(regY2,which(lat5 < -10 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)),5)) %>%
+      mutate(regY2 = replace(regY2,which(lat5 < 30 & lat5 >= 10 & lon5 >= 80 & lon5 < 100 & !is.na(lat5)),6))
   }
 
   # regB North of 15S and west of 80 is R1, or north of 20 and west of 45; north of 15S and east of 80 is R2; north of 35S is R3

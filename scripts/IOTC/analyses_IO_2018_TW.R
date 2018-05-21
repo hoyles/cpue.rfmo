@@ -1,7 +1,7 @@
 projdir <- "~/IOTC/2018_CPUE/"
 twdir <- paste0(projdir, "TW/")
 datadir <- paste0(twdir, "data/1979-2017/")
-datadir_oil <- paste0(twdir, "data/1979-2017 including oil fish/")
+datadir_oil <- paste0(twdir, "data/revisedoildata/")
 twylisis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -39,8 +39,8 @@ library("cpue.rfmo")
 nms <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oilv","foc","rem")
 nms_oil <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","oil","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","oil_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oilv","foc","rem")
 
-wdths <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
-cc <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
+wdths     <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
+cc     <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
 wdths_oil <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
 cc_oil <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
 
@@ -99,27 +99,34 @@ table(is.na(dat1$hbf),dat1$op_yr)
 table(dat1$op_yr,dat1$op_yr==1)
 
 splist1 <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")
-splist_oil <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt", "oil")
-prepdat1 <- dataprep_TW(dat1, splist = splist1)
-prepdat1_oil <- dataprep_TW(dat1_oil, splist = splist_oil)
+#splist_oil <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt", "oil")
+# initial data preparation. Failures to parse (19, 167, 352) due to bad dates (Feb 29, April 31 etc)
 
+prepdat1 <-     dataprep_TW(dat1,     splist = splist1)
+#prepdat1_oil <- dataprep_TW(dat1_oil, splist = splist_oil)
 
-prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB3=T, regB2=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
-datold <- dataclean_TW(prepdat)
+prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
+#prepdat_oil <- setup_IO_regions(prepdat1_oil,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
+datold <-     dataclean_TW(prepdat, splist = splist1)
+#datold_oil <- dataclean_TW(prepdat_oil, splist = splist_oil)
 save(datold,file="TWdat_old.RData")
-dat <- dataclean_TW(prepdat,rmssp=T)
+
+splist2 <- splist1[splist1 != "pbf"] # remove 'pbf' which was removed by 'dataprep'
+#splist_oil2 <- splist_oil[splist_oil != "pbf"]
+dat <-     dataclean_TW(prepdat, rmssp=T, splist = splist2)
+#dat_oil <- dataclean_TW(prepdat_oil, rmssp=T, splist = splist_oil2)
 save(dat,file="TWdat.RData")
 load(file="TWdat.RData")
 getwd()
 
-table(dat$op_lon,dat$lon,useNA="always")
+#table(dat$op_lon,dat$lon,useNA="always")
 table(dat$op_lon,useNA="always")
 table(dat$lon,useNA="always")
 
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regB","regY1","regB1","regB2","regA","regA1","regA2","regA3","regA4","regA5")]
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regY1","regY2","regB","regB1","regB2","regB3","regA","regA1","regA2","regA3","regA4","regA5")]
 windows(width=15,height=10)
-for(fld in c("regY","regB","regY1","regB1","regB2","regA","regA1","regA2","regA3","regA4","regA5")) {
+for(fld in c("regY","regY1","regY2","regB","regB1","regB2","regB3","regA","regA1","regA2","regA3","regA4","regA5")) {
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
   text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)

@@ -262,15 +262,27 @@ dataprep <- function(dat, alldat = F) {
 dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")) {
    splist_w <- paste0(splist, "_w")
    dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+   dat <- dat[!is.na(dat$dmy),]
+   # makedmy <- function(yy, mm, dd) {
+   #   if(sum(!is.na(yy)) > 0) {
+   #     a = paste(yy, mm, dd, sep = " - ")
+   #     a1 <- gsub(" ", "", a)
+   #     a2 <- ymd(a1)
+   #   } else a2 <- yy
+   #   return(a2)
+   # }
    makedmy <- function(yy, mm, dd) {
-     if(sum(!is.na(yy)) > 0) {
-       a = paste(yy, mm, dd, sep = " - ")
-       a1 <- gsub(" ", "", a)
-       a2 <- ymd(a1)
-     } else a2 <- yy
+     tmp <- data.frame(yy=yy,mm==mm,dd==dd)
+     loc <- !is.na(tmp$yy)
+     tm2 <- tmp[loc,]
+     tm2$a <- paste(tm2$yy, tm2$mm, tm2$dd, sep = " - ")
+     tm2$a1 <- gsub(" ", "", tm2$a)
+     tm2$a2 <- ymd(tm2$a1)
+     tmp$a2 <- NA
+     tmp[loc,]$a2 <- tm2$a2
      return(a2)
    }
-    dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
+   dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
    dat$debark_dmy <- makedmy(dat$debark_yr, dat$debark_mn, dat$debark_dd)
    dat$op_start_dmy <- makedmy(dat$op_start_yr, dat$op_start_mn, dat$op_start_dd)
    dat$op_end_dmy <- makedmy(dat$op_end_yr, dat$op_end_mn, dat$op_end_dd)

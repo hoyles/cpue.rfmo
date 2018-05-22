@@ -1,5 +1,5 @@
 # Set up directories
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/catch_effort/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -33,13 +33,23 @@ library(plyr)
 library(dplyr)
 library(dtplyr)
 library(tm)
+library(devtools)
+
+# The new library 'cpue.rfmo' replaces the 'support functions.r' file.
+# The command 'install_github("hoyles/cpue.rfmo")' should install cpue.rfmo, but currently doesn't work,
+# possibly due to a bug in devtools with private github repositories, or something else, I'm still looking.
+# The current workaround is either:
+# a) download cpue.rfmo from github and compile it into a package, following the instructions here:
+# http://kbroman.org/pkg_primer/pages/build.html. This is the best approach; or
+# b) download cpue.rfmo from github, and install from the binary package (cpue.rfmo_0.1.0.zip) in the top dir.
+# Check first that cpue.rfmo has been recompiled to match the latest source code, which may not be the case.
+# c) ask me to email you a copy of the binary package, then install it.
+
 library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ignored.
-# source(paste0(Rdir,"support_functions.r"))
-# xsd # stop!
 
 ##################
 
-# Load data. These will need to be changed if the data format changes.
+# Load data. This section will only need to be changed if the data format changes.
 nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
       "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid")
 wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
@@ -48,48 +58,38 @@ posses <- cumsum(c(1,wdths))
 cc <- "iiiiiiiciiiiiiiiiiiiicci"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
-# chk <- readLines(paste0(datadir1,"/JPNLL_20170524.dat"))
-# chk[10240:10242]
-a <- read_fwf(file=paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+# Load initial test segment of data
+a <- read_fwf(file=paste0(datadir1,"/JPNLL_20180524.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
 names(a) <- nms
-a
-dat5216 <- read_fwf(file=paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types=cc)
-problems(dat5216)
+
+# Load the entire dataset
+dat5216 <- read_fwf(file=paste0(datadir1,"/JPNLL_20180524.dat"),fwf_widths(wdths),col_types=cc)
+problems(dat5216) # Report problems
 names(dat5216) <- nms
 table(dat5216$trip_st==0,dat5216$op_yr)
 table(dat5216$op_yr)
 
+# Prepare and check the data
 rawdat <- dat5216
 pd1 <- dataprep_JPIO(rawdat)
 pd2 <- setup_IO_regions(pd1, regY=T, regY1=T, regB=T, regB1=T, regB2=T)
 
 clndat <- dataclean_JPIO(rawdat)
 prepdat1 <- dataprep_JPIO(clndat)
-prepdat <- setup_IO_regions(prepdat1, regY=T, regY1=T, regB=T, regB1=T, regB2=T)
+prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 save(pd1, pd2, prepdat, file="prepdat.RData")
 
-dat <- make_clid(prepdat)
-dat <- make_lbidmon(dat)
+dat <- make_lbidmon(dat) # This sets up the clustering variable. Function will be moved into dataprep()
 save(dat,file="JPdat.RData")
 load(file="JPdat.RData")
 
 
-######################################################
+# ===================================================================================
 # Plot and explore the data
-##################
+# ===================================================================================
 table(dat$op_yr)
-table(is.na(dat$clid))
-table(dat$clid==0)
-a <- table(dat$clid)
-hist(a,nclass=max(a))
-windows(height=10,width=10);par(mfrow=c(3,2))
-max(a[a<100000])
-a1 <- hist(a,nclass=max(a),main="cluster_id frequency",xlab="Sets per cluster_id")
-plot(a1$breaks,c(a1$counts,0)*a1$breaks,xlim=c(0,max(a)),ylim=c(0,2e5),main="set frequency by cluster_id",
-  xlab="Sets per cluster_id",ylab="Number of sets")
-#plot(a1$breaks,c(a1$counts,0)*a1$breaks,xlim=c(0,1500),ylim=c(0,3e4))
-#plot(a1$breaks,c(a1$counts,0)*a1$breaks,xlim=c(0,200),ylim=c(0,3e4))
 
+# Explore performance of various trip id variables
 a3 <- table(as.character(dat$tripidmon[dat$op_yr < 1979]))
 hist(a3,nclass=max(a3)/80,main="tripidmon frequency before 1979",xlab="Sets per tripidmon")
 a2 <- table(as.character(dat$tripidmon[dat$op_yr >= 1979]))
@@ -102,6 +102,7 @@ savePlot(file="Alternate cluster versions",type="png")
 windows()
 hist(a2[a2>31])
 
+# Explore vessel identifiers
 xfun <- function(x) sum(x > 0)
 a <- table(dat$vessid,dat$op_yr)
 apply(a,2,xfun)
@@ -113,7 +114,7 @@ tm_map(vnm, function(x) content_transformer(iconv(enc2utf8, sub = "byte")))
 a <- table(dat$vesselname,dat$op_yr)
 apply(a,2,xfun)
 
-
+# Check a few specific instances where there have been problems in the past. Consider checking for similar problems in new data.
 a <- dat[dat$tripidmon=="461 1971 1",]
 a <- data.frame(a)
 a[,1:15]
@@ -122,10 +123,11 @@ as.data.frame(dat[match(a,dat$callsign),c("callsign","vessid")])
 table(dat$callsign,useNA="always")
 table(dat$vessid,useNA="always")
 
+# Make maps to check regional patterns
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regB","regY1","regB2","regB3","regY2")]
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY", "regY1", "regY2", "regB", "regB1", "regB2", "regB3", "regA", "regA1", "regA2", "regA3", "regA4","regA5")]
 windows(width=15,height=10)
-for(fld in c("regY","regB","regY1","regB2","regB3","regY2")) {
+for(fld in c("regY", "regY1", "regY2", "regB", "regB1", "regB2", "regB3", "regA", "regA1", "regA2", "regA3", "regA4","regA5")) {
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
   text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
@@ -133,6 +135,7 @@ for(fld in c("regY","regB","regY1","regB2","regB3","regY2")) {
   savePlot(paste0("map_",fld),type="png")
   }
 
+# Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
 regYord <- c(1,2,3,6,5,4)
 windows(height=14,width=12); par(mfcol=c(3,2),mar=c(3,2,2,1))
 for (r in regYord) {
@@ -151,7 +154,7 @@ for (r in regYord) {
 }
 savePlot(filename="Clean strata hooks",type="png")
 
-
+# time series of sets
 windows(width=15,height=9)
 hist(prepdat$dmy,breaks="days",freq=T,xlab="Date",main="Sets per day")
 savePlot(file="sets_per_day.png",type="png")
@@ -159,16 +162,18 @@ hist(prepdat$dmy,breaks="months",freq=T,xlab="Date",main="Sets per month")
 savePlot(file="sets_per_month.png",type="png")
 table(prepdat$dmy)
 
+# Map the effort with circles
 a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm=T)
 windows(width=11,height=9)
 symbols(x=a[,2],y=a[,1],circles=.0002*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude",ylim=c(-50,25),xlim=c(15,145))
 map(add=T,interior=F,fill=T)
 savePlot(file="map_hooks.png",type="png")
 
+# Dbn of hooks per set
 hist(dat$hooks, nclass=60,xlab="Hooks per set")   # ask if very large # hooks is okay
 savePlot("Hook histogram.png",type="png")
 
-
+# Look for outliers. Individual sets with high catch are not a problem.
 table(prepdat$alb)   # ask sets with 990 alb
 table(prepdat$bet)   # ask set with 461 bet
 table(prepdat$yft)   # ask set with 1038
@@ -182,41 +187,44 @@ table(prepdat$blm)   # ask set with 75 blm
 #table(prepdat$skj)   # ask set with 143
 #table(prepdat$sha)   # ask majority of sets (=719211) with 0 sha. Also one set with 663
 #table(prepdat$oth)   # ask sets with 3059! But most (=636641) have 0.
-table(prepdat$hbf,useNA="always")  # 6408 with NA! All in 1973-75
 
+# Look for pattrns in hbf, including NA
+table(prepdat$hbf,useNA="always")  # 6408 with NA! All in 1973-75
 table(dat$hbf,dat$op_yr,useNA="always")  #
 table(dat$op_yr,is.na(dat$hbf))  #
-
-
 dat <- dat[is.na(dat$hbf)==FALSE | dat$op_yr < 1976,]
 a <- table(dat$op_yr,round(dat$hbf,0),useNA="always")
 write.csv(a,"table hbf by year.csv")
 
-table(clndat$loncode) # all good
+# Map the effort at 5 degree scale
 a <- log(table(dat$lon5,dat$lat5))
 windows(width=13,height=10)
 image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,xlab="Longitude",ylab="Latitude")
 map("worldHires",add=T, interior=F,fill=F)
 savePlot("Setmap_logscale.png",type="png")
 
+# Map the effort at 1 degree scale
 a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],log(table(lon,lat)))
 windows(width=15,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab="Longitude",ylab="Latitude",ylim=c(-55,30),xlim=c(15,150))
 map("worldHires",add=T, interior=F,fill=T)
 savePlot("Setmap_logscale_1deg.png",type="png")
 
+# Map bigeye regions at 1 degree scale
 a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],tapply(regB,list(lon,lat),mean))
 windows(width=15,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=2:6,xlab="Longitude",ylab="Latitude")
 map("worldHires",add=T, interior=F,fill=T)
 savePlot("regbet.png",type="png")
 
+# Map YFT regions at 1 degree scale
 a <- tapply(dat$regY,list(dat$lon,dat$lat),mean,na.rm=T)
 windows(width=15,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6,xlab="Longitude",ylab="Latitude")
 map("worldHires",add=T, interior=F,fill=T)
 savePlot("regyft.png",type="png")
 
+# Mean fishing location, yrqtr scale
 windows(width=15,height=10);par(mfrow=c(1,2))
 ax <- tapply(dat$yrqtr,dat$yrqtr,mean); ay=tapply(dat$lat5,dat$yrqtr,mean)
 plot(ax,ay,xlab="yr",ylab="Mean latitude",type="n")
@@ -228,14 +236,17 @@ plot(ax,ay,ylab="yr",xlab="Mean longitude",type="n")
 text(ax,ay,a,cex=0.7)
 savePlot("mean_fishing_location1.png",type="png")
 
+# Mean fishing location, year scale
 windows(width=15,height=10);par(mfrow=c(1,2))
 plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat5,dat$op_yr,mean),xlab="yr",ylab="Mean latitude")
 plot(tapply(dat$lon5,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab="yr",xlab="Mean longitude")
 savePlot("mean_fishing_location2.png",type="png")
 
+# Store summaries of hbf by region and through time
 write.csv(table(round(dat$hbf,0),dat$regY,useNA="always"),file="hbf by region.csv")
 write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regY,useNA="always"),file="hbf by region by 5 years.csv")
 
+# Map the average HBF by 5 yr period
 windows(20,14);par(mfrow=c(3,3),mar=c(2,2,2,2))
 for(y in seq(1975,2015,5)) {
   a <- dat[floor(dat$yrqtr/5)*5==y & dat$lon5 < 125 & dat$lat5 < 25,]
@@ -245,6 +256,8 @@ for(y in seq(1975,2015,5)) {
   map("worldHires",add=T, interior=F,fill=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
   }
 savePlot("mean_HBF.png",type="png")
+
+# Map the average HBF by 5 yr period & qtr
 qqs <- c(0.125,0.375,0.625,0.875)
 for(qq in 1:4) {
   windows(20,14);par(mfrow=c(3,3),mar=c(2,2,2,2),oma=c(0,0,1,0))
@@ -259,13 +272,10 @@ for(qq in 1:4) {
   savePlot(paste0("mean_HBF_q",qq,".png"),type="png")
   }
 
-#write.csv(table(dat$ncrew,dat$reg),file="crew by region.csv")
-#write.csv(table(dat$ncrew,floor(dat$yrqtr/10)*10),file="crew by decade.csv")
-#write.csv(table(dat$ncrew,dat$fishingcat,useNA="ifany"),file="crew by fishingcat.csv")
 write.csv(table(dat$lat5,dat$lon5),file="ops by lat-long.csv")
 write.csv(table(dat$lat5,dat$lon5,5*floor(dat$yrqtr/5)),file="ops by lat-long-5yr.csv")
 
-# data exploration
+# Exploratory regression trees. These are not particularly useful.
 #install.packages("rpart")
 library(rpart)
 a <- dat[dat$regY%in% c(2,5),]
@@ -280,24 +290,25 @@ a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
 #simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
-simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
+simplemod <- rpart(a$albcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$betcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 windows(width=11,height=7)
 plot(simplemod)
 text(simplemod)
-savePlot("Rpart bet cpue",type="png")
+savePlot("Rpart alb cpue",type="png")
 simplemod <- rpart(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$betcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 windows(width=11,height=7)
 plot(simplemod)
 text(simplemod)
 savePlot("Rpart yft cpue",type="png")
 
-library(randomForest) # These take a long time and use a lot of memory
-simplefor <- randomForest(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
+# Exploratory random forests. Take too long and too much memory. Better if data were subsampled first.
+library(randomForest)
+simplefor <- randomForest(a$albcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$betcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 print(simplefor)
 windows(width=11,height=7)
 plot(importance)
 text(varImpPlot,main=NULL)
-savePlot("Rforest bet cpue",type="png")
+savePlot("Rforest alb cpue",type="png")
 simplefor <- randomForest(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$betcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 print(simplefor)
 windows(width=11,height=7)
@@ -307,33 +318,31 @@ savePlot("Rforest yft cpue",type="png")
 
 
 
-######################################################
+# ===================================================================================
 # Start the analysis proper
-########################
+# ===================================================================================
 #Clustering
 
-#library(R4MFCL)
-library(maps)
-library(sdhpkg)
-library(mapdata)
-#install.packages("mgcv")
-#install.packages('randomForest')
-#install.packages("nFactors")
-#install.packages("Rcpp")
-#install.packages('dplyr')
+library("date")
+library("lubridate")
+library("maps")
+library("mapdata")
+library("lunar")
 library("mgcv")
-library(randomForest)
-library(influ)
+library("randomForest")
+library("influ")
 library("nFactors")
-library(data.table)
-library(plyr)
-library(dplyr)
-library(cluster)
-library(splines)
-library(boot)
-library(beanplot)
-#source("../RFiles/FRDC_support_functions.r")
-projdir <- "~/IOTC/2017_CPUE/"
+library("data.table")
+library("plyr")
+library("dplyr")
+library("cluster")
+library("splines")
+library("boot")
+library("beanplot")
+
+library("cpue.rfmo")
+
+projdir <- "~/IOTC/2018_CPUE/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -341,99 +350,148 @@ Rdir <- paste0(projdir, "Rfiles/")
 clusdir <- paste0(jpdir, "clustering/")
 setwd(clusdir)
 load(file=paste0(jalysis_dir,"JPdat.RData"))
-source(paste0(Rdir,"support_functions.r"))
 str(dat)
 
 rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
-
 gc()
-allsp <- c("alb","bet","yft","swo","mls","bum","blm","sbt")
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","clid","jnt_clid","lbid_mon","moon","alb","bet","yft","swo",
-          "mls","bum","blm","sbt","Total","dmy","lat","lon","lat5","lon5","regY","regY1","regB","regB1","regB2")
+
+# Set up input variables for clustering and standardization
 dat <- data.frame(dat)
+jp_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbt","sas","shk")
+
+# Plot the mean catch per year of each species by region, to use when deciding which species to cluster
+for (r in c(2:7)) {
+  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  a <- dat[dat$regY2 == r,]
+  for (sp in jp_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+  title(paste("Region", r ), outer = TRUE)
+  savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
+}
+for (r in c(2:7)) {
+  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  a <- dat[dat$regB3 == r,]
+  for (sp in jp_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+  title(paste("Region", r ), outer = TRUE)
+  savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
+}
+for (r in c(2:7)) {
+  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  a <- dat[dat$regA4 == r,]
+  for (sp in jp_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+  title(paste("Region", r ), outer = TRUE)
+  savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
+}
+
+# Put chosen species here
+use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbt","sas")
+# Variables to use
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB1","regB2","regA","regA1","regA2","regA3")
 str(dat[,allabs])
 
+# Determine the number of clusters. Come back and edit this.
 nclY=c(1,4,4,5,4,1)
+nclY2=c(1,4,4,5,4,1,4)
 nclB2=c(5,5,4,4)
+nclB3=c(5,5,4,4,5)
+nclA4=c(5,5,4,4)
+nclA5=c(5)
 flag="JP"
+
+# Covariates to pass to next stage
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 r=4
 
-
-regtype="regY"
-for(r in 2:5) {
+# Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
+regtype="regY2"
+for(r in c(2:5,7)) {
   fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclY[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-  }
-regtype="regB2"
-for(r in 1:length(nclB2)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclB2[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
+  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclY2[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
   save(dataset,file=paste0(fnh,".RData"))
 }
+regtype="regB3"
+for(r in 1:length(nclB3)) {
+  fnh <- paste(flag,regtype,r,sep="_")
+  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclB3[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
+  save(dataset,file=paste0(fnh,".RData"))
+}
+regtype="regA4"
+for(r in 1:length(nclA3)) {
+  fnh <- paste(flag,regtype,r,sep="_")
+  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA4[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
+  save(dataset,file=paste0(fnh,".RData"))
+  }
+regtype="regA5"
+for(r in 1:length(nclA5)) {
+  fnh <- paste(flag,regtype,r,sep="_")
+  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA5[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
+  save(dataset,file=paste0(fnh,".RData"))
+  }
 
-# regtype="regA3"
-# for(r in 1:length(nclA3)) {
-#   fnh <- paste(flag,regtype,r,sep="_")
-#   dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA3[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-#   save(dataset,file=paste0(fnh,".RData"))
-#   }
-# regtype="regA2"
-# for(r in 1:length(nclA2)) {
-#   fnh <- paste(flag,regtype,r,sep="_")
-#   dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA2[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-#   save(dataset,file=paste0(fnh,".RData"))
-#   }
-# regtype="regA5"
-# for(r in 1:length(nclA5)) {
-#   fnh <- paste(flag,regtype,r,sep="_")
-#   dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA5[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-#   save(dataset,file=paste0(fnh,".RData"))
-#   }
+# ========================================================
+# Standardizations, Japan only
+# ========================================================
 
-##################################################
-# Japan only, no clusters, HBF
-#
-# Based on joint standardization analyses from 2016
-
-resdir <- paste0(jalysis_dir,"std_nocl_JPonly_hbf/")
-dir.create(resdir)
-Rdir <-  paste0(projdir,"Rfiles/")
-setwd(resdir)
-#install.packages("survival")
 library("date")
-library(splines)
+library("splines")
 library("maps")
 library("mapdata")
 library("maptools")
 library("lunar")
 library("mgcv")
-library(randomForest)
-library(influ)
+library("randomForest")
+library("influ")
 library("nFactors")
-library(plyr)
-library(dplyr)
-library(data.table)
-library(cluster)
-library(beanplot)
-library(survival)
-source(paste0(Rdir, "support_functions.r"))
+library("plyr")
+library("dplyr")
+library("data.table")
+library("cluster")
+library("beanplot")
+library("survival")
 
-allsp <- c("alb","bet","yft","ott","swo","mls","bum","blm","otb","skj","sha","oth","sbt")
+library("cpue.rfmo")
 
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
-            "Total","lat","lon","lat5","lon5","reg","flag")
+projdir <- "~/IOTC/2018_CPUE/"
+jpdir <- paste0(projdir, "JP/")
+datadir1 <- paste0(jpdir, "data/")
+jalysis_dir <- paste0(jpdir, "analyses/")
+Rdir <- paste0(projdir, "Rfiles/")
 
-# clkeepJP <- list("alb"=list(c(2,3),c(3),c(3),c(2)),
-#                  "bet"=list(c(1,2,3,4,5),c(1,2,4),c(1,2,3)),
-#                  "yft"=list(c(0),c(1,2,3),c(1,2,3),c(1,2,3),c(1,3)))
-# clkeepKR <- list("alb"=list(c(4),c(3),c(4),c(2,4)),
-#                  "bet"=list(c(1,2,3,4,5),c(1,2,4),c(1,2,3)),
-#                  "yft"=list(c(0),c(1,2,3),c(1,2,3),c(1,2,3),c(1,3)))
-# clkeepTW <- list("alb"=list(c(1),c(1),c(1,2),c(1,2)),
-#                  "bet"=list(c(1,2,3,4,5),c(1,2,4),c(1,2,3)),
-#                  "yft"=list(c(0),c(1,2,3),c(1,2,3),c(1,2,3),c(1,3)))
+# Define the clusters to be used. Will need to set this up after checking the cluster allocations
+clkeepJP_A5 <- list("alb"=list(c(2,4)))
+clkeepKR_A5 <- list("alb"=list(c(5)))
+clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
+
+clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
+clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0)))
+clkeepTW_Y <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5)),c(0))
+clkeepSY_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0)))
+clk_Y <- list(JP=clkeepJP_Y,KR=clkeepKR_Y,TW=clkeepTW_Y,SY=clkeepSY_Y)
+
+clkeepJP_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4)))
+clkeepKR_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepTW_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4)))
+clkeepSY_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4)))
+clk_B2 <- list(JP=clkeepJP_B2, KR=clkeepKR_B2, TW=clkeepTW_B2, SY=clkeepSY_B2)
+
+clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0),c(1,2,3,4)))
+clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0),c(1,2,3,4)))
+clkeepTW_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5),c(0),c(1,2,3,4,5)))
+clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0),c(1,2,3,4)))
+clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2,SY=clkeepSY_Y2)
+
+clkeepJP_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4,5)))
+clkeepKR_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepTW_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4),c(1,2,3,4,5)))
+clkeepSY_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4),c(1,2,3,4)))
+clk_B3 <- list(JP=clkeepJP_B3,KR=clkeepKR_B3,TW=clkeepTW_B3,SY=clkeepSY_B3)
+
+minqtrs_Y  <- c(1,8,2,2,5,1)
+minqtrs_Y2  <- c(1,7,2,2,5,1,7)
+minqtrs_B2 <- c(8,8,2,2)
+minqtrs_B3 <- c(7,8,2,2,7)
+
+use_splist <- c("alb","bet","yft")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
 # clkeepJP_A2 <- list("alb"=list(c(2,4),c(3),c(3,4),c(1,3)))
 # clkeepKR_A2 <- list("alb"=list(c(3,4),c(3),c(3,4),c(4)))
@@ -443,22 +501,26 @@ allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet
 # clkeepKR_A5 <- list("alb"=list(c(5)))
 # clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
 
-clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
-clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(2),c(0)))
-clkeepTW_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(3),c(1,2,3,4)),c(0))
-clk_Y <- list(JP=clkeepJP_Y,KR=clkeepKR_Y,TW=clkeepTW_Y)
+## ---------------------------------------------
+# Run various standardization scenarios. Only one here now,
+# but there are some new ones from the Madrid meeting which I will set up later.
+# I can't test the code without data, so apologies if some of the changes in Madrid have broken this code.
+# We can fix it in Keelung.
+## ---------------------------------------------
 
-clkeepJP_B2 <- list("bet"=list(c(2,3,4),c(1,2,3,4,5),c(2,3,4),c(1,2,3,4)))
-clkeepKR_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(1,2,3,4)))
-clkeepTW_B2 <- list("bet"=list(c(2,3,4,5),c(1,2,3,5),c(2,3),c(1,2,3,4)))
-clk_B2 <- list(JP=clkeepJP_B2,KR=clkeepKR_B2,TW=clkeepTW_B2)
+# With clusters, and hbf
 
+resdir <- paste0(jalysis_dir,"std_cl_JPonly_hbf/")
+dir.create(resdir)
+setwd(resdir)
+
+# The runpars define the approach to be used in this run
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB2", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
-runpars[["yft"]] <- list(regtype = "regY",  regtype2 = "Y",  clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regB3", regtype2 = "B3", clk = clk_B3, doregs = 1:5,      addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY2", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
-keepd = FALSE
-maxyr = 2017; maxqtrs=200; minqtrs_byreg = c(8,8,2,2,5,5,5,5); addbranch<-F;addother=F;addalb=F
+keepd = TRUE  # Best to include data in the initial runs, and delete it later after generating all the residual plots
+maxyr = 2018; maxqtrs=200; minqtrs_byreg = c(8,8,2,2,5,5,5,5);
 for(runsp in c("bet", "yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
@@ -466,15 +528,15 @@ for(runsp in c("bet", "yft")) {
   dohbf <- runpars[[runsp]]$dohbf
   cltype <- runpars[[runsp]]$cltype
   jdat <- data.frame()
-  for(flag in c("JP")) {
-    for(r in runpars[[runsp]]$doregs) {
-      load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep="_"),".RData"))
+  for (flag in c("JP")) {
+    for (r in runpars[[runsp]]$doregs) {
+      load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep = "_"),".RData"))
       dataset$flag <- flag
-      jdat <- rbind(jdat,dataset[,allabs])
+      jdat <- rbind(jdat,dataset[,stdlabs])
       rm(dataset)
     }
   }
-  jdat <- jdat[jdat$yrqtr < 2017,]
+  jdat <- jdat[jdat$yrqtr < maxyr,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)
   jdat$vessid <- as.factor(jdat$vessid)
@@ -483,8 +545,8 @@ for(runsp in c("bet", "yft")) {
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for(runreg in runpars[[runsp]]$doregs) {
       minqtrs <- minqtrs_byreg[runreg]
-      glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                    minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
+      glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars, maxqtrs = maxqtrs,
+                                    minvess = 50, minll = 50, minyrqtr = 50, addcl = addcl, cltype = cltype, addpca = NA, samp = NA, strsmp = NA)
       if(nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,60)
       glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
                                         minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
@@ -544,11 +606,12 @@ for(runsp in c("bet", "yft")) {
       graphics.off()
     }
 }
-
-##################################################################################################################################################
+## ======================================================
+# Ignore the code below for now. We may revisit it if we have time
 # Test time-area
+## ======================================================
 
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/catch_effort/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -579,24 +642,6 @@ load(file=paste0(projdir,"cell_areas.RData"))
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
             "Total","lat","lon","lat5","lon5","reg","flag","qtr")
 
-# clkeepJP <- list("alb"=list(c(2,3),c(3),c(3),c(2)),
-#                  "bet"=list(c(1,2,3,4,5),c(1,2,4),c(1,2,3)),
-#                  "yft"=list(c(0),c(1,2,3),c(1,2,3),c(1,2,3),c(1,3)))
-# clkeepKR <- list("alb"=list(c(4),c(3),c(4),c(2,4)),
-#                  "bet"=list(c(1,2,3,4,5),c(1,2,4),c(1,2,3)),
-#                  "yft"=list(c(0),c(1,2,3),c(1,2,3),c(1,2,3),c(1,3)))
-# clkeepTW <- list("alb"=list(c(1),c(1),c(1,2),c(1,2)),
-#                  "bet"=list(c(1,2,3,4,5),c(1,2,4),c(1,2,3)),
-#                  "yft"=list(c(0),c(1,2,3),c(1,2,3),c(1,2,3),c(1,3)))
-
-# clkeepJP_A2 <- list("alb"=list(c(2,4),c(3),c(3,4),c(1,3)))
-# clkeepKR_A2 <- list("alb"=list(c(3,4),c(3),c(3,4),c(4)))
-# clkeepTW_A2 <- list("alb"=list(c(1),c(1),c(1,2),c(1,4)))
-#
-# clkeepJP_A5 <- list("alb"=list(c(2,4)))
-# clkeepKR_A5 <- list("alb"=list(c(5)))
-# clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
-
 clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
 clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(2),c(0)))
 clkeepTW_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(3),c(1,2,3,4)),c(0))
@@ -614,7 +659,7 @@ runpars[["yft"]] <- list(regtype = "regY",  regtype2 = "Y",  clk = clk_Y,  doreg
 runsp="bet"; runreg=3
 
 vars <- c("vessid","hooks","yrqtr","latlong","hbf","lat5","op_yr", "qtr")
-maxyr = 2017; maxqtrs=200; minqtrs_byreg = c(8,8,2,2,5,5,5,5); addbranch<-F;addother=F;addalb=F
+maxyr = 2018; maxqtrs=200; minqtrs_byreg = c(8,8,2,2,5,5,5,5); addbranch<-F;addother=F;addalb=F
 keepd = TRUE
 
 for(runsp in c("bet")) {
@@ -633,7 +678,7 @@ for(runsp in c("bet")) {
       rm(dataset)
     }
   }
-  jdat <- jdat[jdat$yrqtr < 2017,]
+  jdat <- jdat[jdat$yrqtr < 2018,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)
   jdat$vessid <- as.factor(jdat$vessid)

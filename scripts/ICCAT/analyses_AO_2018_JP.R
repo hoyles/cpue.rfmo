@@ -120,7 +120,7 @@ for (fld in c("regB","regB1")) {
   savePlot(paste0("mapf_",fld),type = "png")
 }
 
-# Plot the effect of data cleaning on the number of sets
+# Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
 regBord <- c(1,2,3)
 windows(height = 12,width = 12); par(mfrow = c(2,2),mar = c(3,2,2,1))
 for (r in regBord) {
@@ -318,6 +318,7 @@ library("plyr")
 library("dplyr")
 library("data.table")
 library("cluster")
+library("boot")
 library("beanplot")
 library("cpue.rfmo")
 
@@ -364,6 +365,7 @@ for (r in 1:length(nclB)) {
   save(dataset,file = paste0(fnh,".RData"))
 }
 
+# ========= as an exercise, run clustering without the species of interest ===========
 clusdir_xsoi <- paste0(jpdir, "clustering_xsoi/")
 dir.create(clusdir_xsoi)
 setwd(clusdir_xsoi)
@@ -466,12 +468,17 @@ for (runsp in c("bet")) {
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for (runreg in runpars[[runsp]]$doregs) {
       minqtrs <- minqtrs_byreg[runreg]
-      glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars, maxqtrs = maxqtrs, minvess = 50, minll = 50, minyrqtr = 50, addcl = addcl, cltype = cltype, addpca = NA, samp = NA, strsmp = NA)
+      glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars, maxqtrs = maxqtrs,
+                                    minvess = 50, minll = 50, minyrqtr = 50, addcl = addcl, cltype = cltype, addpca = NA, samp = NA, strsmp = NA)
       if (nrow(glmdat) > 60000) glmdat <- samp_strat_data(glmdat,60)
-      glmdat5279 <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs, minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA,yrlims = c(1952,1980))
+      glmdat5279 <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs,
+                                        minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA,
+                                        yrlims = c(1952,1980))
       if (nrow(glmdat5279) > 60000) glmdat5279 <- samp_strat_data(glmdat5279,60)
       a <- jdat[jdat$vessid != "JP1",]
-      glmdat79nd <- select_data_JointIO(a,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs, minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA,yrlims = c(1979,maxyr))
+      glmdat79nd <- select_data_JointIO(a,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs,
+                                        minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA,
+                                        yrlims = c(1979,maxyr))
       if (nrow(glmdat79nd) > 60000) glmdat79nd <- samp_strat_data(glmdat79nd,60)
       wtt.all   <- mk_wts(glmdat,wttype = "area")
       wtt.5279   <- mk_wts(glmdat5279,wttype = "area")

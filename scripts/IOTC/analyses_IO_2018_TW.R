@@ -116,7 +116,7 @@ table(is.na(dat1$hbf),dat1$op_yr)
 table(dat1$op_yr,dat1$op_yr==1)
 
 splist1 <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")
-#splist_oil <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt", "oil")
+splist_oil <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt", "oil")
 # initial data preparation. Failures to parse (19, 167, 352) due to bad dates (Feb 29, April 31 etc)
 
 # ========================
@@ -124,25 +124,46 @@ splist1 <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj"
 # ========================
 
 prepdat1 <-     dataprep_TW(dat1,     splist = splist1)
-#prepdat1_oil <- dataprep_TW(dat1_oil, splist = splist_oil)
+prepdat1_oil <- dataprep_TW(dat1_oil, splist = splist_oil)
 
 prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
-#prepdat_oil <- setup_IO_regions(prepdat1_oil,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
+prepdat_oil <- setup_IO_regions(prepdat1_oil,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 datold <-     dataclean_TW(prepdat, splist = splist1)
-#datold_oil <- dataclean_TW(prepdat_oil, splist = splist_oil)
-save(datold,file="TWdat_old.RData")
+datold_oil <- dataclean_TW(prepdat_oil, splist = splist_oil)
+save(datold,datold_oil, file="TWdat_old.RData")
 
 splist2 <- splist1[splist1 != "pbf"] # remove 'pbf' which was removed by 'dataprep'
-#splist_oil2 <- splist_oil[splist_oil != "pbf"]
+splist_oil2 <- splist_oil[splist_oil != "pbf"]
 dat <-     dataclean_TW(prepdat, rmssp=T, splist = splist2)
-#dat_oil <- dataclean_TW(prepdat_oil, rmssp=T, splist = splist_oil2)
-save(dat,file="TWdat.RData")
-load(file="TWdat.RData")
+dat_oil <- dataclean_TW(prepdat_oil, rmssp=T, splist = splist_oil2)
+save(dat, dat_oil, file="TWdat.RData")
 getwd()
+
+windows(12,9)
+plot(1979:2017,tapply(dat_oil$oil, list(dat_oil$op_yr), mean), ylim = c(0, 90), xlim = c(1990, 2018))
+points(1979:2017,tapply(dat_oil$oth, list(dat_oil$op_yr), mean), col = 2, pch = 2)
+points(1979:2017,tapply(dat$oth, list(dat$op_yr), mean), col = 3, pch = 3)
+points(1979:2017,tapply(dat_oil$oth + dat_oil$oil, list(dat_oil$op_yr), mean), col = 4, pch = 4)
+legend("topleft", legend = c("dat_oil$oil","dat_oil$oth", "dat$oth", "dat_oil$oil + dat_oil$oth"), pch=1:4, col = 1:4)
+savePlot("oil_v_oth_1", type = "png")
+
+windows(12,9)
+o1 <- tapply(dat$oth, list(dat$op_yr), mean)
+o2 <- tapply(dat_oil$oth + dat_oil$oil, list(dat_oil$op_yr), mean)
+plot(1979:2017,o1 - o2, xlim = c(2000, 2018))
+legend("bottomleft", legend = "dat$oth - (dat_oil$oth + dat_oil$oil)", col=1, pch = 1)
+savePlot("oil_v_oth_2", type = "png")
+
+# It looks like the best option is to use oth + oil
+dat_oil$ot2 <- dat_oil$oth + dat_oil$oil
+dat <- dat_oil
+
+save(dat, file = "../analyses/TW_newdat.RData")
 
 # ===================================================================================
 # check, plot and explore the data
 # ===================================================================================
+load(file="../analyses/TW_newdat.RData")
 
 #table(dat$op_lon,dat$lon,useNA="always")
 table(dat$op_lon,useNA="always")
@@ -182,7 +203,6 @@ table(prepdat$hbf,prepdat$yr,useNA="always")  #
 a <- table(dat$yr,round(dat$hbf,0),useNA="always")
 write.csv(a,"table hbf by year.csv")
 
-
 # Exploratory regression trees. These are not particularly useful.
 #install.packages("rpart")
 library(rpart)
@@ -208,50 +228,58 @@ text(simplemod)
 # ===================================================================================
 #Clustering
 
-library(maps)
-library(mapdata)
+library("maps")
+library("mapdata")
 library("mgcv")
-library(randomForest)
-library(influ)
+library("randomForest")
+library("influ")
 library("nFactors")
-library(data.table)
-library(plyr)
-library(dplyr)
-library(cluster)
-library(splines)
-library(boot)
-library(beanplot)
+library("data.table")
+library("plyr")
+library("dplyr")
+library("cluster")
+library("splines")
+library("boot")
+library("beanplot")
+library("cpue.rfmo")
 
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 twdir <- paste0(projdir, "TW/")
 twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(twdir,"clustering/")
 setwd(clustdir)
-load(file="../analyses/TWdat.RData")
-source(paste0(Rdir,"support_functions.r"))
+#load(file="../analyses/TWdat.RData")
+load(file="../analyses/TW_newdat.RData")
 
-tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "sha", "oth", "sbt")
+tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "sha", "ot2", "sbt")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-flag = "TW"
-for (r in c(1:3)) {
-  windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB == r,]
-  for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
-  title(paste("Region", r ), outer = TRUE)
-  savePlot(filename = paste("freq",flag,"Region", r, "allyrs", sep = "_"), type = "png")
+plot_spfreqyq <- function(indat, regname, splist, flag, mfr = c(5,3)){
+  reglist <- sort(unique(indat[,regname]))
+  for (r in reglist) {
+    windows(15,12);
+    par(mfrow = mfr, mar = c(3,2,2,1), oma = c(0,0,2,0))
+    a <- indat[indat[,regname] == r,]
+    for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+    title(paste(regname, "Region", r ), outer = TRUE)
+    savePlot(filename = paste("spfreq", flag, regname, "R", r, "allyrs", sep = "_"), type = "png")
+  }
 }
+plot_spfreqyq(indat = dat, regname = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+plot_spfreqyq(indat = dat, regname = "regA4", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+
+
 
 # Put chosen species here
-use_allsp_allyrs <- c("alb","bet","yft","ott","swo","mls","bum","otb")
+use_allsp_allyrs <- c("alb","bet","yft","swo","mls","bum","ot2","sbt")
 # Variables to use
 allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_allyrs,"Total","sst","dmy","lat","lon","lat5","lon5", "regY","regY2","regB","regB3","regB2","regA","regA1","regA2","regA3","regA4","regA5")
 
 
 ##########
 # All years included, YFT regions
-rm(datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2)
+rm(a,dat_oil,datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2, o1, o2,r)
 
 # Determine the number of clusters. Come back and edit this.
 nclA4=c(4,3,3,3)
@@ -267,8 +295,16 @@ r=2
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-regtype="regY2"
-for(r in c(2:5,7)) {
+run_clustercode_byreg <- function(indat, regtype, allsp, ncl, plotPCA, clustid, allclust, flag, fnhead, covarnames) {
+  for(r in c(1:4)) {
+    fnh <- paste(flag,regtype,r,sep="_")
+    dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclY2[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
+    save(dataset,file=paste0(fnh,".RData"))
+  }
+}
+
+regtype="regA4"
+for(r in c(1:4)) {
   fnh <- paste(flag,regtype,r,sep="_")
   dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclY2[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
   save(dataset,file=paste0(fnh,".RData"))
@@ -318,7 +354,7 @@ library("survival")
 library("cpue.rfmo")
 
 
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 twdir <- paste0(projdir, "TW/")
 twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")

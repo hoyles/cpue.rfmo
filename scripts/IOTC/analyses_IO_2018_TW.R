@@ -256,8 +256,8 @@ tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "s
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
 plot_spfreqyq <- function(indat, regname, splist, flag, mfr = c(5,3)){
-  reglist <- sort(unique(indat[,regname]))
-  for (r in reglist) {
+  doreg <- sort(unique(indat[,regname]))
+  for (r in doreg) {
     windows(15,12);
     par(mfrow = mfr, mar = c(3,2,2,1), oma = c(0,0,2,0))
     a <- indat[indat[,regname] == r,]
@@ -272,63 +272,51 @@ plot_spfreqyq(indat = dat, regname = "regA4", splist = tw_allsp, flag = "TW", mf
 
 
 # Put chosen species here
-use_allsp_allyrs <- c("alb","bet","yft","swo","mls","bum","ot2","sbt")
+use_sp <- c("alb","bet","yft","swo","mls","bum","ot2","sbt")
 # Variables to use
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_allyrs,"Total","sst","dmy","lat","lon","lat5","lon5", "regY","regY2","regB","regB3","regB2","regA","regA1","regA2","regA3","regA4","regA5")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_sp,"Total","sst","dmy","lat","lon","lat5","lon5", "regY","regY2","regB","regB3","regB2","regA","regA1","regA2","regA3","regA4","regA5")
 
 
 ##########
 # All years included, YFT regions
 rm(a,dat_oil,datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2, o1, o2,r)
 
+reglist <- list()
+reglist$regA4$allreg <- 1:4
+reglist$regA5$allreg <- 1
+reglist$regB2$allreg <- 1:4
+reglist$regB3$allreg <- 1:5
+reglist$regY$allreg <- 1:6
+reglist$regY2$allreg <- 1:7
+
 # Determine the number of clusters. Come back and edit this.
-nclA4=c(4,3,3,3)
-nclA5=c(5)
-nclY=c(1,5,4,3,5,1)
-nclB2=c(5,5,4,4)
-nclY2=c(1,5,4,3,5,1,5)
-nclB3=c(5,5,4,4,5)
+reglist$regA4$ncl <- c(4,3,3,3)
+reglist$regA5$ncl <- 5
+reglist$regB2$ncl <- c(5,5,4,4)
+reglist$regB3$ncl <- c(5,5,4,4,5)
+reglist$regY$ncl <- c(4,5,4,3,5,1)
+reglist$regY2$ncl <- c(4,5,4,3,5,5,5)
+
 flag="TW"
-r=2
 
 # Covariates to pass to next stage
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg <- function(indat, regtype, allsp, ncl, plotPCA, clustid, allclust, flag, fnhead, covarnames) {
-  for(r in c(1:4)) {
+run_clustercode_byreg <- function(indat, regtype, allsp, allabs, ncl="get_RL", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames) {
+  if (ncl == "get_RL") ncl <- reglist[[regtype]]$ncl
+  for(r in reglist[[regtype]]$allreg) {
     fnh <- paste(flag,regtype,r,sep="_")
-    dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclY2[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
+    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=ncl[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvnames)
     save(dataset,file=paste0(fnh,".RData"))
   }
 }
 
-regtype="regA4"
-for(r in c(1:4)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclY2[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
+run_clustercode_byreg(indat=dat, regtype = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, regtype = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, regtype = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, regtype = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
 
-regtype="regB3"
-for(r in c(1:5)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclB3[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
-
-regtype="regA4"
-for(r in 1:4) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA4[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
-regtype="regA5"
-for(r in 1:length(nclA5)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA5[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
 
 # ========================================================
 # Standardizations, TW only

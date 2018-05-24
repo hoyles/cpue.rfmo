@@ -255,21 +255,8 @@ load(file="../analyses/TW_newdat.RData")
 tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "sha", "ot2", "sbt")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-plot_spfreqyq <- function(indat, regname, splist, flag, mfr = c(5,3)){
-  doreg <- sort(unique(indat[,regname]))
-  for (r in doreg) {
-    windows(15,12);
-    par(mfrow = mfr, mar = c(3,2,2,1), oma = c(0,0,2,0))
-    a <- indat[indat[,regname] == r,]
-    for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
-    title(paste(regname, "Region", r ), outer = TRUE)
-    savePlot(filename = paste("spfreq", flag, regname, "R", r, "allyrs", sep = "_"), type = "png")
-  }
-}
-plot_spfreqyq(indat = dat, regname = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
-plot_spfreqyq(indat = dat, regname = "regA4", splist = tw_allsp, flag = "TW", mfr = c(5,3))
-
-
+plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 
 # Put chosen species here
 use_sp <- c("alb","bet","yft","swo","mls","bum","ot2","sbt")
@@ -281,21 +268,14 @@ allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks"
 # All years included, YFT regions
 rm(a,dat_oil,datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2, o1, o2,r)
 
-reglist <- list()
-reglist$regA4$allreg <- 1:4
-reglist$regA5$allreg <- 1
-reglist$regB2$allreg <- 1:4
-reglist$regB3$allreg <- 1:5
-reglist$regY$allreg <- 1:6
-reglist$regY2$allreg <- 1:7
-
 # Determine the number of clusters. Come back and edit this.
-reglist$regA4$ncl <- c(4,3,3,3)
-reglist$regA5$ncl <- 5
-reglist$regB2$ncl <- c(5,5,4,4)
-reglist$regB3$ncl <- c(5,5,4,4,5)
-reglist$regY$ncl <- c(4,5,4,3,5,1)
-reglist$regY2$ncl <- c(4,5,4,3,5,5,5)
+reglist <- list()
+reglist$regA4 <- list(allreg = 1:4, ncl = c(4,4,3,5))
+reglist$regA5 <- list(allreg = 1,   ncl = 5)
+reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
+reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
+reglist$regY <-  list(allreg = 1:6, ncl = c(4,5,4,3,5,1))
+reglist$regY2 <- list(allreg = 1:7, ncl = c(4,5,4,3,5,5,5))
 
 flag="TW"
 
@@ -303,19 +283,10 @@ flag="TW"
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg <- function(indat, regtype, allsp, allabs, ncl="get_RL", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames) {
-  if (ncl == "get_RL") ncl <- reglist[[regtype]]$ncl
-  for(r in reglist[[regtype]]$allreg) {
-    fnh <- paste(flag,regtype,r,sep="_")
-    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=ncl[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvnames)
-    save(dataset,file=paste0(fnh,".RData"))
-  }
-}
-
-run_clustercode_byreg(indat=dat, regtype = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, regtype = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, regtype = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, regtype = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
 
 
 # ========================================================
@@ -355,6 +326,12 @@ allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks"
 dat <- data.frame(dat)
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
+clkeepJP_A4 <- list("alb"=list(c(), c(), c(), c()))
+clkeepKR_A4 <- list("alb"=list(c(), c(), c(), c()))
+clkeepTW_A4 <- list("alb"=list(c(1), c(1), c(1,2), c(1:5)))
+clkeepSY_A4 <- list("alb"=list(c(), c(), c(), c()))
+clk_A4 <- list(JP=clkeepJP_A4, KR=clkeepKR_A4, TW=clkeepTW_A4, SY=clkeepSY_A4)
+
 clkeepJP_A5 <- list("alb"=list(c(2,4)))
 clkeepKR_A5 <- list("alb"=list(c(5)))
 clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
@@ -405,6 +382,7 @@ setwd(std_dir)
 
 # The runpars define the approach to be used in this run
 runpars <- list()
+runpars[["alb"]] <- list(regtype = "regA4", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 runpars[["bet"]] <- list(regtype = "regB2", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 runpars[["yft"]] <- list(regtype = "regY",  regtype2 = "Y",  clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 

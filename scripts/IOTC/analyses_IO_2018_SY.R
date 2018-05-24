@@ -93,27 +93,8 @@ dat <- data.frame(dat)
 sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbt","sas","shk")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-for (r in c(2:7)) {
-  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regY2 == r,]
-  for (sp in sy_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
-  title(paste("Region", r ), outer = TRUE)
-  savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
-}
-for (r in c(2:7)) {
-  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB3 == r,]
-  for (sp in sy_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
-  title(paste("Region", r ), outer = TRUE)
-  savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
-}
-for (r in c(2:7)) {
-  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regA4 == r,]
-  for (sp in sy_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
-  title(paste("Region", r ), outer = TRUE)
-  savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
-}
+plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(4,3))
+plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = sy_splist, flag = "SY", mfr = c(4,3))
 
 # Put chosen species here
 use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbt","sas")
@@ -122,12 +103,13 @@ allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","
 str(dat[,allabs])
 
 # Determine the number of clusters. Come back and edit this.
-nclY=c(1,4,4,5,4,1)
-nclY2=c(1,4,4,5,4,1,4)
-nclB2=c(5,5,4,4)
-nclB3=c(5,5,4,4,5)
-nclA4=c(5,5,4,4)
-nclA5=c(5)
+reglist <- list()
+reglist$regA4 <- list(allreg = 1:4, ncl = c(4,4,3,5))
+reglist$regA5 <- list(allreg = 1,   ncl = 5)
+reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
+reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
+reglist$regY <-  list(allreg = 1:6, ncl = c(4,5,4,3,5,1))
+reglist$regY2 <- list(allreg = 1:7, ncl = c(4,5,4,3,5,5,5))
 flag="SY"
 
 # Covariates to pass to next stage
@@ -135,30 +117,10 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-regtype="regY2"
-for(r in c(2:5,7)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclY2[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
-regtype="regB3"
-for(r in 1:length(nclB3)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclB3[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
-regtype="regA4"
-for(r in 1:length(nclA3)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA4[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
-regtype="regA5"
-for(r in 1:length(nclA5)) {
-  fnh <- paste(flag,regtype,r,sep="_")
-  dataset <- clust_PCA_run(r=r,ddd=dat,allsp=allsp,allabs=allabs,regtype=regtype,ncl=nclA5[r],plotPCA=F,clustid="lbid_mon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvn)
-  save(dataset,file=paste0(fnh,".RData"))
-}
+run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
 
 
 # ========================================================

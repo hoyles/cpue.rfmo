@@ -103,6 +103,29 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
     return(invisible(dataset))
 }
 
+#' Run clustering code across all regions and save the results.
+#' @param indat The input dataset.
+#' @param reg_struc The name of the regional structure to be used.
+#' @param allsp Vector of variable names to include in the species composition clustering.
+#' @param allabs Vector of variable names to pass to the clust_PCA_run function.
+#' @param ncl Vector of number of clusters to identify by region. Default of 'lst' uses the ncl values specified in reg_struc.
+#' @param plotPCA Generate PCA plots if TRUE.
+#' @param clustid Name of variable to aggregate across for trip-level clustering.
+#' @param allclust Generate plots for all clustering methods if TRUE.
+#' @param flag Fleet code to use in figure titles.
+#' @param cvnames Names of covariates to return with dataset.
+#' @param reglist A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
+#' @return Nothing is returned but each dataset is saved.
+#'
+run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames, reglist=reglist) {
+  if (ncl == "lst") ncl <- reglist[[reg_struc]]$ncl
+  for(r in reglist[[reg_struc]]$allreg) {
+    fnh <- paste(flag,reg_struc,r,sep="_")
+    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvnames)
+    save(dataset,file=paste0(fnh,".RData"))
+  }
+}
+
 #' Principal components analysis of species composition by 'trip'
 #' Run PCA at the trip level using normalised species composition data.
 #' @param datr The input dataset.

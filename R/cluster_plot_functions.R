@@ -440,4 +440,24 @@ map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "reg
     savePlot(paste0(ti, "_mapclust_", cl, ".png"), type = "png")
 }
 
+# 'Plot the mean catch per year of each species by region.
+#'
+#' Use this plot when deciding which species to cluster.
+#' @param indat Input dataset
+#' @param reg_struc The name of the regional structure to be used.
+#' @param splist Vector of variable names to include in the plot.
+#' @param flag Flag to identify the fleet, used in the filename of the plot.
+#' @param mfr The par(mfrow) variable used to define the figure layout. Defaults to c(5,3).
+#'
+plot_spfreqyq <- function(indat, reg_struc, splist, flag, mfr = c(5,3)){
+  doreg <- sort(unique(indat[,reg_struc]))
+  for (r in doreg) {
+    windows(15,12);
+    par(mfrow = mfr, mar = c(3,2,2,1), oma = c(0,0,2,0))
+    a <- indat[indat[,reg_struc] == r,]
+    for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+    title(paste(reg_struc, "Region", r ), outer = TRUE)
+    savePlot(filename = paste("spfreq", flag, reg_struc, "R", r, "allyrs", sep = "_"), type = "png")
+  }
+}
 

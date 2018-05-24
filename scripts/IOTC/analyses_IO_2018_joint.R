@@ -36,8 +36,8 @@ library(survival)
 
 source(paste0(Rdir, "support_functions.r"))
 
- allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
-             "Total","lat","lon","lat5","lon5","reg","flag","qtr")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
+            "Total","lat","lon","lat5","lon5","reg","flag","qtr")
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
             "lat","lon","lat5","lon5","reg","flag","qtr")
 
@@ -85,8 +85,9 @@ dir.create(resdir)
 setwd(resdir)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB2", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
-runpars[["yft"]] <- list(regtype = "regY",  regtype2 = "Y",  clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp", minq_byreg = c())
+runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp", minq_byreg = c())
+runpars[["regY2"]] <- list(runsp = "yft",  regtype2 = "Y2",  clk = clk_Y2,  doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, cltype = "hcltrp", minq_byreg = c())
 
 runreg=2; runsp="yft"
 
@@ -94,7 +95,7 @@ clk <- clk_B2   # for testing
 minqtrs_byreg = c(8,8,2,2,5,5,5,5)
 vars <- c("vessid","hooks","yrqtr","latlong")
 
-maxyr = 2017; keepd = TRUE; maxqtrs=200; addbranch<-F;addother=F;addalb=F
+maxyr = 2018; keepd = TRUE;
 for(runsp in c("bet", "yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
@@ -111,7 +112,7 @@ for(runsp in c("bet", "yft")) {
       rm(dataset)
     }
   }
-  jdat <- jdat[jdat$yrqtr < 2017,]
+  jdat <- jdat[jdat$yrqtr < maxyr,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)
   jdat$vessid <- as.factor(jdat$vessid)
@@ -120,15 +121,12 @@ for(runsp in c("bet", "yft")) {
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for(runreg in runpars[[runsp]]$doregs) {
     minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                  minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
+    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
     if(nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,40)
-    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
+    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
     if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,40)
     a <- jdat[jdat$vessid != "JP1",]
-    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
+    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
     if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,40)
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
@@ -197,10 +195,10 @@ runreg=2; runsp="yft"
 minqtrs_byreg = c(8,8,2,2,5,5,5,5)
 vars <- c("vessid","hooks","yrqtr","latlong")
 
-maxyr = 2017; keepd = TRUE; maxqtrs=200; addbranch<-F;addother=F;addalb=F
+maxyr = 2018; keepd = TRUE;
 #for(runsp in c("bet","yft")) {
 for(runsp in c("yft")) {
-    regtype <- runpars[[runsp]]$regtype
+  regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
   dohbf <- runpars[[runsp]]$dohbf
@@ -215,25 +213,22 @@ for(runsp in c("yft")) {
       rm(dataset)
     }
   }
-  jdat <- jdat[jdat$yrqtr < 2017,]
+  jdat <- jdat[jdat$yrqtr < maxyr,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)
   jdat$vessid <- as.factor(jdat$vessid)
   jdat <- jdat[jdat$yrqtr > 2005 | jdat$flag != "TW",]
 
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
-#  for(runreg in runpars[[runsp]]$doregs) {
+  #  for(runreg in runpars[[runsp]]$doregs) {
   for(runreg in 3:5) {
     minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                  minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
+    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
     if(nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,40)
-    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
+    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
     if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,40)
     a <- jdat[jdat$vessid != "JP1",]
-    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
+    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars, minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
     if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,40)
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
@@ -299,7 +294,7 @@ runpars[["yft"]] <- list(regtype = "regY2", regtype2 = "Y2", clk = clk_Y2, doreg
 
 minqtrs_byreg = c(8,8,2,2,5,5,5,5)
 vars <- c("vessid","hooks","yrqtr","latlong")
-maxyr = 2017; keepd = TRUE; maxqtrs=200; addbranch<-F;addother=F;addalb=F
+maxyr = 2018; keepd = TRUE;
 for(runsp in c("bet", "yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
@@ -316,7 +311,7 @@ for(runsp in c("bet", "yft")) {
       rm(dataset)
     }
   }
-  jdat <- jdat[jdat$yrqtr < 2017,]
+  jdat <- jdat[jdat$yrqtr < maxyr,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)
   jdat$vessid <- as.factor(jdat$vessid)
@@ -325,15 +320,12 @@ for(runsp in c("bet", "yft")) {
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for(runreg in runpars[[runsp]]$doregs) {
     minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                  minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
+    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars, minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
     if(nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,40)
-    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
+    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
     if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,40)
     a <- jdat[jdat$vessid != "JP1",]
-    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
+    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars, minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
     if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,40)
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
@@ -398,7 +390,7 @@ runpars[["yft"]] <- list(regtype = "regY2", regtype2 = "Y2", clk = clk_Y2, doreg
 
 minqtrs_byreg = c(8,8,2,2,5,5,5,5)
 vars <- c("vessid","hooks","yrqtr","latlong")
-maxyr = 2017; keepd = TRUE; maxqtrs=200; addbranch<-F;addother=F;addalb=F
+maxyr = 2018; keepd = TRUE;
 for(runsp in c("bet", "yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
@@ -415,7 +407,7 @@ for(runsp in c("bet", "yft")) {
       rm(dataset)
     }
   }
-  jdat <- jdat[jdat$yrqtr < 2017,]
+  jdat <- jdat[jdat$yrqtr < maxyr,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)
   jdat$vessid <- as.factor(jdat$vessid)
@@ -424,15 +416,12 @@ for(runsp in c("bet", "yft")) {
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for(runreg in runpars[[runsp]]$doregs) {
     minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                  minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
+    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=100,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
     if(nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,40)
-    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
+    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
     if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,40)
     a <- jdat[jdat$vessid != "JP1",]
-    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
+    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=50,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
     if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,40)
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
@@ -500,7 +489,7 @@ runpars <- list()
 runpars[["bet"]] <- list(regtype = "regB2", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 runpars[["yft"]] <- list(regtype = "regY",  regtype2 = "Y",  clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 vars <- c("vessid","hooks","yrqtr","latlong", "lat5", "qtr", "op_yr")
-minqtrs_byreg = c(8,8,2,2,5,5,5,5);maxyr = 2017; keepd = TRUE; maxqtrs=200
+minqtrs_byreg = c(8,8,2,2,5,5,5,5);maxyr = 2018; keepd = TRUE;
 
 for(runsp in c("bet", "yft")) {
   regtype <- runpars[[runsp]]$regtype
@@ -518,7 +507,7 @@ for(runsp in c("bet", "yft")) {
       rm(dataset)
     }
   }
-  jdat <- jdat[jdat$yrqtr < 2017,]
+  jdat <- jdat[jdat$yrqtr < maxyr,]
   jdat$vessidx <- jdat$vessid
   jdat$vessid <- paste0(jdat$flag,jdat$vessid)
   jdat$vessid <- as.factor(jdat$vessid)
@@ -529,15 +518,12 @@ for(runsp in c("bet", "yft")) {
 
   for(runreg in runpars[[runsp]]$doregs) {
     minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                  minvess=90,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
+    glmdat <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=90,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
     if(nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,30)
-    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=90,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
+    glmdat5279 <- select_data_JointIO(jdat,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=90,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
     if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,30)
     a <- jdat[jdat$vessid != "JP1",]
-    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                                      minvess=90,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
+    glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=90,minll=50,minyrqtr=50,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
     if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,30)
 
     #  t1 <- Sys.time()
@@ -589,46 +575,43 @@ for(regtype in c("regB2","regY","regY2","regB3")) {
   clk <- switch(regtype,regB2=clk_B2,regY=clk_Y,regY2=clk_Y2,regB3=clk_B3)
   jdat <- data.frame()
   for(flag in c("JP", "KR", "TW", "SY")) {
-      for(r in runpars[[runsp]]$doregs) {
-        load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep="_"),".RData"))
-        dataset$flag <- flag
-        dataset$qtr <- revtrunc(defactor(dataset$yrqtr))
-        jdat <- rbind(jdat,dataset[,allabs])
-        rm(dataset)
-      }
+    for(r in runpars[[runsp]]$doregs) {
+      load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep="_"),".RData"))
+      dataset$flag <- flag
+      dataset$qtr <- revtrunc(defactor(dataset$yrqtr))
+      jdat <- rbind(jdat,dataset[,allabs])
+      rm(dataset)
     }
-    jdat <- jdat[jdat$yrqtr < 2017,]
-    jdat$vessidx <- jdat$vessid
-    jdat$vessid <- paste0(jdat$flag,jdat$vessid)
-    jdat$vessid <- as.factor(jdat$vessid)
-    jdat$lat5 <- as.factor(jdat$lat5)
-    jdat$op_yr <- as.factor(jdat$op_yr)
-    jdat$qtr <- as.factor(jdat$qtr)
-    jdat <- jdat[jdat$yrqtr > 2005 | jdat$flag != "TW",]
+  }
+  jdat <- jdat[jdat$yrqtr < maxyr,]
+  jdat$vessidx <- jdat$vessid
+  jdat$vessid <- paste0(jdat$flag,jdat$vessid)
+  jdat$vessid <- as.factor(jdat$vessid)
+  jdat$lat5 <- as.factor(jdat$lat5)
+  jdat$op_yr <- as.factor(jdat$op_yr)
+  jdat$qtr <- as.factor(jdat$qtr)
+  jdat <- jdat[jdat$yrqtr > 2005 | jdat$flag != "TW",]
 
-    for(fl in  1:5) {
-      flagl <- flaglist[[fl]]
-      datmeds[[regtype]][[fl]] <- flagl
-      print(c(fl, flagl))
-      for(runreg in reglist[[regtype]]) {
-        dd <- jdat[jdat$flag %in% flagl,]
-        minqtrs <- minqtrs_byreg[runreg]
-        glmdat <- select_data_JointIO(dd,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                  minvess=30,minll=30,minyrqtr=30,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
-        if(dim(glmdat)[1] > 0) {
-          glmdat_meds <- get_base_newdat(glmdat)
-          if((length(flagl) > 1 | flagl == "JP")[1]) {
-            glmdat5279 <- select_data_JointIO(dd,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                    minvess=30,minll=30,minyrqtr=30,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
-            glmdat5279_meds <- get_base_newdat(glmdat5279)
-          } else glmdat5279_meds <- ""
-          a <- dd[dd$vessid != "JP1",]
-          glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,maxqtrs=maxqtrs,
-                    minvess=30,minll=30,minyrqtr=30,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
-          glmdat79nd_meds <- get_base_newdat(glmdat79nd)
-          datmeds[[regtype]][[fl]][[runreg]] <- list(flag=flagl, glmdat_meds, glmdat5279_meds, glmdat79nd_meds)
-        } else datmeds[[regtype]][[fl]][[runreg]] <- list(flag=flagl, 0,0,0)
-      }
+  for(fl in  1:5) {
+    flagl <- flaglist[[fl]]
+    datmeds[[regtype]][[fl]] <- flagl
+    print(c(fl, flagl))
+    for(runreg in reglist[[regtype]]) {
+      dd <- jdat[jdat$flag %in% flagl,]
+      minqtrs <- minqtrs_byreg[runreg]
+      glmdat <- select_data_JointIO(dd,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars,minvess=30,minll=30,minyrqtr=30,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA)
+      if(dim(glmdat)[1] > 0) {
+        glmdat_meds <- get_base_newdat(glmdat)
+        if((length(flagl) > 1 | flagl == "JP")[1]) {
+          glmdat5279 <- select_data_JointIO(dd,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars, minvess=30,minll=30,minyrqtr=30,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1952,1980))
+          glmdat5279_meds <- get_base_newdat(glmdat5279)
+        } else glmdat5279_meds <- ""
+        a <- dd[dd$vessid != "JP1",]
+        glmdat79nd <- select_data_JointIO(a,runreg=runreg,clk=clk,minqtrs=minqtrs,runsp=runsp,mt="deltabin",vars=vars, minvess=30,minll=30,minyrqtr=30,addcl=addcl,cltype=cltype,addpca=NA,samp=NA,strsmp=NA,yrlims=c(1979,maxyr))
+        glmdat79nd_meds <- get_base_newdat(glmdat79nd)
+        datmeds[[regtype]][[fl]][[runreg]] <- list(flag=flagl, glmdat_meds, glmdat5279_meds, glmdat79nd_meds)
+      } else datmeds[[regtype]][[fl]][[runreg]] <- list(flag=flagl, 0,0,0)
     }
+  }
 }
 save(datmeds, file = paste0(projdir, "data_medians.RData"))

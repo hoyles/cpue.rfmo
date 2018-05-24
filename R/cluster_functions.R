@@ -117,9 +117,9 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
 #' @param reglist A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
 #' @return Nothing is returned but each dataset is saved.
 #'
-run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames, reglist=reglist) {
-  if (ncl == "lst") ncl <- reglist[[reg_struc]]$ncl
-  for(r in reglist[[reg_struc]]$allreg) {
+run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames, rgl=reglist) {
+  if (ncl == "lst") ncl <- rgl[[reg_struc]]$ncl
+  for(r in rgl[[reg_struc]]$allreg) {
     fnh <- paste(flag,reg_struc,r,sep="_")
     dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvnames)
     save(dataset,file=paste0(fnh,".RData"))

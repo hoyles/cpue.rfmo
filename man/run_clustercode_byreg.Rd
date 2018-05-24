@@ -6,7 +6,7 @@
 \usage{
 run_clustercode_byreg(indat, reg_struc, allsp, allabs, ncl = "lst",
   plotPCA = F, clustid = "tripidmon", allclust = F, flag, cvnames,
-  reglist = reglist)
+  rgl = reglist)
 }
 \arguments{
 \item{indat}{The input dataset.}

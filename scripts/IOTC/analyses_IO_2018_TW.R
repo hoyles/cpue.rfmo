@@ -319,8 +319,6 @@ twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(twdir,"clustering/")
 
-dat <- data.frame(dat)
-
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
 clkeepJP_A4 <- list("alb"=list(c(), c(), c(), c()))
 clkeepKR_A4 <- list("alb"=list(c(), c(), c(), c()))
@@ -331,6 +329,8 @@ clk_A4 <- list(JP=clkeepJP_A4, KR=clkeepKR_A4, TW=clkeepTW_A4, SY=clkeepSY_A4)
 clkeepJP_A5 <- list("alb"=list(c(2,4)))
 clkeepKR_A5 <- list("alb"=list(c(5)))
 clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
+clkeepSY_A5 <- list("alb"=list(c(), c(), c(), c()))
+clk_A5 <- list(JP=clkeepJP_A5, KR=clkeepKR_A5, TW=clkeepTW_A5, SY=clkeepSY_A5)
 
 clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
 clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0)))
@@ -377,24 +377,30 @@ std_dir <- paste0(twdir,"std/")
 setwd(std_dir)
 
 # The runpars define the approach to be used in this run
-runpars <- list()
-runpars[["alb"]] <- list(regtype = "regA4", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
-runpars[["bet"]] <- list(regtype = "regB3", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
-runpars[["yft"]] <- list(regtype = "regY2",  regtype2 = "Y2",  clk = clk_Y2,  doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+regA4_minss <- list(minq_byreg = c(3,2,5,5), minvess=c(60,40,100,100), minll=c(30,20,50,50), minyrqtr = c(30,20,50,50), minyqll = c(3,3,5,5))
+regA5_minss <- list(minq_byreg = c(5), minvess=c(100), minll=c(50), minyrqtr = c(50), minyqll = c(5))
+regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
+regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
 
-runsp <- "alb"; runreg <- 2
-maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(8,8,2,2,5,5,5,5); keepd <- TRUE
-for (runsp in c("alb")) {
-  regtype <- runpars[[runsp]]$regtype
-  clk <- runpars[[runsp]]$clk
-  addcl <- runpars[[runsp]]$addcl
-  dohbf <- runpars[[runsp]]$dohbf
-  cltype <- runpars[[runsp]]$cltype
+runpars <- list()
+runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss)
+runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
+runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
+runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)
+
+regstr <- "regA4"; runreg <- 2; keepd <- TRUE; doflags <- "TW"
+maxyr <- 2018
+for (regstr in c("regA4")) {
+  rp <- runpars[[regstr]]
+  runsp <- rp$runsp
+  addcl <- rp$addcl
+  dohbf <- rp$dohbf
   jdat <- data.frame()
-  for (flag in c("TW")) {
-    for (r in runpars[[runsp]]$doregs) {
-      load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep = "_"),".RData"))
+  for (flag in doflags) {
+    for (r in rp$doregs) {
+      load(paste0(projdir,flag,"/clustering/",paste(flag,regstr,r,sep = "_"),".RData"))
       dataset$flag <- flag
+      dataset$qtr <- revtrunc(defactor(dataset$yrqtr))
       jdat <- rbind(jdat,dataset[,stdlabs])
       rm(dataset)
     }
@@ -405,35 +411,34 @@ for (runsp in c("alb")) {
   jdat$vessid <- as.factor(jdat$vessid)
 
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
-  for (runreg in runpars[[runsp]]$doregs) {
-    minqtrs <- minqtrs_byreg[runreg]
-    glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs, minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA)
+  for (runreg in rp$doregs) {
+    glmdat <- select_data_IO2(jdat,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars)
     if (nrow(glmdat) > 60000) glmdat <- samp_strat_data(glmdat,60)
     wtt.all   <- mk_wts(glmdat,wttype = "area")
-    fmla.oplogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = T,nhbf = 3)
-    fmla.oplogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = F,nhbf = 3)
-    fmla.boatlogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = T,nhbf = 3)
-    fmla.boatlogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = F,nhbf = 3)
+    fmla.oplogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = T,nhbf = 3, dohook = rp$dohook)
+    fmla.oplogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = F,nhbf = 3, dohook = rp$dohook)
+    fmla.boatlogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = T,nhbf = 3, dohook = rp$dohook)
+    fmla.boatlogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = F,nhbf = 3, dohook = rp$dohook)
     mn <- with(glmdat,0.1 *  mean(get(runsp)/hooks))
 
-    modlab = "lognC_novess_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    modlab = "lognC_novess_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
     if (lu(glmdat$clust) > 1)
     { model <- glm(fmla.oplogn,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() } else
     { model <- glm(fmla.oplogn_ncl,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() }
     summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
 
-    modlab = "lognC_boat_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
+    modlab = "lognC_boat_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
     if (lu(glmdat$clust) > 1)
     { model <- glm(fmla.boatlogn,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() } else
     { model <- glm(fmla.boatlogn_ncl,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() }
     summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
 
     # delta lognormal
-    modlab = "dellog_novess_allyrs"; fname <- paste0("Joint_", regtype,"_R",runreg);
-    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = TRUE)
+    modlab = "dellog_novess_allyrs"; fname <- paste0("Joint_", regstr,"_R",runreg);
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = rp$dohook)
 
-    modlab = "dellog_boat_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = TRUE)
+    modlab = "dellog_boat_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = rp$dohook)
 
     graphics.off()
   }

@@ -48,21 +48,15 @@ make_formula <- function(runsp, modtype, addboat, splitboat = F, addmain = F, ad
 #'
 make_formula_IO <- function(runsp, modtype, addboat, dohbf = T, splitboat = F, addcl = F, addpca = NA, nhbf = 6, dohook = TRUE) {
   fmla <- "~ yrqtr + latlong"
-  if (dohbf)
-    fmla <- paste0(fmla, " + ns(hbf, ", nhbf, ")")
   modhead <- switch(modtype, logn = paste0("log(", runsp, "/hooks + mn)"), deltabin = paste0(runsp, " !=  0"), deltapos = paste0("log((", runsp, ")/hooks)"), qp = runsp, propn = runsp, negbin = runsp, weibull = paste0("Surv(", runsp, ")"))
   fmla <- paste(modhead, fmla)
   # if (modtype %in% c('deltabin', 'qp')) fmla <- paste(fmla, '+ ns(hooks, 10)')
-  if (dohook)
-  fmla <- paste(fmla, "+ ns(hooks, 10)")
-  if (addboat & !splitboat)
-    fmla <- paste(fmla, "+ vessid")
-  if (addboat & splitboat)
-    fmla <- paste(fmla, "+ splitvess")
-  if (addcl)
-    fmla <- paste(fmla, "+ clust")
-  if (!is.na(addpca))
-    fmla <- paste(fmla, "+", addpca)
+  if (dohbf)                fmla <- paste(fmla, "+ ns(hbf, ", nhbf, ")")
+  if (dohook)               fmla <- paste(fmla, "+ ns(hooks, 10)")
+  if (addboat & (splitboat==FALSE)) fmla <- paste(fmla, "+ vessid")
+  if (addboat & splitboat)  fmla <- paste(fmla, "+ splitvess")
+  if (addcl)                fmla <- paste(fmla, "+ clust")
+  if (!is.na(addpca))       fmla <- paste(fmla, "+", addpca)
   # fmla <- as.formula(fmla)
   return(fmla)
 }

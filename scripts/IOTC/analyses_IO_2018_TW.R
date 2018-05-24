@@ -319,10 +319,6 @@ twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(twdir,"clustering/")
 
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5","alb","bet","yft","ott","swo",
-            "mls","bum","blm","otb","skj","sha","oth","sbt","Total","alb_w","bet_w","yft_w",
-            "ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sbt_w","sst","dmy",
-            "embark_dmy","debark_dmy","op_start_dmy","op_end_dmy","lat","lon","lat5","lon5","regY","regB","regY","regB","regY1","regB1","regA","regA1","regA2","regA3")
 dat <- data.frame(dat)
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
@@ -365,7 +361,7 @@ minqtrs_Y2  <- c(1,7,2,2,5,1,7)
 minqtrs_B2 <- c(8,8,2,2)
 minqtrs_B3 <- c(7,8,2,2,7)
 
-use_splist <- use_allsp_2005
+use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",use_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
 
 ## ---------------------------------------------
@@ -382,13 +378,13 @@ setwd(std_dir)
 
 # The runpars define the approach to be used in this run
 runpars <- list()
-runpars[["alb"]] <- list(regtype = "regA4", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
-runpars[["bet"]] <- list(regtype = "regB2", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
-runpars[["yft"]] <- list(regtype = "regY",  regtype2 = "Y",  clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["alb"]] <- list(regtype = "regA4", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regB3", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY2",  regtype2 = "Y2",  clk = clk_Y2,  doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 
-runsp <- "bet"; runreg <- 2
+runsp <- "alb"; runreg <- 2
 maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(8,8,2,2,5,5,5,5); keepd <- TRUE
-for (runsp in c("bet")) {
+for (runsp in c("alb")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -434,10 +430,10 @@ for (runsp in c("bet")) {
 
     # delta lognormal
     modlab = "dellog_novess_allyrs"; fname <- paste0("Joint_", regtype,"_R",runreg);
-    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd)
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = TRUE)
 
     modlab = "dellog_boat_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd)
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = TRUE)
 
     graphics.off()
   }

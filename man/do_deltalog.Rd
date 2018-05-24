@@ -5,7 +5,7 @@
 \title{Run delta lognormal models.}
 \usage{
 do_deltalog(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp,
-  fname, modlab, keepd = TRUE, dohook = dohook)
+  fname, modlab, keepd = TRUE, dohook = TRUE)
 }
 \arguments{
 \item{dat}{Input dataset.}

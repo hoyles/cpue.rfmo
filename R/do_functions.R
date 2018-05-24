@@ -89,7 +89,7 @@ do_lognCx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runs
 #' @param keepd If FALSE, delete the data from the model object before saving.
 #' @param dohook Include hooks in the model on the RHS if TRUE.
 #'
-do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp, fname, modlab, keepd = TRUE, dohook = dohook) {
+do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp, fname, modlab, keepd = TRUE, dohook = TRUE) {
   datpos <- dat[dat[, runsp] > 0, ]
   if (lu(dat$clust) > 1) {
     fmla.bin <- make_formula_IO(runsp, modtype = "deltabin", dohbf = dohbf, addboat = addboat, addcl = T, nhbf = nhbf, dohook = dohook)

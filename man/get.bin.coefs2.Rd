@@ -7,11 +7,11 @@
 get.bin.coefs2(model, nyrs = NA, dat)
 }
 \arguments{
+\item{model}{The model summary object from a binomial glm.}
+
 \item{nyrs}{The number of yrqtr time variables to extract.}
 
 \item{dat}{Data file used to produce glm.}
-
-\item{mod}{The model summary object from a binomial glm.}
 }
 \value{
 Yrqtr coefficients as proportions, with the same mean as the observed proportions.

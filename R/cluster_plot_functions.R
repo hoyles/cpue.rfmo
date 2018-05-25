@@ -403,7 +403,6 @@ beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
 #' @param regtype Deprecated, not used.
 #' @param ncl Number of clusters.
 #' @param r Deprecated, not used.
-#' @param allsp Vector of species to use in the cluster plots.
 #'
 map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "regY", ncl, r = r) {
     if (ncl <= 4) {

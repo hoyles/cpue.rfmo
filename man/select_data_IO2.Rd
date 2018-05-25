@@ -20,8 +20,6 @@ select_data_IO2(indat, runreg, runpars, mt, vars, yrlims = NA, oneflag = NA)
 \item{yrlims}{Bounding years for the analysis. Use integer values, because yrqtrs use 0.125 to 0.875.}
 
 \item{oneflag}{If not NA, the flag to use in the analysis. Otherwise flags JP, KR, SY, TW are used.}
-
-\item{llstrat}{Define latlong based on this stratification level defined here.}
 }
 \value{
 Modified dataset.

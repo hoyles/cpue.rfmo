@@ -244,7 +244,6 @@ select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtr
 #' @param runpars Settings for this run, passed as a list.
 #' @param mt Model type, used to select only nonzero sets when mt is 'deltapos'.
 #' @param vars Default variables to include in the dataset.
-#' @param llstrat Define latlong based on this stratification level defined here.
 #' @param yrlims Bounding years for the analysis. Use integer values, because yrqtrs use 0.125 to 0.875.
 #' @param oneflag If not NA, the flag to use in the analysis. Otherwise flags JP, KR, SY, TW are used.
 #' @return Modified dataset.
@@ -471,88 +470,4 @@ select_data_TW <- function(indat, runreg, runsp, mt, minqtrs = 2, maxqtrs = 500,
   return(gdat)
 }
 
-#' Select TW data for the GLM.
-#'
-#' The function chooses fields and rows of data for the GLM analysis according to various criteria. This version developed for selecting from Japanese datasets in the Indian Ocean. Probably no longer used, replaced by select_data_JointIO.
-#' @param indat Input dataset
-#' @param runreg The region label to select data for.
-#' @param runsp Species of interest.
-#' @param mt Model type, used to select only nonzero sets when mt is 'deltapos'.
-#' @param minqtrs Vessels must fish in at least this many qtrs.
-#' @param maxqtrs Vessels must fish no more than this many qtrs.
-#' @param minvess Include only vessels with at least this many sets.
-#' @param minll Include only grid cells with at least this many sets.
-#' @param minyrqtr Include only year-qtrs with at least this many sets.
-#' @param llstrat Define latlong based on this stratification level defined here.
-#' @param addcl If not NA, defines the name of the cluster variable to include in the dataset.
-#' @param addpca Include PCA variables in the dataset if TRUE.
-#' @param samp Unless NA, apply random subsampling with n = samp.
-#' @param strsmp Unless NA, apply stratified sampling with n = strsmp.
-#' @return Modified dataset.
-#'
-select_data_TWIO <- function(indat, runreg, clk = NA, runsp, mt, minqtrs = 2, maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100, llstrat = 5,
-                             addcl = NA, addpca = NA, samp = NA, strsmp = 30) {
-  gdat <- indat[indat$reg == runreg, ]
-  if (sum(is.na(gdat$hbf)) > 0)
-    gdat[is.na(gdat$hbf), ]$hbf <- 5
-  gdat <- gdat[gdat$hbf >= 5, ]
-  if (!is.na(clk)) {
-    clk <- clkeep[[runsp]][[runreg]]
-    gdat <- gdat[gdat$clust %in% clk[[runsp]][[runreg]], ]
-  }
-  if (llstrat != 5)
-    gdat$latlong <- paste(llstrat * floor(gdat$lat/llstrat), llstrat * floor(gdat$lon/llstrat), sep = "_")
-  if (mt == "deltapos")
-    gdat <- gdat[gdat[, runsp] > 0, ]
-  a <- table(gdat$vessid, gdat$yrqtr)
-  a <- apply(a > 0, 1, sum)
-  table(a)
-  a <- a[a >= minqtrs & a <= maxqtrs]
-  gdat <- gdat[gdat$vessid %in% names(a), ]
-  a <- table(gdat$yrqtr)
-  a
-  a <- a[a >= minyrqtr]
-  gdat <- gdat[gdat$yrqtr %in% names(a), ]
-  a <- table(gdat$latlong)
-  a
-  a <- a[a >= minll]
-  gdat <- gdat[gdat$latlong %in% names(a), ]
-  a <- table(gdat$vessid)
-  a
-  a <- a[a >= minvess]
-  gdat <- gdat[gdat$vessid %in% names(a), ]
-  vars <- c("vessid", "hooks", "yft", "bet", "yrqtr", "latlong", "moon", "bt1", "bt2", "bt3", "bt4", "bt5")
-  if (!is.na(addcl))
-    vars <- c(vars, addcl)
-  if (!is.na(addpca))
-    vars <- c(vars, addpca)
-  gdat <- gdat[, vars]
-  a <- grep(switch(runsp, bet = "yft", yft = "bet"), names(gdat))
-  gdat <- gdat[, -a]
-  if (!is.na(samp))
-    gdat <- samp_data2(gdat, samp)
-  gdat$vessid <- as.factor(gdat$vessid)
-  gdat$latlong <- as.factor(gdat$latlong)
-  gdat$yrqtr <- as.factor(gdat$yrqtr)
-  return(gdat)
-}
-
-# load_jointdat <- function(flags = c("JP", "KR", "TW"), regs, regtype = "regB2", bdir = paste0(basedir, "../"), allabs = allabs, endyr, noTW = T) {
-#   jdat <- data.frame()
-#   for (flag in flags) {
-#     for (r in regs) {
-#       load(paste0(bdir, flag, "/clustering/", paste(flag, regtype, r, sep = "_"), ".RData"))
-#       dataset$flag <- flag
-#       jdat <- rbind(jdat, dataset[, allabs])
-#       rm(dataset)
-#     }
-#   }
-#   jdat <- jdat[jdat$yrqtr < endyr, ]
-#   jdat$vessidx <- jdat$vessid
-#   jdat$vessid <- paste0(jdat$flag, jdat$vessid)
-#   jdat$vessid <- as.factor(jdat$vessid)
-#   if (noTW)
-#     jdat <- jdat[jdat$yrqtr > 2005 | jdat$flag != "TW", ]
-#   return(jdat)
-# }
 

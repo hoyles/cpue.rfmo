@@ -7,9 +7,9 @@
 get.summ.coefs(model, nyrs)
 }
 \arguments{
-\item{nyrs}{The number of yrqtr time variables to extract.}
+\item{model}{The summary object from the lognormal glm.}
 
-\item{mod}{The summary object from the lognormal glm.}
+\item{nyrs}{The number of yrqtr time variables to extract.}
 }
 \value{
 Normalized yrqtr coefficients.

@@ -322,7 +322,7 @@ clustdir <- paste0(twdir,"clustering/")
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
 clkeepJP_A4 <- list("alb"=list(c(), c(), c(), c()))
 clkeepKR_A4 <- list("alb"=list(c(), c(), c(), c()))
-clkeepTW_A4 <- list("alb"=list(c(1), c(1), c(1,2), c(1:5)))
+clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
 clkeepSY_A4 <- list("alb"=list(c(), c(), c(), c()))
 clk_A4 <- list(JP=clkeepJP_A4, KR=clkeepKR_A4, TW=clkeepTW_A4, SY=clkeepSY_A4)
 
@@ -383,7 +383,7 @@ regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), mi
 regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
 
 runpars <- list()
-runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss)
+runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss)
 runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
 runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
 runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)

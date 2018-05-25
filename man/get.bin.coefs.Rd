@@ -7,11 +7,11 @@
 get.bin.coefs(model, nyrs = NA, dat = NA)
 }
 \arguments{
+\item{model}{The model result object from the binomial glm.}
+
 \item{nyrs}{Deprecated, not used.}
 
 \item{dat}{Deprecated, not used.}
-
-\item{mod}{The model result object from the binomial glm.}
 }
 \value{
 Yrqtr coefficients as proportions, with the same mean as the observed proportions.

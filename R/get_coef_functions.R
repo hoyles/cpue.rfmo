@@ -1,7 +1,7 @@
 #' Extract yrqtr coefficients from a binomial glm.
 #'
 #' The function extracts yrqtr coefficients from a binomial glm.
-#' @param mod The model result object from the binomial glm.
+#' @param model The model result object from the binomial glm.
 #' @param nyrs Deprecated, not used.
 #' @param dat Deprecated, not used.
 #' @return Yrqtr coefficients as proportions, with the same mean as the observed proportions.
@@ -18,7 +18,7 @@ get.bin.coefs <- function(model, nyrs=NA, dat=NA) {
 #' Extract yrqtr coefficients from a binomial glm summary object.
 #'
 #' The function extracts yrqtr coefficients from a binomial glm summary object.
-#' @param mod The model summary object from a binomial glm.
+#' @param modelsumm The model summary object from a binomial glm.
 #' @param nyrs The number of yrqtr time variables to extract.
 #' @param dat Deprecated, not used.
 #' @return Yrqtr coefficients as proportions, with the same mean as the observed proportions.
@@ -34,7 +34,7 @@ get.bin.coefs.summ <- function(modelsumm, nyrs, dat=NA) {
 #' Old version of get.bin.coefs.
 #'
 #' The function extracts yrqtr coefficients from a binomial glm summary.
-#' @param mod The model summary object from a binomial glm.
+#' @param model The model summary object from a binomial glm.
 #' @param nyrs The number of yrqtr time variables to extract.
 #' @param dat Data file used to produce glm.
 #' @return Yrqtr coefficients as proportions, with the same mean as the observed proportions.
@@ -52,7 +52,7 @@ get.bin.coefs2 <- function(model, nyrs=NA, dat) {
 #' Extract yrqtr coefficients from a lognormal positive glm summary object.
 #'
 #' The function extracts yrqtr coefficients from a lognormal positive glm summary object.
-#' @param mod The summary object from the lognormal glm.
+#' @param modelsumm The summary object from the lognormal glm.
 #' @param nyrs The number of yrqtr time variables to extract.
 #' @return Normalized yrqtr coefficients.
 #'
@@ -65,7 +65,7 @@ get.coefs.summ <- function(modelsumm, nyrs) {
 #' Extract yrqtr coefficients from a lognormal positive glm summary object.
 #'
 #' The function extracts yrqtr coefficients from a lognormal positive glm summary object. Same as get.coefs.summ().
-#' @param mod The summary object from the lognormal glm.
+#' @param model The summary object from the lognormal glm.
 #' @param nyrs The number of yrqtr time variables to extract.
 #' @return Normalized yrqtr coefficients.
 #'
@@ -228,27 +228,26 @@ glm.coefs2 <- function(model, dat, parm = "yrqtr") {
 #' @param runreg The model region, used in output file names.
 #'
 combine_delta <- function(fnamedelta, fnamepos, fname, runsp, runreg) {
+  model.base <- model.boat <- NULL
   load(paste("model.", fnamedelta, ".base.RData", sep = ""))
   load(paste("model.", fnamedelta, ".boat.RData", sep = ""))
   yrbin <- as.numeric(model.base$xlevels[[1]])
-  a <- length(yrbin)
-  coefsdeltabin.base <- get.coefs(model.base, a)
-  coefsdeltabin.boat <- get.coefs(model.boat, a)
+  coefsdeltabin.base <- get.coefs(model.base)
+  coefsdeltabin.boat <- get.coefs(model.boat)
   rm(model.base, model.boat)
   gc()
   load(paste("model.", fnamepos, ".base.RData", sep = ""))
   load(paste("model.", fnamepos, ".boat.RData", sep = ""))
   yrpos <- as.numeric(model.base$xlevels[[1]])
-  a <- length(yrpos)
-  coefsdeltapos.base <- get.coefs(model.base, a)
-  coefsdeltapos.boat <- get.coefs(model.boat, a)
+  coefsdeltapos.base <- get.coefs(model.base)
+  coefsdeltapos.boat <- get.coefs(model.boat)
   rm(model.base, model.boat)
   gc()
   a <- match(names(coefsdeltapos.base), names(coefsdeltabin.base))
   coefs.base <- coefsdeltabin.base[a] * coefsdeltapos.base
   coefs.boat <- coefsdeltabin.boat[a] * coefsdeltapos.boat
   fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye")
-  plot.slope.ratio(coefs.base, coefs.boat, yrpos, titl = paste("Region", runreg, fishlab, "Delta lognormal combined"))
+  plot_slope_ratio(coefs.base, coefs.boat, yrpos, titl = paste("Region", runreg, fishlab, "Delta lognormal combined"))
   par(mar = c(5, 4, 1, 1))
   plot(yrpos, coefs.base, type = "l", ylab = "Relative abundance estimate", xlab = "Year", ylim = c(0, 2.5))
   lines(yrpos, coefs.boat, col = "red")
@@ -274,7 +273,7 @@ combine_delta_xl <- function(fnamedelta, fnamepos, runsp, runreg) {
   coefs.base <- xl_delta[pos, 3] * xl_pos[, 3]
   yrpos <- xl_delta[pos, 2]
   fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye")
-  plot.slope.ratio(coefs.base, coefs.boat, yrpos, titl = paste("Region", runreg, fishlab, "Delta lognormal combined"))
+  plot_slope_ratio(coefs.base, coefs.boat, yrpos, titl = paste("Region", runreg, fishlab, "Delta lognormal combined"))
   # par(mar = c(5, 4, 1, 1)) plot(yrpos, coefs.base, type = 'l', ylab = 'Relative abundance estimate', xlab = 'Year', ylim = c(0, 2.5)) lines(yrpos,
   # coefs.boat, col = 'red')
   fname2 <- gsub("deltabin", "deltacomb", fnamedelta)

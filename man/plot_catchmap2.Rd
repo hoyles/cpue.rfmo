@@ -19,6 +19,8 @@ plot_catchmap2(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130),
 \item{lonlim}{Longitude limits for plot.}
 
 \item{ti}{Title of the plot.}
+
+\item{delta}{Lat and long resolution}
 }
 \description{
 Function to plot map of catches or other spatial variable. This version has no defined breaks, but ensures the spatial effects are constrained within the correct 1x1 square.

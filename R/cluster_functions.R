@@ -114,10 +114,10 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
 #' @param allclust Generate plots for all clustering methods if TRUE.
 #' @param flag Fleet code to use in figure titles.
 #' @param cvnames Names of covariates to return with dataset.
-#' @param reglist A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
+#' @param rgl A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
 #' @return Nothing is returned but each dataset is saved.
 #'
-run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames, rgl=reglist) {
+run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames, rgl) {
   if (ncl == "lst") ncl <- rgl[[reg_struc]]$ncl
   for(r in rgl[[reg_struc]]$allreg) {
     fnh <- paste(flag,reg_struc,r,sep="_")
@@ -131,6 +131,7 @@ run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", pl
 #' @param datr The input dataset.
 #' @param Screeplotname File name of the diagnostic Scree plot.
 #' @param allsp Species codes / variable names to use in the PCA.
+#' @param clustid Name of variable to aggregate across for trip-level clustering.
 #' @return A list of two objects based on standard PCA and binomial PCA.
 #'
 PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp, clustid) {
@@ -322,8 +323,9 @@ aggregate_data <- function(dat, sp) {
 #' @return The aggregated dataset.
 #'
 aggregate_by_trip <- function(dat, flds) {
+  TRIP_NUM <- NULL
   dt1 <- data.table(dat)
-  setkey(dt1, TRIP_NUM)
+  setkeyv(dt1, cols = "TRIP_NUM")
   df2 <- dt1[, lapply(.SD, mean, na.rm = T), by = list(TRIP_NUM), .SDcols = flds]
   df2 <- data.frame(df2)
   df3 <- cbind(TRIP_NUM = df2[, 1], df2[, flds]/apply(df2[, flds], 1, sum))

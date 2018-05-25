@@ -4,12 +4,10 @@
 \alias{dataprep_KRSBT}
 \title{Prepare Korean SBT data.}
 \usage{
-dataprep_KRSBT(dat, alldat = F, splist)
+dataprep_KRSBT(dat, splist)
 }
 \arguments{
 \item{dat}{Input dataset}
-
-\item{alldat}{Deprecated.}
 
 \item{splist}{List of species codes}
 }

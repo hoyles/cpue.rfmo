@@ -7,13 +7,9 @@
 lsos(..., n = 10)
 }
 \arguments{
+\item{...}{Whatever.}
+
 \item{n}{Report the first n objects if head is TRUE.}
-
-\item{order.by}{Sort the output by this characteristic.}
-
-\item{decreasing}{Sort descending if TRUE.}
-
-\item{head}{Report the first n objects if head is TRUE.}
 }
 \value{
 Output to console.

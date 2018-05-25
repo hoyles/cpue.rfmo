@@ -1,74 +1,5 @@
 #' Clean data.
 #'
-#' The function sets up variables and removes bad data. Originally developed for Japanese data in the WCPO.
-#' @param dat Input dataset
-#' @param checktg If TRUE, remove effort identified as not targetng tuna. Not generally used.
-#' @param allHBF Deprecated.
-#' @return Modified dataset.
-#'
-dataclean <- function(dat, checktg = F, allHBF = F, splist) {
-    dat$op_yr <- as.numeric(dat$op_yr)
-    dat$op_mon <- as.numeric(dat$op_mon)
-    dat$op_day <- as.numeric(dat$op_day)
-    dat <- dat[dat$op_day < 32, ]
-    dat <- dat[!is.na(dat$op_day), ]
-    dat$lat <- as.numeric(dat$lat)
-    dat$latcode <- as.numeric(dat$latcode)
-    dat$lon <- as.numeric(dat$lon)
-    dat$loncode <- as.numeric(dat$loncode)
-    dat <- dat[dat$loncode %in% c(1, 2), ]
-    dat$hbf <- as.numeric(dat$hbf)
-    # dat$tonnage <- as.numeric(dat$tonnage)
-    dat$hooks <- as.numeric(dat$hooks)
-    # dat$alb <- as.numeric(dat$alb)
-    # dat$bet <- as.numeric(dat$bet)
-    # dat$yft <- as.numeric(dat$yft)
-    # dat$swo <- as.numeric(dat$swo)
-    # dat$sbt <- as.numeric(dat$sbt)
-    # dat$blm <- as.numeric(dat$blm)
-    # dat$bum <- as.numeric(dat$bum)
-    # dat$mls <- as.numeric(dat$mls)
-    # if (sum(is.na(dat$alb)) > 0)
-    #     dat[is.na(dat$alb), ]$alb <- 0
-    # if (sum(is.na(dat$bet)) > 0)
-    #     dat[is.na(dat$bet), ]$bet <- 0
-    # if (sum(is.na(dat$yft)) > 0)
-    #     dat[is.na(dat$yft), ]$yft <- 0
-    # if (sum(is.na(dat$swo)) > 0)
-    #     dat[is.na(dat$swo), ]$swo <- 0
-    # if (sum(is.na(dat$sbt)) > 0)
-    #     dat[is.na(dat$sbt), ]$sbt <- 0
-    # if (sum(is.na(dat$blm)) > 0)
-    #     dat[is.na(dat$blm), ]$blm <- 0
-    # if (sum(is.na(dat$bum)) > 0)
-    #     dat[is.na(dat$bum), ]$bum <- 0
-    # if (sum(is.na(dat$mls)) > 0)
-    #     dat[is.na(dat$mls), ]$mls <- 0
-    for (sp in splist) {
-      dat[,sp] <- as.numeric(dat[,sp])
-      if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
-    }
-    dat <- dat[!is.na(dat$hooks), ]
-    dat <- dat[dat$hooks < 10000, ]  # clean up outliers
-    dat <- dat[dat$hooks > 200, ]
-    dat <- dat[dat$yft < 250, ]
-    dat <- dat[dat$bet < 250, ]
-    dat <- dat[dat$alb < 250, ]
-    dat <- dat[dat$tonnage < 30000 | is.na(dat$tonnage), ]
-    # dat[dat$fishingcat == '0', ] dat <- dat[dat$fishingcat != '.', ]
-    dat <- dat[dat$fishingcat != "0", ]
-    # dat <- dat[dat$hbf != ' .', ]
-    dat <- dat[is.na(dat$hbf) == F | dat$op_yr < 1976, ]
-    dat <- dat[dat$hbf < 26 | is.na(dat$hbf) == T, ]
-    # if (allHBF == F) { dat[dat$hbf > 22, ]$hbf <- 22 # pool hbf > 22 into 22 dat <- dat[dat$hbf > 4, ] # remove swordfish targeting in R1 and R2 }
-    # dat$ncrew <- as.numeric(dat$ncrew)
-    if (checktg)
-        dat <- dat[dat$target == 3 | is.na(dat$target), ]  # tuna target  (remove to avoid a change in 1994 - but recent trend is more important)
-    return(dat)
-}
-
-#' Clean data.
-#'
 #' The function sets up variables and removes bad data. Originally developed for Japanese data in the IO.
 #' @param dat Input dataset
 #' @param checktg If TRUE, remove effort identified as not targetng tuna. Not generally used.
@@ -169,6 +100,7 @@ dataclean_KR <- function(dat, yearlim = 2016, splist) {
 #' The function sets up variables and removes bad data. Originally developed for Taiwanese data in the IO.
 #' @param dat1 Input dataset
 #' @param doHBF If TRUE, remove HBF > 25.
+#' @param splist List of species codes
 #' @return Modified dataset.
 #'
 dataclean_TW_std <- function(dat1, doHBF = F, splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")) {

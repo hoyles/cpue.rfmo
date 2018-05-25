@@ -53,16 +53,12 @@ lu <- function(x) length(unique(x))
 #'
 defactor <- function(x) as.numeric(as.character(x))
 
-#' Calulate number of unique values in a vector.
-#'
-#' A helper function to calulate the number of unique values in a vector, length(unique()).
-#' @param x Input vector.
-#' @return Number of unique values.
-#'
-lu <- function(x) length(unique(x))
-
 #' Expand a grid across a data frame.
 #'
+#' Creates new data frame containing all combination of rows from data.frames in ...
+#' Copied from reshape package
+#' https://www.rdocumentation.org/packages/reshape/versions/0.8.7/topics/expand.grid.df
+#' @param ... list of data frames (first varies fastest)
 #' @return Expanded grid.
 #'
 expand.grid.df <- function(...) Reduce(function(...) merge(..., by = NULL), list(...))
@@ -114,9 +110,7 @@ ls.objects <- function(pos = 1, pattern, order.by, decreasing = FALSE, head = FA
 #' List objects in the workspace and their characteristics.
 #'
 #' List objects in the workspace and their characteristics.
-#' @param order.by Sort the output by this characteristic.
-#' @param decreasing Sort descending if TRUE.
-#' @param head Report the first n objects if head is TRUE.
+#' @param ... Whatever.
 #' @param n Report the first n objects if head is TRUE.
 #' @return Output to console.
 #'

@@ -21,8 +21,6 @@ map_clusters(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "regY",
 \item{ncl}{Number of clusters.}
 
 \item{r}{Deprecated, not used.}
-
-\item{allsp}{Vector of species to use in the cluster plots.}
 }
 \description{
 This function plots maps of cluster spatial distribution.

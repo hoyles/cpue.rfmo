@@ -668,33 +668,33 @@ for(runsp in c("bet")) {
   #  t1 <- Sys.time()
     # lognormal constant
     modlab="lognC_novess_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    do_lognCx(dat=glmdat, dohbf, addboat=F, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    do_lognCx(dat=glmdat, dohbf, addboat=F, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
   #  t2 <- Sys.time()
     # modlab="lognC_boat_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    # do_lognCx(dat=glmdat, dohbf, addboat=T, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    # do_lognCx(dat=glmdat, dohbf, addboat=T, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
   #  t3 <- Sys.time()
     modlab="lognC_novess_5279"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    do_lognCx(dat=glmdat5279, dohbf, addboat=F, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    do_lognCx(dat=glmdat5279, dohbf, addboat=F, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
 #    t4 <- Sys.time()
     modlab="lognC_vessid_79nd"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    do_lognCx(dat=glmdat79nd, dohbf, addboat=F, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    do_lognCx(dat=glmdat79nd, dohbf, addboat=F, addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
 #    t5 <- Sys.time()
     # delta lognormal
     modlab="dellog_novess_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg);
-    do_deltalogx(dat=glmdat,dohbf, addboat=F,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    do_deltalogx(dat=glmdat,dohbf, addboat=F,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
     # modlab="dellog_boat_allyrs"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    # do_deltalogx(dat=glmdat,dohbf, addboat=T,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    # do_deltalogx(dat=glmdat,dohbf, addboat=T,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
     modlab="dellog_novess_5279"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    do_deltalogx(dat=glmdat5279,dohbf, addboat=F,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    do_deltalogx(dat=glmdat5279,dohbf, addboat=F,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
     modlab="dellog_vessid_79nd"; fname <- paste0("Joint_",regtype,"_R",runreg)
-    do_deltalogx(dat=glmdat79nd,dohbf, addboat=F,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F)
+    do_deltalogx(dat=glmdat79nd,dohbf, addboat=F,addcl, nhbf=3,runsp, fname, modlab, keepd = keepd, lat5xqtr = T, lat5xyr = T, bcorr=F, cell_areas=cell_areas)
 
     graphics.off()
   }

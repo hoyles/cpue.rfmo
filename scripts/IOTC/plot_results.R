@@ -2,248 +2,49 @@
 # Plots
 ########################################
 # Joint standardization
-#projdir <- "~/IOTC/2017_CPUE/"
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/IOTC/2018_CPUE/"
 
-Rdir <-  paste0(projdir,"Rfiles/")
 jointdir <- paste0(projdir, "joint/")
-KRdir <- paste0(projdir, "KR/")
-TWdir <- paste0(projdir, "TW/")
 JPdir <- paste0(projdir, "JP/")
 KRdir <- paste0(projdir, "KR/")
-USdir <- paste0(projdir, "US/")
+SYdir <- paste0(projdir, "SY/")
+TWdir <- paste0(projdir, "TW/")
 
-# resdirs <- c(paste0(jointdir,"analyses/std_cl_nohbf_spl/"),
-#              paste0(jointdir,"analyses/std_cl_nohbf/"),
-#              paste0(jointdir,"analyses/std_nocl_hbf/"),
-#              paste0(jointdir,"analyses/std_nocl_hbf_spl/"),
-#              paste0(jointdir,"analyses/intx_nocl_hbf/"),
-#              paste0(jointdir,"analyses/intx_cl_nohbf/")) # change these folders to match your own
+alldirs <- c(paste0(KRdir,"analyses/std/"),
+             paste0(JPdir,"analyses/std/"),
+             paste0(TWdir,"analyses/std/"),
+             paste0(SYdir,"analyses/std/"))
 
-reglist <- list("regB" = c(1,2,3), "regB1" = c(1,2,3))
-resdirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
-            paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
-            paste0(TWdir,"analyses/std_cl_TWonly_hbf/"),
-            paste0(USdir,"analyses/std_cl_USonly_hbf/")) # change these folders to match your own
+reglist <- list("regA4" = c(1:4), "regA5" = 1, "regB3" = c(1,2,3,4,5), "regY2" = c(2:5,7))
+splist <- list("regA4" = "alb", "regA5" = "alb", "regB3" = "bet", "regY2" = "yft")
 
-#install.packages("survival")
-library(beanplot)
-library(cluster)
-library(data.table)
-#install.packages("date")
+library("beanplot")
+library("cluster")
+library("data.table")
 library("date")
-library(influ)
-library(MASS)
+library("influ")
+library("MASS")
 library("mgcv")
-#install.packages("nFactors")
 library("nFactors")
-library(plyr)
-library(dplyr)
-library(randomForest)
-library(splines)
-library(survival)
-library(cpue.rfmo)
+library("plyr")
+library("dplyr")
+library("randomForest")
+library("splines")
+library("survival")
+library("cpue.rfmo")
 
-resdirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
-             paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
-             paste0(TWdir,"analyses/std_cl_TWonly_hbf/"),
-             paste0(USdir,"analyses/std_cl_USonly_hbf/"),
-             paste0(projdir, "joint/analyses/std_cl_hbf/"),
-             paste0(projdir, "joint/analyses/std_cl_hbf_nohook/"),
-             paste0(projdir,"joint/analyses/std_cl_hbf_nohook_yqll5/"))
 
-resdir <- resdirs[2]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
+resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
-doplot_cpue <- function(a,vartype, mfti, regstr, runreg) {
-  plot(a$yq,a$pr/mean(a$pr,na.rm=T),xlab="Year-quarter",ylab="Relative CPUE",main=paste(vartype,mdti),type="l",ylim=c(0,3))
-  points(a$yq,a$pr/mean(a$pr,na.rm=T), cex=0.7)
-  points(a$yq,a$ul/mean(a$pr,na.rm=T),pch="-",col=3)
-  points(a$yq,a$ll/mean(a$pr,na.rm=T),pch="-",col=2)
-  mtext(paste0(regstr," R",runreg),side=3,outer=T,line=-2)
-  }
-resdir <- resdirs[7]
+resdir <- resdirs[3]
 regstr = "regB"
 vartype = "dellog"
 mdn=4
 
-
-  for (resdir in resdirs[7]) {
-    outdir <- paste0(resdir,"/outputs_test/")
-    dir.create(outdir)
-    setwd(resdir)
-  #  for(regstr in c("regB2","regY","regY2","regB3")) {
-     for(regstr in c("regB")) {
-        for(runreg in reglist[[regstr]]) {
-        for(vartype in c("lognC","dellog")) {
-          windows(height=12,width=12);par(mfrow=c(2,2),mar=c(4,4,3,1))
-          saveit <- FALSE
-          for(mdn in 1:4) {
-            mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-            mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-            modtype <- paste(vartype,mdt,sep="_")
-            fname <- paste0("Joint_",regstr,"_R",runreg)
-            if(vartype != "dellog") {
-              if(file.exists(paste0(fname,"_",modtype,"_predictions.RData"))) {
-                load(paste0(fname,"_",modtype,"_predictions.RData"))
-                xx <- data.frame(yq=as.numeric(as.character(nd$newdat$yrqtr)))
-                xx$pr1 <- switch(vartype,lognC=exp(nd$predresp$fit),negbC=nd$predresp$fit)
-                #      predt <- predict(mod,newdata=nd$newdat
-                if(vartype=="lognC") {
-                  xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
-                  xx$cv <- nd$predterms$se.fit[,1]
-                  xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-                  xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
-                } else {
-                  xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
-                  xx$cv <- nd$predterms$se.fit[,1]
-                  xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-                  xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
-                }
-                a <- data.frame(yq=seq(min(xx$yq),max(xx$yq),0.25))
-                a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),3:6])
-                a[,c(2,4,5)] <- a[,c(2,4,5)]/mean(a[,2],na.rm=TRUE)
-                a$yr <- as.factor(floor(a$yq))
-                a$qtr <- as.factor(a$yq - floor(a$yq))
-                doplot_cpue(a,vartype, mfti, regstr, runreg)
-                mod <- glm(pr ~ yr + qtr,data=a)
-                nd <- data.frame(yr=sort(unique(a$yr[!is.na(a$pr)])),qtr=levels(a$qtr)[2])
-                nd$pr <- predict(mod,newdat=nd,se.fit=FALSE)
-                write.csv(a,file=paste0(outdir,fname,"_",modtype,".csv"))
-                write.csv(nd,file=paste0(outdir,fname,"_",modtype,"yr.csv"))
-                saveit <- TRUE
-              }}
-            if(vartype=="dellog") {
-              if(file.exists(paste0(fname,"_pos_",modtype,"_predictions.RData"))) {
-                load(paste0(fname,"_pos_",modtype,"_predictions.RData"))
-#                load(paste0(fname,"_bin_",modtype,"_predictions.RData"))
-                load(paste0(fname,"_",modtype,"_indices.RData"))
-#                xx <- data.frame(yq=as.numeric(gsub("yrqtr","",names(coefs.pos))))
-                xx <- data.frame(yq=as.numeric(as.character(ndpos$newdat$yrqtr)))
-                xx$pr <- pcoefs
-                xx$ln.cv <- ndpos$predterms$se.fit[,1]
-                xx$ll <- exp(log(pcoefs) - 1.96*ndpos$predterms$se.fit[,1])
-                xx$ul <- exp(log(pcoefs) + 1.96*ndpos$predterms$se.fit[,1])
-
-                a <- data.frame(yq=seq(min(xx$yq,na.rm=T),max(xx$yq,na.rm=T),0.25))
-                a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),2:5])
-                a[,c(2,4:5)] <- a[,c(2,4:5)]/mean(a[,2],na.rm=TRUE)
-                a$yr <- as.factor(floor(a$yq))
-                a$qtr <- as.factor(a$yq - floor(a$yq))
-                doplot_cpue(a,vartype, mfti, regstr, runreg)
-                mod <- glm(pr ~ yr + qtr,data=a)
-                nd <- data.frame(yr=sort(unique(a$yr[!is.na(a$pr)])),qtr=levels(a$qtr)[2])
-                nd$pr <- predict(mod,newdat=nd,se.fit=FALSE)
-                write.csv(a,file=paste0(outdir,fname,"_",modtype,".csv"))
-                write.csv(nd,file=paste0(outdir,fname,"_",modtype,"yr.csv"))
-                saveit <- TRUE
-              }}
-          }
-          if(saveit) savePlot(file=paste0(outdir,fname,"_",vartype,"_comp.png"),type="png")
-          graphics.off()
-        }}
-    }}
-
-# for (resdir in resdirs[1:4]) {
-#   browser()
-#   outdir <- paste0(resdir,"/outputs/")
-#   dir.create(outdir)
-#   setwd(resdir)
-#   for(regstr in c("regB2","regY","regY2","regB3")) {
-#     for(runreg in reglist[[regstr]]) {
-#       for(vartype in c("lognC","dellog")) {
-#         windows(height=12,width=12);par(mfrow=c(2,2),mar=c(4,4,3,1))
-#         saveit <- FALSE
-#         for(mdn in 1:4) {
-#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-#           modtype <- paste(vartype,mdt,sep="_")
-#           fname <- paste0("Joint_",regstr,"_R",runreg)
-#           if(vartype != "dellog") {
-#             if(file.exists(paste0(fname,"_",modtype,"_predictions.RData"))) {
-#               load(paste0(fname,"_",modtype,"_predictions.RData"))
-#               xx <- data.frame(yq=as.numeric(as.character(nd$newdat$yrqtr)))
-#               xx$pr1 <- switch(vartype,lognC=exp(nd$predxxp$fit),negbC=nd$predxxp$fit)
-#               #      predt <- predict(mod,newdata=nd$newdat
-#               if(vartype=="lognC") {
-#                 xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
-#                 xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-#                 xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
-#               } else {
-#                 xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
-#                 xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-#                 xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
-#               }
-#               a <- data.frame(yq=seq(min(xx$yq),max(xx$yq),0.25))
-#               a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),3:5])
-#               a[,2:4] <- a[,2:4]/mean(a[,2],na.rm=TRUE)
-#               a$yr <- as.factor(floor(a$yq))
-#               a$qtr <- as.factor(a$yq - floor(a$yq))
-#               doplot_cpue(a,vartype, mfti, regstr, runreg)
-#               mod <- glm(pr ~ yr + qtr,data=a)
-#               nd <- data.frame(yr=sort(unique(a$yr[!is.na(a$pr)])),qtr=levels(a$qtr)[2])
-#               nd$pr <- predict(mod,newdat=nd,se.fit=FALSE)
-#               write.csv(a,file=paste0(outdir,fname,"_",modtype,".csv"))
-#               write.csv(nd,file=paste0(outdir,fname,"_",modtype,"yr.csv"))
-#               saveit <- TRUE
-#             }}
-#         }
-#         if(saveit) savePlot(file=paste0(outdir,fname,"_",vartype,"_comp.png"),type="png")
-#         graphics.off()
-#       }}
-#   }}
-#
+prep_indices(resdirs=alldirs[3], reg_strs=c("regY2","regB3"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
 
-# # plot for interactions models
-# for (resdir in resdirs[5:6]) {
-#   browser()
-#   outdir <- paste0(resdir,"/outputs/")
-#   dir.create(outdir)
-#   setwd(resdir)
-#   for(regstr in c("regB2","regY","regY2","regB3")) {
-#     for(runreg in reglist[[regstr]]) {
-#       for(vartype in c("lognC")) {
-#         windows(height=12,width=12);par(mfrow=c(2,2),mar=c(4,4,3,1))
-#         saveit <- FALSE
-#         for(mdn in 1:4) {
-#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-#           modtype <- paste(vartype,mdt,sep="_")
-#           fname <- paste0("Joint_",regstr,"_R",runreg)
-#           if(vartype != "dellog") {
-#             if(file.exists(paste0(fname,"_",modtype,"_predictions.RData"))) {
-#               load(paste0(fname,"_",modtype,"_predictions.RData"))
-#               xx <- data.frame(yq=as.numeric(as.character(res$nd1$yrqtr)))
-#               xx$pr1 <- switch(vartype,lognC=exp(nd$predxxp$fit),negbC=nd$predxxp$fit)
-#               #      predt <- predict(mod,newdata=nd$newdat
-#               if(vartype=="lognC") {
-#                 xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
-#                 xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-#                 xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
-#               } else {
-#                 xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
-#                 xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-#                 xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
-#               }
-#               a <- data.frame(yq=seq(min(xx$yq),max(xx$yq),0.25))
-#               a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),3:5])
-#               a[,2:4] <- a[,2:4]/mean(a[,2],na.rm=TRUE)
-#               a$yr <- as.factor(floor(a$yq))
-#               a$qtr <- as.factor(a$yq - floor(a$yq))
-#               doplot_cpue(a,vartype, mfti, regstr, runreg)
-#               mod <- glm(pr ~ yr + qtr,data=a)
-#               nd <- data.frame(yr=sort(unique(a$yr[!is.na(a$pr)])),qtr=levels(a$qtr)[2])
-#               nd$pr <- predict(mod,newdat=nd,se.fit=FALSE)
-#               write.csv(a,file=paste0(outdir,fname,"_",modtype,".csv"))
-#               write.csv(nd,file=paste0(outdir,fname,"_",modtype,"yr.csv"))
-#               saveit <- TRUE
-#             }}
-#         }
-#         if(saveit) savePlot(file=paste0(outdir,fname,"_",vartype,"_comp.png"),type="png")
-#         graphics.off()
-#       }}
-#   }}
-
+  # Overlay national plots for comparison. ICCAT.
 resdirs_flags <- c(paste0(projdir, "joint/analyses/std_cl_hbf/outputs_test/"),
                    paste0(JPdir,"analyses/std_cl_JPonly_hbf/outputs_test/"),
                    paste0(KRdir,"analyses/std_cl_KRonly_hbf/outputs_test/"),
@@ -254,14 +55,14 @@ labs <- c("Joint", "JP", "KR", "TW", "US")
 reslist <- list()
 for(r in 1:3) {
   for(md in c("boat_allyrs", "novess_allyrs")) {
-    for(n in 1:5) {
-      if(md == "boat_allyrs" & labs[n] %in% c("Joint", "JP")) {
+    for(dirnum in 1:5) {
+      if(md == "boat_allyrs" & labs[dirnum] %in% c("Joint", "JP")) {
         md2 <- "vessid_79nd"
       } else { md2 <- md }
-      fn <- paste0(resdirs_flags[n],"Joint_regB_R",r,"_dellog_",md2,"yr.csv")
+      fn <- paste0(resdirs_flags[dirnum],"Joint_regB_R",r,"_dellog_",md2,"yr.csv")
       if (file.exists(fn)) {
         a <- read.csv(fn)
-        if(n == 1) {
+        if(dirnum == 1) {
           aa <- data.frame(yr = seq(min(a$yr, na.rm = TRUE), max(a$yr, na.rm = TRUE)))
           aa$pr <- a$pr[match(aa$yr, a$yr)]
         } else {
@@ -274,119 +75,71 @@ for(r in 1:3) {
     }
     # equalise means
     allin <- aa
-    for (n in 1:5) {
-      if(n == 1) {
+    for (dirnum in 1:5) {
+      if(dirnum == 1) {
         aa <- data.frame(yr = seq(min(a$yr, na.rm = TRUE), max(a$yr, na.rm = TRUE)))
         aa$pr <- a$pr[match(aa$yr, a$yr)]
         windows()
         plot(aa$yr, aa$pr, type = "b", xlab = "Year-quarter", ylab = "Relative CPUE", main = paste("Region", r, " ", md2), ylim = c(0, 3))
         legend("topright", legend = labs, col = 1:5, pch = 1:5, lty=1)
       } else {
-        lines(yrs, a$pr[match(yrs, a$yr)], col = n, pch = n, type = "b")
+        lines(yrs, a$pr[match(yrs, a$yr)], col = dirnum, pch = dirnum, type = "b")
       }
   }
   fnf <- paste0(projdir, "joint/analyses/std_cl_hbf/outputs_test/plot2_compare_yr_R", r,"_", md)
   savePlot(file = fnf, type = "png")
 }
 
-
-# # Adjust boat_allyrs
-# # Actually, don't adjust, it's more complicated, for various reasons.
-# # Use the 2 separate series before and after, instead
-# resdir = resdirs[2]; regstr = "regB2"; vartype="dellog"; runreg = 3 # testing
-# resdir = resdirs[2]; regstr = "regB2"; vartype="dellog"; runreg = 3 # testing
-# for (resdir in resdirs[1:4]) {
-#   outdir <- paste0(resdir,"/outputs/")
-#   setwd(resdir)
-#   for(regstr in c("regB2","regY","regY2","regB3")) {
-#     for(runreg in reglist[[regstr]]) {
-#       for(vartype in c("lognC","dellog")) {
-#         mdtn <- "novess_allyrs"
-#         mdtv <- "boat_allyrs"
-#         modtypen <- paste(vartype,mdtn,sep="_")
-#         modtypev <- paste(vartype,mdtv,sep="_")
-#         fname <- paste0("Joint_",regstr,"_R",runreg)
-#         nv <- read.csv(file=paste0(outdir,fname,"_",modtypen,".csv"))
-#         ve <- read.csv(file=paste0(outdir,fname,"_",modtypev,".csv"))
-#         windows()
-#         with(nv, plot(yq, pr, type = "b", ylim = c(0, 3)))
-#         with(ve, points(yq, pr, type = "b", col = 2))
-#         with(nv[nv$yq %in% seq(1978.125, 1978.875, .25),], mean(pr)) -
-#         with(ve[ve$yq %in% seq(1978.125, 1978.875, .25),], mean(pr))
-#         with(nv[nv$yq %in% seq(1980.125, 1980.875, .25),], mean(pr)) -
-#         with(ve[ve$yq %in% seq(1980.125, 1980.875, .25),], mean(pr))
-#
-#         windows()
-#         a <- vector()
-#         for (y in 1953:2016) a <- c(a, with(nv[nv$yr == y,], mean(pr)) - with(ve[ve$yr == y,], mean(pr)))
-#         plot(1952:2016, a)
-#         cbind(1952:2016, a)
-#         cbind(1953:2016, tapply(nv$pr, nv$yr, mean), a)
-#
-#         resdir = resdirs[2]; regstr = "regB2"; vartype="lognC"; runreg = 3 # testing
-#         resdir = resdirs[2]; regstr = "regY"; vartype="lognC"; runreg = 5 # testing
-#         outdir <- paste0(resdir,"/outputs/")
-#         mdtn <- "novess_allyrs"; mdtv <- "boat_allyrs"
-#         modtypen <- paste(vartype,mdtn,sep="_"); modtypev <- paste(vartype,mdtv,sep="_")
-#         fname <- paste0("Joint_",regstr,"_R",runreg)
-#         nv <- read.csv(file=paste0(outdir,fname,"_",modtypen,".csv"))
-#         ve <- read.csv(file=paste0(outdir,fname,"_",modtypev,".csv"))
-#         windows(); par(mfrow = c(2,1))
-#         plot(nv$yq, nv$pr/ve$pr)
-#         plot(nv$yq, nv$pr - ve$pr)
-#         rbind(nv$yq, nv$pr/ve$pr)
+## -----------------------------------
+# Run influence plots.
+  ## -----------------------------------
 
 mdtn <- "novess_allyrs"
 mdtv <- "boat_allyrs"
 md5279 <- "novess_5279"
 md79nd <- "vessid_79nd"
 
-resdirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
-             paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
-             paste0(TWdir,"analyses/std_cl_TWonly_hbf/"),
-             paste0(USdir,"analyses/std_cl_USonly_hbf/"),
-             paste0(projdir, "joint/analyses/std_cl_hbf/"),
-             paste0(projdir, "joint/analyses/std_cl_hbf_nohook/"),
-             paste0(projdir,"joint/analyses/std_cl_hbf_nohook_yqll5/"))
+mdt_all <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")
+mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1978 no vessid"),"1978-present vessid")
+reg_strs <- c("regA4")
 
-#topdir <- c(KRdir, JPdir, TWdir, USdir)
-r=2
-fl = c("KR","JP","TW","US","jnt","jnt","jnt")
-# md <- md5279; nm_dat <- "glmdat5279"; nm_wt <- "wtt.5279"
-# md <- mdtn  ; nm_dat <- "glmdat"    ; nm_wt <- "wtt.all"
-# md <- md79nd; nm_dat <- "glmdat79nd"; nm_wt <- "wtt.79nd"
-# md <- mdtv  ; nm_dat <- "glmdat"; nm_wt <- "wtt.all"
-for (md in c(md5279, md79nd, mdtn, mdtv)) {
-  nm_dat <- switch(md, vessid_79nd = "glmdat79nd", novess_allyrs = "glmdat", boat_allyrs = "glmdat", novess_5279 = "glmdat5279")
-  nm_wt <- switch(md, vessid_79nd = "wtt.79nd", novess_allyrs = "wtt.all", boat_allyrs = "wtt.all", novess_5279 = "wtt.5279")
-  for (r in 1:3) {
-    for(n in 7) {
-      rm(mod)
-      rm(infve)
-      fn <- paste0(resdirs[n],"Joint_regB_R",r,"_lognC_",md,"_model.RData")
-      if (file.exists(fn)) {
+fl = c("KR","JP","TW","SY","jnt","jnt","jnt")
+for(dirnum in 3) {
+  setwd(alldirs[dirnum])
+  for(regstr in reg_strs) {
+    for (r in reglist[[regstr]]) {
+      for (mdi in 1:4) {
+        md <- mdt_all[mdi]
+        nm_dat <- c("glmdat", "glmdat", "glmdat5279", "glmdat79nd")[mdi]
+        nm_wt <- c("wtt.all", "wtt.all", "wtt.5279", "wtt.79nd")[mdi]
+        rm(mod)
+        rm(infve)
+        fn <- paste0(alldirs[dirnum],"Joint_", regstr,"_R",r,"_lognC_",md,"_model.RData")
+        if (file.exists(fn)) {
         load(fn)
-        runsp <- "bet"
+        runsp <- "alb"
         assign(nm_dat, mod$data)
         assign(nm_wt, mk_wts(mod$data,wttype="area"))
         mn <- with(mod$data,0.1 * mean(get(runsp)/hooks))
-        keepd = TRUE
-        setwd(resdirs[n])
+        # check variables
+        doltln <- isTRUE(grep("latlong", mod$formula) > 0)
+        dohbf  <- isTRUE(grep("hbf", mod$formula) > 0)
+        dohook <- isTRUE(grep("hooks", mod$formula) > 0)
+        dovess <- isTRUE(grep("vessid", mod$formula) > 0)
+        doclust <- isTRUE(grep("clust", mod$formula) > 0)
         infve=Influence$new(mod)
         infve$calc()
         windows()
-        fname <- paste0("_baseglm_R",r,"_",fl[n],"_",runsp,"_",md,".png")
+        fname <- paste0(regstr,"_R",r,"_",fl[dirnum],"_",runsp,"_",md,".png")
         infve$stanPlot();savePlot(paste0("Stanplot", fname),type="png")
         infve$stepPlot();savePlot(paste0("stepPlot", fname), type = "png")
         infve$influPlot();savePlot(paste0("influPlot", fname), type = "png")
-        infve$cdiPlot('latlong');savePlot(paste0("influPlot_latlong", fname),type="png")
-        if (!md %in% c(md5279, mdtn)) {
-          infve$cdiPlot('vessid');
-          savePlot(paste0("influPlot_vessid", fname),type="png")
-          }
-        #infve$cdiPlot('ns(hooks, 10)');savePlot(paste0("influPlot_hooks", fname),type="png")
-        infve$cdiPlot('ns(hbf, 3)');savePlot(paste0("influPlot_hbf", fname),type="png")
-        infve$cdiPlot('clust');savePlot(paste0("influPlot_cl", fname),type="png")
+        if (doltln) { infve$cdiPlot('latlong');savePlot(paste0("influPlot_latlong", fname),type="png") }
+        if (dovess) { infve$cdiPlot('vessid'); savePlot(paste0("influPlot_vessid", fname),type="png") }
+        if (dohook) { infve$cdiPlot('ns(hooks, 10)');savePlot(paste0("influPlot_hooks", fname),type="png") }
+        if (dohbf)  { infve$cdiPlot('ns(hbf, 3)');savePlot(paste0("influPlot_hbf", fname),type="png") }
+        if (doclust) { infve$cdiPlot('clust');savePlot(paste0("influPlot_cl", fname),type="png") }
+        }
       }
     }
   }
@@ -417,25 +170,26 @@ table(floor(a$yr), a$vessid=="JP2")
 #              paste0(jointdir,"analyses/intx_nocl_hbf/"),
 #              paste0(jointdir,"analyses/intx_cl_nohbf/")) # change these folders to match your own
 
-resdirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
-             paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
-             paste0(TWdir,"analyses/std_cl_TWonly_hbf/"),
-             paste0(USdir,"analyses/std_cl_USonly_hbf/"),
+resdirs <- c(paste0(KRdir,"analyses/std/"),
+             paste0(JPdir,"analyses/std/"),
+             paste0(TWdir,"analyses/std/"),
+             paste0(SYdir,"analyses/std/"),
              paste0(projdir, "joint/analyses/std_cl_hbf/"),
              paste0(projdir, "joint/analyses/std_cl_hbf_nohook/"),
              paste0(projdir, "joint/analyses/std_cl_hbf_nohook_yqll5/"))
 
-regstr="regB"
+regstr="regA4"
 runreg=1 ;mdn=2
 mdt="boat_allyrs"; mdt="vessid_79nd"; mdt="novess_5279"; mdt="novess_allyrs";
-reglist <- list("regB" = c(1,2,3))
 vartype="lognC"
 
-for (resdir in resdirs[c(7)]) {
+reg_strs <- c("regA4", "regA5", "regB3", "regY2")
+
+for (resdir in resdirs[c(3)]) {
   outdir <- paste0(resdir,"/diags_x/")
   dir.create(outdir)
-  for(regstr in c("regB")) {
-    sp <- switch(regstr,regB2="bet",regY="yft",regY2="yft",regB3="bet")
+  for(regstr in reg_strs) {
+    sp <- splist[[regstr]]
     for(runreg in reglist[[regstr]]) {
       for(vartype in c("lognC")) {
         for(mdn in 1:4) {
@@ -469,11 +223,11 @@ for (resdir in resdirs[c(7)]) {
   }
 }
 
- for (resdir in resdirs[c(7)]) {
+ for (resdir in resdirs[c(3)]) {
   outdir <- paste0(resdir,"/diags_x/")
   dir.create(outdir)
-  for(regstr in c("regB")) {
-    sp <- switch(regstr,regB="bet",regY="yft",regB3="bet",regY2="yft")
+  for(regstr in reg_strs) {
+    sp <- splist[[regstr]]
     for(runreg in reglist[[regstr]]) {
       for(vartype in c("lognC")) {
         for(mdn in 1:4) {
@@ -507,11 +261,11 @@ for (resdir in resdirs[c(7)]) {
   }
 }
 
-for (resdir in resdirs[7]) {
+for (resdir in resdirs[3]) {
   outdir <- paste0(resdir,"/diags_x/")
   dir.create(outdir)
-  for(regstr in c("regB")) {
-    sp <- switch(regstr,regB="bet",regY="yft",regB3="bet",regY2="yft")
+  for(regstr in reg_strs) {
+    sp <- splist[[regstr]]
     for(runreg in reglist[[regstr]]) {
       for(vartype in c("lognC")) {
         for(mdn in 1:4) {
@@ -544,11 +298,11 @@ for (resdir in resdirs[7]) {
   }
 }
 
-for (resdir in resdirs[c(7)]) {
+for (resdir in resdirs[c(3)]) {
   outdir <- paste0(resdir,"/diags_x/")
   dir.create(outdir)
-  for(regstr in c("regB")) {
-    sp <- switch(regstr,regB="bet",regY="yft",regB3="bet",regY2="yft")
+  for(regstr in reg_strs) {
+    sp <- splist[[regstr]]
     for(runreg in reglist[[regstr]]) {
       for(vartype in c("lognC")) {
         for(mdn in 1:4) {
@@ -585,11 +339,11 @@ library(maps)
 library(maptools)
 library(mapdata)
 
-for (resdir in resdirs[7]) {
+for (resdir in resdirs[3]) {
   outdir <- paste0(resdir,"/diags_x/")
   dir.create(outdir)
-  for(regstr in c("regB")) {
-    sp <- switch(regstr,regB="bet",regY="yft",regB3="bet",regY2="yft")
+  for(regstr in reg_strs) {
+    sp <- splist[[regstr]]
     for(runreg in reglist[[regstr]]) {
       for(vartype in c("lognC")) {
         for(mdn in 1:4) {
@@ -631,11 +385,11 @@ for (resdir in resdirs[7]) {
   }
 }
 
-for (resdir in resdirs[c(7)]) {
+for (resdir in resdirs[c(3)]) {
   outdir <- paste0(resdir,"/diags_x/")
   dir.create(outdir)
-  for(regstr in c("regB")) {
-    sp <- switch(regstr,regB="bet",regY="yft",regB3="bet",regY2="yft")
+  for(regstr in reg_strs) {
+    sp <- splist[[regstr]]
     for(runreg in reglist[[regstr]]) {
       for(vartype in c("lognC")) {
         for(mdn in 1:4) {
@@ -681,23 +435,22 @@ for (resdir in resdirs[c(7)]) {
 resdirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
              paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
              paste0(TWdir,"analyses/std_cl_TWonly_hbf/"),
-             paste0(USdir,"analyses/std_cl_USonly_hbf/"),
+             paste0(SYdir,"analyses/std_cl_SYonly_hbf/"),
              paste0(projdir, "joint/analyses/std_cl_hbf/"),
              paste0(projdir, "joint/analyses/std_cl_hbf_nohook/"),
              paste0(projdir,"joint/analyses/std_cl_hbf_nohook_yqll5/"))
 
 # Spatial temporal residual plots
-
-for (r in 1:3) {
-  n <- 7
-  resdir <- resdirs[n]
+for(regstr in reg_strs) {
+  for (r in reglist[[regstr]]) {
+  dirnum <- 3
+  resdir <- resdirs[dirnum]
   outdir <- paste0(resdir,"/diags_x/")
   runreg <- r
-  mdn <- 4
+  mdn <- 2
   mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
   mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid")[mdn]
-  regstr <- c("regB")
-  sp <- switch(regstr,regB="bet",regY="yft",regB3="bet",regY2="yft")
+  sp <- splist[[regstr]]
   vartype <- c("lognC")
   modtype <- paste(vartype,mdt,sep="_")
   fname <- paste0("Joint_",regstr,"_R",runreg)
@@ -759,7 +512,7 @@ for (r in 1:3) {
   bb3 <- tapply(res$est,list(res$lon,res$lat),mean)
   windows(width = 18, height = 14)
   image(sort(unique(res$lon)),sort(unique(res$lat)),bb3,xlab="Lon",ylab="Lat",main=paste0("Residual trends by grid cell R", r),breaks = seq(-0.07, 0.075, length.out = 31), col=heat.colors(30))
-  contour(sort(unique(res$lon)),sort(unique(res$lat)),100*bb3,add=T,breaks=seq(-10,10,length.out=2001))
+  contour(sort(unique(res$lon)),sort(unique(res$lat)),100*bb3,add=T,levels=seq(-10,10,length.out=41))
   map(add=TRUE,fill=TRUE)
   savePlot(paste0(outdir,paste0("Residual trends by grid cellx", r, ".png")), type = "png")
   # Table of strata sample sizes
@@ -768,8 +521,9 @@ for (r in 1:3) {
   samps <- tapply(a$latlong, list(a$latlong, a$yrqtr), length)
   windows()
   table(samps)
-  hist(samps, breaks = seq(0, 100, 1), xlim = range(samps, na.rm = TRUE), main = paste0("Frequency histogram of sample sizes by stratum, R", r))
+  hist(samps, breaks = seq(0, 1000, 1), xlim = range(samps, na.rm = TRUE), main = paste0("Frequency histogram of sample sizes by stratum, R", r))
   savePlot(paste0(outdir,paste0("ss_by_stratum_R", r, ".png")), type = "png")
+  }
 }
 
 ############ End of residual plots ##################
@@ -825,7 +579,7 @@ YNR4 <- read.csv("~/../OneDrive/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outpu
 resdirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
              paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
              paste0(TWdir,"analyses/std_cl_TWonly_hbf/"),
-             paste0(USdir,"analyses/std_cl_USonly_hbf/"),
+             paste0(SYdir,"analyses/std_cl_SYonly_hbf/"),
              paste0(projdir, "joint/analyses/std_cl_hbf/"),
              paste0(projdir, "joint/analyses/std_cl_hbf_nohook/"),
              paste0(projdir,"joint/analyses/std_cl_hbf_nohook_yqll5/"))

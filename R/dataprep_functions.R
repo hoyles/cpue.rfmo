@@ -3,11 +3,10 @@
 #'
 #' The function prepares the Korean SBT data.
 #' @param dat Input dataset
-#' @param alldat Deprecated.
 #' @param splist List of species codes
 #' @return Modified dataset.
 #'
-dataprep_KRSBT <- function(dat, alldat = F ,splist) {
+dataprep_KRSBT <- function(dat, splist) {
  dat$dmy <- as.Date(dat$DATE)
  dat$hbf <- round(dat$hooks/dat$floats, 0)
  dat$lat <- dat$Lat01
@@ -36,7 +35,6 @@ dataprep_KRSBT <- function(dat, alldat = F ,splist) {
 #'
 #' The function prepares Korean longline data for IO analyses.
 #' @param dat Input dataset
-#' @param alldat Deprecated.
 #' @param splist List of species codes
 #' @return Modified dataset.
 #'
@@ -377,6 +375,7 @@ make_lbidmon <- function(dat) {
 #'
 setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB1 = F, regB2 = F, regB3 = F, regA = F, regA1 = F, regA2 = F, regA3 = F,
                              regA4 = F, regA5 = F) {
+  lat5 <- lon5 <- NULL
   if (regY) {
     dat$regY <- 0
     dat <-
@@ -516,6 +515,7 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
 #'
 setup_AO_regions <- function(dat, regB = F, regB1 = F) {
   # north of 25N, between 25N and 15S, and south of 15S
+  lat5 <- lon5 <- NULL
   if (regB) {
     dat$regB <- 0
     dat <- mutate(dat, regB = replace(regB, which(lat5 < 45 & lat5 >= 25 & lon5 < -5 & !is.na(lat5)), 1)) %>%

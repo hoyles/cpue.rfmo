@@ -74,8 +74,10 @@ summarize_and_store_dl <- function(modb, modp, dat, datpos, fname, modlab, dohbf
 
   vessidx <- Mode(datpos$vessid)
   latlongx <- Mode(datpos$latlong)
-  if (!"clust" %in% names(dat))
+  if (!dohbf & !"clust" %in% names(dat))
     newdat <- expand.grid(yrqtr = sort(unique(datpos$yrqtr)), latlong = latlongx, hooks = median(datpos$hooks), vessid = vessidx)
+  if (!dohbf & "clust" %in% names(dat))
+    newdat <- expand.grid(yrqtr = sort(unique(datpos$yrqtr)), latlong = latlongx, hooks = median(datpos$hooks), vessid = vessidx, clust = Mode(datpos$clust))
   if (dohbf & "clust" %in% names(dat))
     newdat <- expand.grid(yrqtr = sort(unique(datpos$yrqtr)), latlong = latlongx, hooks = median(datpos$hooks), vessid = vessidx, clust = Mode(datpos$clust),
                           hbf = median(datpos$hbf))
@@ -196,7 +198,7 @@ summarize_and_store_dlx <- function(modb1, modb2, modp1, modp2, dat, datpos, fna
 
   coefs.bin1 <- get.bincoefsx(ndb1, cell_areas)
   coefs.bin2 <- get.bincoefsx(ndb2, cell_areas)
-  mn <- logit(mean(modb$y))
+  mn <- logit(mean(modb1$y))
   coefs.pos1 <- get.poscoefsx(ndp1, bcorr = bcorr, cell_areas)
   coefs.pos2 <- get.poscoefsx(ndp2, bcorr = bcorr, cell_areas)
 

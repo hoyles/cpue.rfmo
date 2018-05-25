@@ -6,9 +6,14 @@
 \usage{
 expand.grid.df(...)
 }
+\arguments{
+\item{...}{list of data frames (first varies fastest)}
+}
 \value{
 Expanded grid.
 }
 \description{
-Expand a grid across a data frame.
+Creates new data frame containing all combination of rows from data.frames in ...
+Copied from reshape package
+https://www.rdocumentation.org/packages/reshape/versions/0.8.7/topics/expand.grid.df
 }

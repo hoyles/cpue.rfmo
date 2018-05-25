@@ -339,7 +339,7 @@ plot_effects <- function(model, indat, addmain = F, addbranch = F, addalb = F, a
 #' @param fname Filename for saving the plot.
 #' @param addrate If TRUE, write the rate of change on the plot.
 #'
-plot.agg.slope.ratio <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2", fname = NULL, addrate = T) {
+plot_agg_slope_ratio <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2", fname = NULL, addrate = T) {
     # agg goes first, op goes second
     windows(height = 16, width = 14)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
@@ -374,7 +374,7 @@ plot.agg.slope.ratio <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coef
 #' @param lab1 Label for the first glm.
 #' @param lab2 Label for the second glm.
 #'
-plot.agg.slope.ratio_2000 <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2") {
+plot_agg_slope_ratio_2000 <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2") {
     # agg goes first, op goes second
     windows(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
@@ -405,7 +405,7 @@ plot.agg.slope.ratio_2000 <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = 
 #' @param name1 Label for the first glm.
 #' @param name2 Label for the second glm.
 #'
-plot.res <- function(summ1, summ2, name1, name2) {
+plot_res <- function(summ1, summ2, name1, name2) {
     nyrs <- length(grep("yrqtr", rownames(summ1$coefficients))) + 1
     coefs1 <- get.summ.coefs(summ1, nyrs)
     coefs2 <- get.summ.coefs(summ2, nyrs)
@@ -413,7 +413,7 @@ plot.res <- function(summ1, summ2, name1, name2) {
     yrs <- c(1980.25, as.numeric(substring(yrs, 17)))
     windows(height = 13, width = 11)
     par(mfrow = c(2, 1), mar = c(5, 4, 1, 2))
-    plot.slope.ratio(coefs1, coefs2, yrs, "")
+    plot_slope_ratio(coefs1, coefs2, yrs, "")
     plot(yrs, coefs1, type = "l", ylab = "Relative abundance estimate", xlab = "Year", ylim = c(0, 2.5))
     lines(yrs, coefs2, col = "red")
     legend("topleft", legend = c(name1, name2), lty = c(1, 1), col = c("black", "red"))
@@ -424,10 +424,10 @@ plot.res <- function(summ1, summ2, name1, name2) {
 #' Function to make slope ratio plot for two sets of coefficients. Assumes there are indices for all years. Probably not used any more.
 #' @param coefs1 Coefficients for model 1.
 #' @param coefs2 Coefficients for model 2.
-#' @param yrqtr Year sequence.
+#' @param yr Year sequence.
 #' @param titl Title of plot.
 #'
-plot.slope.ratio <- function(coefs1, coefs2, yr, titl) {
+plot_slope_ratio <- function(coefs1, coefs2, yr, titl) {
     # base goes first, boat goes second
     windows(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
@@ -453,7 +453,7 @@ plot.slope.ratio <- function(coefs1, coefs2, yr, titl) {
 #' @param yr2 Year-qtr sequence in the 2nd glm.
 #' @param titl Title of plot.
 #'
-plot.slope.ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
+plot_slope_ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
     # base goes first, boat goes second
     windows(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
@@ -509,6 +509,7 @@ plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 1
 #' @param latlim Latitude limits for plot.
 #' @param lonlim Longitude limits for plot.
 #' @param ti Title of the plot.
+#' @param delta Lat and long resolution
 #'
 plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), ti = "", delta=1) {
     plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")

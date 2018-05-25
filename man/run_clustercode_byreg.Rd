@@ -5,8 +5,7 @@
 \title{Run clustering code across all regions and save the results.}
 \usage{
 run_clustercode_byreg(indat, reg_struc, allsp, allabs, ncl = "lst",
-  plotPCA = F, clustid = "tripidmon", allclust = F, flag, cvnames,
-  rgl = reglist)
+  plotPCA = F, clustid = "tripidmon", allclust = F, flag, cvnames, rgl)
 }
 \arguments{
 \item{indat}{The input dataset.}
@@ -29,7 +28,7 @@ run_clustercode_byreg(indat, reg_struc, allsp, allabs, ncl = "lst",
 
 \item{cvnames}{Names of covariates to return with dataset.}
 
-\item{reglist}{A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.}
+\item{rgl}{A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.}
 }
 \value{
 Nothing is returned but each dataset is saved.

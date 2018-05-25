@@ -9,9 +9,11 @@ qqDist(x, standardise = F, add.median = F, ...)
 \arguments{
 \item{x}{Residuals or standardized residuals.}
 
+\item{standardise}{Standardize the residuals if TRUE.}
+
 \item{add.median}{Add median line if TRUE.}
 
-\item{standardize}{Standardize the residuals if TRUE.}
+\item{...}{Other qqnorm() parameters.}
 }
 \description{
 The function produces a QQ plot for a GLM.

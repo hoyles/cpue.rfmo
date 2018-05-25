@@ -6,7 +6,7 @@
 \usage{
 do_deltalogx(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3,
   runsp, fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T,
-  bcorr = FALSE)
+  bcorr = FALSE, cell_areas)
 }
 \arguments{
 \item{dat}{Input dataset.}
@@ -32,6 +32,8 @@ do_deltalogx(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3,
 \item{lat5xyr}{Include lat5 by yr interaction in the model.}
 
 \item{bcorr}{Include lognormal bias correction.}
+
+\item{cell_areas}{Cell areas to use when aggregating densities across space.}
 }
 \description{
 The function runs delta lognormal glm models with interactions.

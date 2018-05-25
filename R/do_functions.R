@@ -13,8 +13,9 @@
 #' @param lat5xqtr Include lat5 by qtr interaction in the model.
 #' @param lat5xyr Include lat5 by yr interaction in the model.
 #' @param bcorr Include lognormal bias correction.
+#' @param cell_areas Cell areas to use when aggregating densities across space.
 #'
-do_deltalogx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp, fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T, bcorr = FALSE) {
+do_deltalogx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp, fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T, bcorr = FALSE, cell_areas) {
   datpos <- dat[dat[, runsp] > 0, ]
   fmla1.bin <- make_formula_IOx(runsp, modtype = "deltabin", dohbf = dohbf, addboat = addboat, addcl = T, nhbf = nhbf, lat5xqtr = lat5xqtr, lat5xyr = lat5xyr)
   fmla1.pos <- make_formula_IOx(runsp, modtype = "deltapos", dohbf = dohbf, addboat = addboat, addcl = T, nhbf = nhbf, lat5xqtr = lat5xqtr, lat5xyr = lat5xyr)
@@ -39,7 +40,7 @@ do_deltalogx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, r
     modelpos1 <- glm(as.formula(fmla1.pos_ncl), family = "gaussian", data = datpos, weights = datpos$.wtt, model = keepd)
     modelpos2 <- glm(as.formula(fmla2.pos_ncl), family = "gaussian", data = datpos, weights = datpos$.wtt, model = keepd)
   }
-  summarize_and_store_dlx(modb1 = modelbin1, modb2 = modelbin2, modp1 = modelpos1, modp2 = modelpos2, dat = dat, datpos = datpos, fname, modlab = modlab, dohbf = dohbf, addcl = addcl, keepd = keepd, bcorr, cell_areas)
+  summarize_and_store_dlx(modb1 = modelbin1, modb2 = modelbin2, modp1 = modelpos1, modp2 = modelpos2, dat = dat, datpos = datpos, fname, modlab = modlab, dohbf = dohbf, addcl = addcl, keepd = keepd, bcorr, cell_areas=cell_areas)
 }
 
 #' Run lognormal positive models with interactions.
@@ -57,8 +58,9 @@ do_deltalogx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, r
 #' @param lat5xqtr Include lat5 by qtr interaction in the model.
 #' @param lat5xyr Include lat5 by yr interaction in the model.
 #' @param bcorr Include lognormal bias correction.
+#' @param cell_areas Cell areas to use when aggregating densities across space.
 #'
-do_lognCx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp, fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T, bcorr = FALSE) {
+do_lognCx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp, fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T, bcorr = FALSE, cell_areas) {
   mn <- with(dat, 0.1 * mean(get(runsp)/hooks))
   fmla1 <- make_formula_IOx(runsp, modtype = "logn", dohbf = dohbf, addboat = addboat, addcl = T, nhbf = nhbf, lat5xqtr = lat5xqtr, lat5xyr = lat5xyr)
   fmla1.ncl <- make_formula_IOx(runsp, modtype = "logn", dohbf = dohbf, addboat = addboat, addcl = F, nhbf = nhbf, lat5xqtr = lat5xqtr, lat5xyr = lat5xyr)
@@ -72,7 +74,7 @@ do_lognCx <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runs
     model1 <- glm(as.formula(fmla1.ncl), data = dat, family = "gaussian", weights = dat$.wtt, model = keepd)
     model2 <- glm(as.formula(fmla2.ncl), data = dat, family = "gaussian", weights = dat$.wtt, model = keepd)
   }
-  summarize_and_store_logCx(mod1 = model1, mod2 = model2, dat, fname, modlab, addcl, dohbf, keepd, mn, bcorr, cell_areas)
+  summarize_and_store_logCx(mod1 = model1, mod2 = model2, dat, fname, modlab, addcl, dohbf, keepd, mn, bcorr, cell_areas=cell_areas)
 }
 
 #' Run delta lognormal models.
@@ -106,4 +108,24 @@ do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, ru
   summarize_and_store_dl(modb = modelbin, modp = modelpos, dat = dat, datpos = datpos, fname, modlab = modlab, dohbf = dohbf,
                          addcl = addcl, keepd = keepd)
 }
+
+# do_deltalog_sep <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp, fname, modlab, keepd = TRUE, dohook = TRUE) {
+#   datpos <- dat[dat[, runsp] > 0, ]
+#   a <- table(dat[,runsp]==0, dat$vessid)
+#   datbin <
+#   if (lu(dat$clust) > 1) {
+#     fmla.bin <- make_formula_IO(runsp, modtype = "deltabin", dohbf = dohbf, addboat = addboat, addcl = T, nhbf = nhbf, dohook = dohook)
+#     fmla.pos <- make_formula_IO(runsp, modtype = "deltapos", dohbf = dohbf, addboat = addboat, addcl = T, nhbf = nhbf, dohook = dohook)
+#     addcl <- TRUE
+#   } else {
+#     fmla.bin <- make_formula_IO(runsp, modtype = "deltabin", dohbf = dohbf, addboat = addboat, addcl = F, nhbf = nhbf, dohook = dohook)
+#     fmla.pos <- make_formula_IO(runsp, modtype = "deltapos", dohbf = dohbf, addboat = addboat, addcl = F, nhbf = nhbf, dohook = dohook)
+#     addcl <- FALSE
+#   }
+#   datpos$.wtt <- mk_wts(datpos, wttype = "area")
+#   modelbin <- glm(as.formula(fmla.bin), data = dat, family = "binomial", model = keepd)
+#   modelpos <- glm(as.formula(fmla.pos), family = "gaussian", data = datpos, weights = datpos$.wtt, model = keepd)
+#   summarize_and_store_dl(modb = modelbin, modp = modelpos, dat = dat, datpos = datpos, fname, modlab = modlab, dohbf = dohbf,
+#                          addcl = addcl, keepd = keepd)
+# }
 

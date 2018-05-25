@@ -15,8 +15,9 @@ plotdiags <- function(res, ti = "") {
 #'
 #' The function produces a QQ plot for a GLM.
 #' @param x Residuals or standardized residuals.
-#' @param standardize Standardize the residuals if TRUE.
+#' @param standardise Standardize the residuals if TRUE.
 #' @param add.median Add median line if TRUE.
+#' @param ... Other qqnorm() parameters.
 #'
 qqDist <- function(x, standardise = F, add.median = F, ...) {
   n <- length(x)

@@ -13,6 +13,8 @@ PCA_by_trip(datr, Screeplotname = "screeplot set", allsp, clustid)
 \item{Screeplotname}{File name of the diagnostic Scree plot.}
 
 \item{allsp}{Species codes / variable names to use in the PCA.}
+
+\item{clustid}{Name of variable to aggregate across for trip-level clustering.}
 }
 \value{
 A list of two objects based on standard PCA and binomial PCA.

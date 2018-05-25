@@ -11,6 +11,8 @@ dataclean_TW_std(dat1, doHBF = F, splist = c("alb", "bet", "yft", "ott",
 \item{dat1}{Input dataset}
 
 \item{doHBF}{If TRUE, remove HBF > 25.}
+
+\item{splist}{List of species codes}
 }
 \value{
 Modified dataset.

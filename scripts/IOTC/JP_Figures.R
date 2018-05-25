@@ -1536,7 +1536,7 @@ for(runreg in c(2,5)) {
     coefs.opboat.area2 <- coefs.opboatbin.equal[a] * coefs.opboatpos.area
     save(file=paste(fname,"indices.RData",sep=""),list=ls(pattern="coefs."))
 
-    plot.agg.slope.ratio(coefs.op.area2, coefs.opboat.area2, opyr,opyr,titl=paste("Region",runreg,fishlab,"op area vs opboat area2 d_logn"),  lab1="op area", lab2="opboat area2",fname)  # plot results
+    plot_agg_slope_ratio(coefs.op.area2, coefs.opboat.area2, opyr,opyr,titl=paste("Region",runreg,fishlab,"op area vs opboat area2 d_logn"),  lab1="op area", lab2="opboat area2",fname)  # plot results
     rm(list=ls(pattern="coefs."))
     graphics.off()
     }
@@ -1654,7 +1654,7 @@ for(runreg in c(5)) {
     opyr <- sort(unique(glmdat.pos$yrqtr))
     fishlab <- switch(runsp,yft="Yellowfin",bet="Bigeye"); methlab <- switch(mt,deltabin="Delta-binomial",deltapos="Delta-positive",logl="Lognormal(+0.5)")
 
-    plot.agg.slope.ratio(coefs.opboatlogn.area, coefs.opboatlogn.clust, opyr,opyr,titl=paste("Region",runreg,fishlab,"opboat  vs opboat cluster d_logn"),  lab1="op boat", lab2="opboat cluster",fname)  # plot results
+    plot_agg_slope_ratio(coefs.opboatlogn.area, coefs.opboatlogn.clust, opyr,opyr,titl=paste("Region",runreg,fishlab,"opboat  vs opboat cluster d_logn"),  lab1="op boat", lab2="opboat cluster",fname)  # plot results
 
     a <- match(names(coefs.opboatpos.area),names(coefs.opboatbin.equal))             # make opboat.area indices
     coefs.opboat.area2 <- coefs.opboatbin.equal[a] * coefs.opboatpos.area

@@ -1018,3 +1018,46 @@ m1 <- load(paste0(resdirs[7], paste0("Joint_regB_R", 1, "_lognC_vessid_79nd_mode
 m2 <- load(paste0(resdirs[7], paste0("Joint_regB_R", 2, "_lognC_vessid_79nd_model.RData")))
 m3 <- load(paste0(resdirs[7], paste0("Joint_regB_R", 3, "_lognC_vessid_79nd_model.RData")))
 
+# Joined-up model
+getwd()
+setwd(resdirs[7])
+setwd("./outputs_test")
+r2erly <- read.csv("Joint_regB_R2_dellog_novess_5279.csv")
+r2late <- read.csv("Joint_regB_R2_dellog_vessid_79nd.csv")
+r2long_novess <- read.csv("Joint_regB_R2_dellog_novess_allyrs.csv")
+link7778 <- mean(r2long_novess[r2long_novess$yq > 1977 & r2long_novess$yq < 1979,"pr"], na.rm = TRUE)
+link7980 <- mean(r2long_novess[r2long_novess$yq > 1979 & r2long_novess$yq < 1981,"pr"], na.rm = TRUE)
+r2erlink <- mean(r2erly[r2erly$yq > 1977 & r2erly$yq < 1979,"pr"], na.rm = TRUE)
+r2ltlink <- mean(r2late[r2late$yq > 1979 & r2late$yq < 1981,"pr"], na.rm = TRUE)
+r2e_adj <- data.frame(yq=r2erly[,2], pr=r2erly[,3] * link7778 / r2erlink, cv=r2erly[,4])
+r2l_adj <- data.frame(yq=r2late[,2], pr=r2late[,3] * link7980 / r2ltlink, cv=r2late[,4])
+r2_joined <- rbind(r2e_adj, r2l_adj)
+
+r2yerly <- read.csv("Joint_regB_R2_dellog_novess_5279yr.csv")
+r2ylate <- read.csv("Joint_regB_R2_dellog_vessid_79ndyr.csv")
+r2ylong_novess <- read.csv("Joint_regB_R2_dellog_novess_allyrsyr.csv")
+link7778 <- mean(r2ylong_novess[r2ylong_novess$yr >= 1977 & r2ylong_novess$yr < 1979,"pr"], na.rm = TRUE)
+link7980 <- mean(r2ylong_novess[r2ylong_novess$yr >= 1979 & r2ylong_novess$yr < 1981,"pr"], na.rm = TRUE)
+r2yerlink <- mean(r2yerly[r2yerly$yr >= 1977 & r2yerly$yr < 1979,"pr"], na.rm = TRUE)
+r2yltlink <- mean(r2ylate[r2ylate$yr >= 1979 & r2ylate$yr < 1981,"pr"], na.rm = TRUE)
+r2ye_adj <- data.frame(yr=r2yerly[,2], pr=r2yerly[,4] * link7778 / r2yerlink)
+r2yl_adj <- data.frame(yr=r2ylate[,2], pr=r2ylate[,4] * link7980 / r2yltlink)
+r2y_joined <- rbind(r2ye_adj, r2yl_adj)
+
+windows(12, 10)
+plot(r2yerly$yr, r2yerly$pr, type = "b", pch = 1, lwd = 2, xlab = "Year", ylab = "Relative catch rate", xlim = range(r2y_joined$yr), ylim = c(0, 2.5))
+lines(r2ylate$yr, r2ylate$pr, type = "b", pch = 0, col = "brown", lwd = 2)
+lines(r2ylong_novess$yr, r2ylong_novess$pr, type = "b", pch = 5, col = 2, lwd = 2)
+lines(r2y_joined$yr, r2y_joined$pr, type = "b", pch = 2, col = 4, lwd = 2)
+legend("topright", legend = c("Early no vessid","Late vessid","All periods no vessid","Joined time series"), col = c(1,"brown",2,4), pch = c(21,22,23,24), lty = 1, lwd = 2, pt.bg = "white")
+savePlot(filename = "R2_joined_yr.png", type = "png")
+
+windows(12, 10); par(mfrow = c(2,2), mar = c(4,4,3,1)+.1)
+plot(r2erly$yq, r2erly$pr, type = "l", xlab = "Year-quarter", ylab = "Relative catch rate",
+     xlim = range(r2_joined$yq), ylim = c(0, 3), main = "R2 early and late series")
+lines(r2late$yq, r2late$pr, col = 1)
+plot(r2long_novess$yq, r2long_novess$pr, type = "l", xlab = "Year-quarter", ylab = "Relative catch rate",
+     xlim = range(r2_joined$yq), ylim = c(0, 3), main = c("Full time series without vessel effects"))
+plot(r2_joined$yq, r2_joined$pr, type = "l", xlab = "Year-quarter", ylab = "Relative catch rate",
+     xlim = range(r2_joined$yq), ylim = c(0, 3), main = "Joined time series")
+savePlot(filename = "R2_joined_yq.png", type = "png")

@@ -127,27 +127,59 @@ dataclean_TW_std <- function(dat1, doHBF = F, splist = c("alb", "bet", "yft", "o
 #' @return Modified dataset.
 #'
 dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")) {
-    dat1 <- dat1[!is.na(dat1$dmy),]
-    dat1 <- dat1[!is.na(dat1$hooks), ]  #
-    dat1 <- dat1[dat1$hooks < 5000, ]  # clean up outliers
-    dat1 <- dat1[dat1$hooks > 200, ]
-    dat1[dat1$hbf %in% c(35, 155, 20000), "hbf"] <- 15
-    dat1[dat1$hbf %in% c(26, 30), "hbf"] <- 20
-    dat1[dat1$hbf %in% c(25), "hbf"] <- 24
-    lenzero <- function(x) sum(x > 0)
-    if (rmssp) {
-        ssp <- apply(dat1[, splist], 1, lenzero)
-        dat1 <- dat1[ssp > 1, ]
-    }
-    dat1 <- dat1[!is.na(dat1$yrqtr),]
-    # remove sets where 1 degree location is not in the op_area
-    a <- dat1$lon - dat1$lon5
-    loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
-    dat1 <- dat1[loc,]
-    a <- dat1$lat - dat1$lat5
-    loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
-    dat1 <- dat1[loc,]
-    return(dat1)
+  dat1 <- dat1[!is.na(dat1$dmy),]
+  dat1 <- dat1[!is.na(dat1$hooks), ]  #
+  dat1 <- dat1[dat1$hooks < 5000, ]  # clean up outliers
+  dat1 <- dat1[dat1$hooks > 200, ]
+  dat1[dat1$hbf %in% c(35, 155, 20000), "hbf"] <- 15
+  dat1[dat1$hbf %in% c(26, 30), "hbf"] <- 20
+  dat1[dat1$hbf %in% c(25), "hbf"] <- 24
+  lenzero <- function(x) sum(x > 0)
+  if (rmssp) {
+    ssp <- apply(dat1[, splist], 1, lenzero)
+    dat1 <- dat1[ssp > 1, ]
+  }
+  dat1 <- dat1[!is.na(dat1$yrqtr),]
+  # remove sets where 1 degree location is not in the op_area
+  a <- dat1$lon - dat1$lon5
+  loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
+  dat1 <- dat1[loc,]
+  a <- dat1$lat - dat1$lat5
+  loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
+  dat1 <- dat1[loc,]
+  return(dat1)
+}
+
+#' Clean SY data.
+#'
+#' The function sets up variables and removes bad data. Originally developed for Taiwanese data in the IO.
+#' @param dat1 Input dataset
+#' @param rmssp If TRUE, remove sets that report catch of only one species.
+#' @param splist List of species codes.
+#' @return Modified dataset.
+#'
+dataclean_SY <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")) {
+  dat1 <- dat1[!is.na(dat1$dmy),]
+  dat1 <- dat1[!is.na(dat1$hooks), ]  #
+  dat1 <- dat1[dat1$hooks < 5000, ]  # clean up outliers
+  dat1 <- dat1[dat1$hooks > 200, ]
+  dat1[dat1$hbf %in% c(35, 155, 20000), "hbf"] <- 15
+  dat1[dat1$hbf %in% c(26, 30), "hbf"] <- 20
+  dat1[dat1$hbf %in% c(25), "hbf"] <- 24
+  lenzero <- function(x) sum(x > 0)
+  if (rmssp) {
+    ssp <- apply(dat1[, splist], 1, lenzero)
+    dat1 <- dat1[ssp > 1, ]
+  }
+  dat1 <- dat1[!is.na(dat1$yrqtr),]
+  # remove sets where 1 degree location is not in the op_area
+  a <- dat1$lon - dat1$lon5
+  loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
+  dat1 <- dat1[loc,]
+  a <- dat1$lat - dat1$lat5
+  loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
+  dat1 <- dat1[loc,]
+  return(dat1)
 }
 
 #' Clean US data.

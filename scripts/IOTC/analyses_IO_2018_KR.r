@@ -1,5 +1,5 @@
 # Set up directories
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")
 kralysis_dir <- paste0(krdir, "analyses/")
@@ -50,7 +50,7 @@ library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ign
 ##################
 
 # Load data. This section will only need to be changed if the data format changes.
-rawdat <- read.table(paste0(datadir,"IO KOR LL OP data_20170629.txt"), header = TRUE, sep="\t", stringsAsFactors = FALSE)
+rawdat <- read.csv(paste0(datadir,"IO_KOR_LL_OP_data_20180524.csv"), header = TRUE, stringsAsFactors = FALSE)
 str(rawdat)
 
 # Set up standard names, the same as for other fleets
@@ -64,11 +64,12 @@ str(rawdat)
 #rawdat <- storedat
 
 # Prepare and check the data
-prepdat <- dataprep_KR(rawdat)
+splist <- c("alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj","swo","yft")
+prepdat <- dataprep_KR(rawdat, )
 head(prepdat)
 prepdat2 <- setup_IO_regions(prepdat,  regY=T, regY1=T, regY2=T, regB=T, regB3=T, regB2=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 head(prepdat2)
-dat <- dataclean_KR(prepdat2, yearlim = 2017)
+dat <- dataclean_KR(prepdat2, yearlim = 2017, splist = splist)
 save(prepdat,dat,file="KRdat.RData")
 
 load(file="KRdat.RData")
@@ -150,13 +151,13 @@ savePlot("Setmap_logscale.png",type="png")
 a <- tapply(dat$regB,list(dat$lon,dat$lat),mean)
 windows(width=15,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=2:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+map("world",add=TRUE, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 savePlot("regbet.png",type="png")
 
 a <- tapply(dat$regB2,list(dat$lon,dat$lat),mean)
 windows(width=15,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+map("world",add=TRUE, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 savePlot("regbet2.png",type="png")
 
 a <- tapply(dat$regB3,list(dat$lon,dat$lat),mean)
@@ -165,23 +166,59 @@ image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
 map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 savePlot("regbet3.png",type="png")
 
-a <- tapply(dat$regY2,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:7)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regyft2.png",type="png")
-
 a <- tapply(dat$regY,list(dat$lon,dat$lat),mean)
 windows(width=15,height=10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
 map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 savePlot("regyft.png",type="png")
 
-# a <- tapply(dat$regA3,list(dat$lon,dat$lat),mean)
-# windows(width=15,height=10)
-# image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-# map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-# savePlot("regA3.png",type="png")
+a <- tapply(dat$regY1,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regyft1.png",type="png")
+
+a <- tapply(dat$regY2,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:7)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regyft2.png",type="png")
+
+a <- tapply(dat$regA,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regalb.png",type="png")
+
+a <- tapply(dat$regA1,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regalb1.png",type="png")
+
+a <- tapply(dat$regA2,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regalb2.png",type="png")
+
+a <- tapply(dat$regA3,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regalb3.png",type="png")
+
+a <- tapply(dat$regA4,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regalb4.png",type="png")
+
+a <- tapply(dat$regA5,list(dat$lon,dat$lat),mean)
+windows(width=15,height=10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
+map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+savePlot("regalb5.png",type="png")
 
 # Mean fishing location, year scale
 windows(width=15,height=10);par(mfrow=c(1,2))

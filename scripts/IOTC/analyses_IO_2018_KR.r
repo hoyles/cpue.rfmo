@@ -51,7 +51,7 @@ library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ign
 
 # Load data. This section will only need to be changed if the data format changes.
 rawdat <- read.csv(paste0(datadir,"IO_KOR_LL_OP_data_20180524.csv"), header = TRUE, stringsAsFactors = FALSE)
-str(rawdat)
+str(rawdat) #test
 
 # Set up standard names, the same as for other fleets
 nms <- c("op_yr","op_mon","VESSEL_CD","VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks","floats",

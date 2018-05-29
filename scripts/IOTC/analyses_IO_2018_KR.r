@@ -148,77 +148,17 @@ map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW co
 # But also some data near Indonesia, Cambodia, & on land in Africa
 savePlot("Setmap_logscale.png",type="png")
 
-a <- tapply(dat$regB,list(dat$lon,dat$lat),mean)
+# Make maps to check regional patterns
+a <- unique(paste(dat$lat,dat$lon))
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY", "regY1", "regY2", "regB", "regB1", "regB2", "regB3", "regA", "regA1", "regA2", "regA3", "regA4","regA5")]
 windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=2:6)
-map("world",add=TRUE, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regbet.png",type="png")
-
-a <- tapply(dat$regB2,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world",add=TRUE, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regbet2.png",type="png")
-
-a <- tapply(dat$regB3,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regbet3.png",type="png")
-
-a <- tapply(dat$regY,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regyft.png",type="png")
-
-a <- tapply(dat$regY1,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regyft1.png",type="png")
-
-a <- tapply(dat$regY2,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:7)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regyft2.png",type="png")
-
-a <- tapply(dat$regA,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regalb.png",type="png")
-
-a <- tapply(dat$regA1,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regalb1.png",type="png")
-
-a <- tapply(dat$regA2,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regalb2.png",type="png")
-
-a <- tapply(dat$regA3,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regalb3.png",type="png")
-
-a <- tapply(dat$regA4,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regalb4.png",type="png")
-
-a <- tapply(dat$regA5,list(dat$lon,dat$lat),mean)
-windows(width=15,height=10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col=1:6)
-map("world2Hires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regalb5.png",type="png")
+for(fld in c("regY", "regY1", "regY2", "regB", "regB1", "regB2", "regB3", "regA", "regA1", "regA2", "regA3", "regA4","regA5")) {
+  reg <- with(a0,get(fld))
+  plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
+  text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
+  map(add=T)
+  savePlot(paste0("map_",fld),type="png")
+}
 
 # Mean fishing location, year scale
 windows(width=15,height=10);par(mfrow=c(1,2))
@@ -588,9 +528,17 @@ Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(krdir,"clustering/")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
+clkeepJP_A4 <- list("alb"=list(c(), c(), c(), c()))
+clkeepKR_A4 <- list("alb"=list(c(), c(), c(), c()))
+clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
+clkeepSY_A4 <- list("alb"=list(c(), c(), c(), c()))
+clk_A4 <- list(JP=clkeepJP_A4, KR=clkeepKR_A4, TW=clkeepTW_A4, SY=clkeepSY_A4)
+
 clkeepJP_A5 <- list("alb"=list(c(2,4)))
 clkeepKR_A5 <- list("alb"=list(c(5)))
 clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
+clkeepSY_A5 <- list("alb"=list(c(1,2,4)))
+clk_A5 <- list(JP=clkeepJP_A5,KR=clkeepKR_A5,TW=clkeepTW_A5,SY=clkeepSY_A5)
 
 clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
 clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0)))

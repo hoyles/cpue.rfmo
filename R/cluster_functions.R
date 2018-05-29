@@ -17,20 +17,16 @@
 #' @param covarnames Names of covariates to return with dataset.
 #' @return The original dataset with added columns for the clusters and PCAs;
 #'
-clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP",
+clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP",dbh = TRUE,
     cllist = NA, fnhead = "", ll5=F, covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr", "op_mon")) {
     datr <- ddd[with(ddd, get(regtype)) == r, allabs]
     datr$reg <- datr[, regtype]
     spec_dat <- datr[, allsp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
     datr <- datr[spec_dat$sum > 0, ]
-    if (sum(datr$sbt, na.rm = T) == 0)
-        datr$sbt[1] <- 1
-    if (sum(datr$sfa, na.rm = T) == 0)
-        datr$sfa[1] <- 1
-    if (sum(datr$blm, na.rm = T) == 0)
-        datr$blm[1] <- 1
-
+    for (sp in allsp) {
+      if (sum(datr[,sp], na.rm = T) == 0) datr[1,sp] <- 1
+    }
     pcaset <- PCA_by_set(datr, Screeplotname = paste0(fnhead, " ", "screeplot set"), allsp)
     pcatrp <- PCA_by_trip(datr, Screeplotname = paste0(fnhead, " ", "screeplot trip"), allsp, clustid = clustid)
     #################### Clustering
@@ -62,12 +58,11 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
     a6$ctype <- "clrset"
     a <- rbind(a1, a2, a3, a4, a5, a6)
     write.csv(a, file = paste(fnhead, "cluster proportions", clustid, ".csv", sep = "_"))
-    dbh <- T
 
     ###### Create datasets ###################################################### covarnames <- c('yrqtr', 'latlong', 'hooks', 'hbf', 'vessid', 'callsign',
     ###### 'Total', 'lat', 'lon', 'lat5', 'lon5', 'reg', 'moon', 'op_yr', 'op_mon')
     covarnames <- c(covarnames, "reg")
-    dataset <- cbind(datr[, covarnames], datr[, allsp], pcaset$pcs[, 1:6], pcaset$pcsBin[, 1:6], pcatrp$pcs[, 1:6], pcatrp$pcsBin[, 1:6], cldat$setdat[,
+    dataset <- cbind(datr[, covarnames], datr[, allsp], pcaset$pcs[, 1:3], pcaset$pcsBin[, 1:3], pcatrp$pcs[, 1:3], pcatrp$pcsBin[, 1:3], cldat$setdat[,
         c("FT", "kcltrp", "clrtrp", "hcltrp", "kclset", "clrset", "hclset")])
     if (!is.na(cllist[1]))
         dataset <- cbind(datr[, covarnames], datr[, allsp], cldat$setdat[, cllist])
@@ -117,11 +112,11 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
 #' @param rgl A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
 #' @return Nothing is returned but each dataset is saved.
 #'
-run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, cvnames, rgl) {
+run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, dohbf = TRUE, cvnames, rgl) {
   if (ncl == "lst") ncl <- rgl[[reg_struc]]$ncl
   for(r in rgl[[reg_struc]]$allreg) {
     fnh <- paste(flag,reg_struc,r,sep="_")
-    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,fnhead=fnh,covarnames=cvnames)
+    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,dbh = dohbf, fnhead=fnh,covarnames=cvnames)
     save(dataset,file=paste0(fnh,".RData"))
   }
 }

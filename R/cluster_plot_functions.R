@@ -385,7 +385,7 @@ beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
     }
     wd = table(dat[, cl])
     for (sp in allsp) {
-        beanplot(dat[, sp]/dat$Total ~ dat[, cl], bw = 0.01, what = c(1, 1, 1, 0), ylim = c(0, 1), log = "", main = sp)
+        beanplot(dat[, sp]/dat$Total ~ dat[, cl], cutmin = 0, cutmax = 1, bw = 0.01, what = c(1, 1, 1, 0), ylim = c(0, 1), log = "", main = sp)
         # boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = sp, outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
     }
     title(paste(gsub("_", " ", ti), cl), outer = T, line = -1, cex.main = 1.5)

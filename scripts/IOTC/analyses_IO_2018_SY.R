@@ -1,14 +1,90 @@
+<<<<<<< HEAD
+projdir <- "~/IOTC/2018_CPUE/"
+sydir <- paste0(projdir, "SY/")
+datadir1 <- paste0(sydir, "data/catch_effort/")
+syalysis_dir <- paste0(sydir, "analyses/")
+=======
 ### --- DATA PREPARATION ----
 
 ### --- Paths ----
-projdir <- "G:/Taiwan062018-CPUE-workshop/workshop2018/cpue.rfmo/scripts/IOTC/2017_CPUE/"
-sydir <- paste0(projdir,"SY/")
-datadir1 <- paste0(sydir,"data/catcheffort/")
-syalysis_dir <- paste0(sydir,"analyses/")
 syfigs <- paste0(sydir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 clusdir <- paste0(sydir, "clustering/")
 setwd(syalysis_dir)
+
+# Install any missing packages
+#install.packages("date")
+#install.packages("maps")
+#install.packages("mapdata")
+#install.packages("maptools")
+#install.packages("data.table")
+#install.packages("lunar")
+#install.packages("dtplyr")
+#install.packages("tm")
+#install.packages("devtools")
+#devtools::install_github("hadley/readr")
+
+# Load packages
+library("date")
+library(splines)
+library("maps")
+library("mapdata")
+library("maptools")
+library("data.table")
+library("lunar")
+library(lubridate)
+library(readr)
+library(plyr)
+library(dplyr)
+library(dtplyr)
+library(tm)
+library(devtools)
+
+# The new library 'cpue.rfmo' replaces the 'support functions.r' file.
+# The command 'install_github("hoyles/cpue.rfmo")' should install cpue.rfmo, but currently doesn't work,
+# possibly due to a bug in devtools with private github repositories, or something else, I'm still looking.
+# The current workaround is either:
+# a) download cpue.rfmo from github and compile it into a package, following the instructions here:
+# http://kbroman.org/pkg_primer/pages/build.html. This is the best approach; or
+# b) download cpue.rfmo from github, and install from the binary package (cpue.rfmo_0.1.0.zip) in the top dir.
+# Check first that cpue.rfmo has been recompiled to match the latest source code, which may not be the case.
+# c) ask me to email you a copy of the binary package, then install it.
+
+library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ignored.
+
+##################
+
+# Load data.
+
+dat$shk[is.na(dat$shk)] <- 0
+dat$sbf[is.na(dat$sbf)] <- 0
+
+# ===================================================================================
+# Start the analysis proper
+# ===================================================================================
+#Clustering
+
+library("date")
+library("lubridate")
+library("maps")
+library("mapdata")
+library("lunar")
+library("mgcv")
+library("randomForest")
+library("influ")
+library("nFactors")
+library("data.table")
+library("plyr")
+library("dplyr")
+library("cluster")
+library("splines")
+library("boot")
+library("beanplot")
+
+library("cpue.rfmo")
+
+projdir <- "~/IOTC/2018_CPUE/"
+=======
 
 ### --- Libraries ----
 library("date",quietly = TRUE)
@@ -45,8 +121,6 @@ library(scales)       #color gradient with alpha()
 library(cpue.rfmo)
 
 ### Sources functions updated through the GitHub (instead of loading the library as it needs to be built)
-source("../../../../../R/dataclean_functions.R")
-source("../../../../../R/dataclean_functions.R")
 
 ### Read the data set ----
 fulldataset <- read.csv(paste0(datadir1,"/LL_CE_N0.csv"),sep = ",", header = TRUE)
@@ -86,8 +160,6 @@ save(dat,file=paste(datadir1,"SYdat.RData",sep=""))
 
 ### DATA CLUSTERING ----
 
-### Paths ----
-projdir <- "G:/Taiwan062018-CPUE-workshop/workshop2018/cpue.rfmo/scripts/IOTC/2017_CPUE/"
 sydir <- paste0(projdir, "SY/")
 datadir1 <- paste0(sydir, "data/catcheffort/")
 syalysis_dir <- paste0(sydir, "analyses/")
@@ -95,6 +167,14 @@ syfigs <- paste0(sydir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 clusdir <- paste0(sydir, "clustering/")
 
+<<<<<<< HEAD
+load(file=paste0(syalysis_dir,"SYdat.RData"))
+#source(paste0(Rdir,"support_functions.r"))
+#str(dat)
+
+dat <- setup_IO_regions(dat,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
+
+=======
 # Libraries ----
 library("date",quietly = TRUE)
 library("splines",quietly = TRUE)
@@ -123,17 +203,42 @@ library("beanplot",quietly=TRUE)
 setwd(datadir1)
 load("SYdat.RData")
 str(dat)
+>>>>>>> 48fd7e46fcfff3390b09d52ce9c2ef4beb50795c
 
 ### Set the working directory ----
 setwd(clusdir)
 
+<<<<<<< HEAD
+# Set up input variables for clustering and standardization
+dat <- data.frame(dat)
+sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","shk")
+
+summary(dat)
+dat$shk[is.na(dat$shk)] <- 0
+dat$sbf[is.na(dat$sbf)] <- 0
+
+=======
 ### Set up input variables for clustering and standardization
 sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbf","skh")
+>>>>>>> 48fd7e46fcfff3390b09d52ce9c2ef4beb50795c
 
 ### Plot the mean catch per year of each species by region, to use when deciding which species to cluster
 plot_spfreqyq(indat = dat, reg_struc = "regY", splist = sy_splist, flag = "SY", mfr = c(4,3))
 plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(4,3))
 
+<<<<<<< HEAD
+summary(dat)
+
+# Put chosen species here
+use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbf")
+# Variables to use
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB1","regB2","regA","regA1","regA2","regA3")
+str(dat[,allabs])
+
+allabs[! allabs %in% names(dat)]
+
+# Determine the number of clusters. Come back and edit this.
+=======
 ### Put chosen species here
 use_splist <- c("alb","bet","yft","swo")
 ### Variables to use
@@ -141,6 +246,7 @@ allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hooks","trip_st","tripi
 str(dat[,allabs])
 
 ### Determine the number of clusters. Come back and edit this
+>>>>>>> 48fd7e46fcfff3390b09d52ce9c2ef4beb50795c
 reglist <- list()
 reglist$regY <-  list(allreg = 1:6, ncl = c(4,5,4,3,5,1))
 reglist$regY2 <- list(allreg = 1:7, ncl = c(4,5,4,3,5,5,5))
@@ -151,9 +257,17 @@ cvn <- c("yrqtr","latlong","hooks","vessid","Total","lat","lon","lat5","lon5","m
 ### r parameter?
 r=4
 
+<<<<<<< HEAD
+# Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
+run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
+=======
 ### Do the clustering and save the results for later
 # Region Y
 run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+>>>>>>> 48fd7e46fcfff3390b09d52ce9c2ef4beb50795c
 
 # Region Y2
 run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)

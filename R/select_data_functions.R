@@ -302,7 +302,7 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
     a <- apply(a > minyqll, 1, sum)
     gdat <- gdat[yqll %in% names(a), ]
     a <- table(gdat$vessid, gdat$yrqtr)
-    a <- apply(a > 0, 1, sum)
+    a <- apply(a > 0, 1, sum, na.rm = TRUE)
     a <- a[a >= minqtrs]  # Vessel fishes in at least 'minqtrs' quarters
     gdat <- gdat[gdat$vessid %in% names(a), ]
     a <- table(gdat$yrqtr)

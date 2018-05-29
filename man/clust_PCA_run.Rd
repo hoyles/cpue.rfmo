@@ -5,10 +5,10 @@
 \title{Generate clusters, PCs, and associated figures}
 \usage{
 clust_PCA_run(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T,
-  clustid = "tripidmon", allclust = F, flag = "JP", cllist = NA,
-  fnhead = "", ll5 = F, covarnames = c("yrqtr", "latlong", "hooks", "hbf",
-  "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr",
-  "op_mon"))
+  clustid = "tripidmon", allclust = F, flag = "JP", dbh = TRUE,
+  cllist = NA, fnhead = "", ll5 = F, covarnames = c("yrqtr", "latlong",
+  "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5",
+  "moon", "op_yr", "op_mon"))
 }
 \arguments{
 \item{r}{The region number.}

@@ -73,7 +73,7 @@ table(dat5217$trip_st==0,dat5217$op_yr)
 table(dat5217$op_yr)
 
 # Prepare and check the data
-rawdat <- dat5217
+rawdat <- as.data.frame(dat5217)
 pd1 <- dataprep_JPIO(rawdat)
 pd2 <- setup_IO_regions(pd1, regY=T, regY1=T, regY2=T, regB=T, regB3=T, regB2=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 
@@ -84,7 +84,7 @@ prepdat1 <- dataprep_JPIO(clndat)
 prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 save(pd1, pd2, prepdat, file="prepdat.RData")
 
-dat <- make_lbidmon(dat) # This sets up the clustering variable. Function will be moved into dataprep()
+dat <- make_lbidmon(prepdat) # This sets up the clustering variable. Function will be moved into dataprep()
 save(dat,file="JPdat.RData")
 load(file="JPdat.RData")
 
@@ -95,6 +95,7 @@ load(file="JPdat.RData")
 table(dat$op_yr)
 
 # Explore performance of various trip id variables
+windows(); par(mfrow = c(2,2))
 a3 <- table(as.character(dat$tripidmon[dat$op_yr < 1979]))
 hist(a3,nclass=max(a3)/80,main="tripidmon frequency before 1979",xlab="Sets per tripidmon")
 a2 <- table(as.character(dat$tripidmon[dat$op_yr >= 1979]))
@@ -142,7 +143,7 @@ for(fld in c("regY", "regY1", "regY2", "regB", "regB1", "regB2", "regB3", "regA"
 
 # Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
 regYord <- c(1,2,3,6,5,4)
-windows(height=14,width=12); par(mfcol=c(3,2),mar=c(3,2,2,1))
+windows(height=14,width=12); par(mfcol=c(2,2),mar=c(3,2,2,1))
 for (r in regYord) {
   llv <- pd2[pd2$regY==r,]
   yq <- seq(1952.125,2015.875,0.25)
@@ -389,10 +390,10 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_sp, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn)
 
 # ========================================================
 # Standardizations, Japan only

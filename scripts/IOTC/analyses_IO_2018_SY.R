@@ -1,4 +1,4 @@
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 sydir <- paste0(projdir, "SY/")
 datadir1 <- paste0(sydir, "data/catch_effort/")
 syalysis_dir <- paste0(sydir, "analyses/")
@@ -49,6 +49,8 @@ library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ign
 
 # Load data.
 
+dat$shk[is.na(dat$shk)] <- 0
+dat$sbf[is.na(dat$sbf)] <- 0
 
 # ===================================================================================
 # Start the analysis proper
@@ -74,7 +76,7 @@ library("beanplot")
 
 library("cpue.rfmo")
 
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 sydir <- paste0(projdir, "SY/")
 datadir1 <- paste0(sydir, "data/")
 syalysis_dir <- paste0(sydir, "analyses/")
@@ -83,24 +85,36 @@ clusdir <- paste0(sydir, "clustering/")
 setwd(clusdir)
 
 load(file=paste0(syalysis_dir,"SYdat.RData"))
-source(paste0(Rdir,"support_functions.r"))
-str(dat)
+#source(paste0(Rdir,"support_functions.r"))
+#str(dat)
+
+dat <- setup_IO_regions(dat,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
+
 
 rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
 
 # Set up input variables for clustering and standardization
 dat <- data.frame(dat)
-sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbt","sas","shk")
+sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","shk")
+
+summary(dat)
+dat$shk[is.na(dat$shk)] <- 0
+dat$sbf[is.na(dat$sbf)] <- 0
+
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
 plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(4,3))
 plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = sy_splist, flag = "SY", mfr = c(4,3))
 
+summary(dat)
+
 # Put chosen species here
-use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbt","sas")
+use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbf")
 # Variables to use
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB1","regB2","regA","regA1","regA2","regA3")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB1","regB2","regA","regA1","regA2","regA3")
 str(dat[,allabs])
+
+allabs[! allabs %in% names(dat)]
 
 # Determine the number of clusters. Come back and edit this.
 reglist <- list()
@@ -117,10 +131,10 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs, flag=flag, dohbf = F, cvnames = cvn, rgl = reglist)
 
 
 # ========================================================

@@ -5,7 +5,8 @@
 \title{Run clustering code across all regions and save the results.}
 \usage{
 run_clustercode_byreg(indat, reg_struc, allsp, allabs, ncl = "lst",
-  plotPCA = F, clustid = "tripidmon", allclust = F, flag, cvnames, rgl)
+  plotPCA = F, clustid = "tripidmon", allclust = F, flag, dohbf = TRUE,
+  cvnames, rgl)
 }
 \arguments{
 \item{indat}{The input dataset.}

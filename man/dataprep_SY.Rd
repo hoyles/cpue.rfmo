@@ -4,18 +4,16 @@
 \alias{dataprep_SY}
 \title{Prepare Seychelles longline data.}
 \usage{
-dataprep_SY(dat, alldat = F, region = "IO", splist = c("alb", "bet",
-  "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf",
-  "sbt"))
+dataprep_SY(dat, region, splist)
 }
 \arguments{
 \item{dat}{Input dataset}
 
-\item{alldat}{Not used.}
-
 \item{region}{IO or AO.}
 
 \item{splist}{Define the species in the dataset}
+
+\item{alldat}{Not used.}
 }
 \value{
 Modified dataset.

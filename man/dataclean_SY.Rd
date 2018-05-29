@@ -4,11 +4,10 @@
 \alias{dataclean_SY}
 \title{Clean SY data.}
 \usage{
-dataclean_SY(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott", "swo",
-  "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt"))
+dataclean_SY(dat, rmssp, splist)
 }
 \arguments{
-\item{dat1}{Input dataset}
+\item{dat}{Input dataset}
 
 \item{rmssp}{If TRUE, remove sets that report catch of only one species.}
 

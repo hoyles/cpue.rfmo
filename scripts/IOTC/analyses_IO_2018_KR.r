@@ -65,11 +65,11 @@ str(rawdat)
 
 # Prepare and check the data
 splist <- c("alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj","swo","yft")
-prepdat <- dataprep_KR(rawdat, )
+prepdat <- dataprep_KR(rawdat, splist)
 head(prepdat)
 prepdat2 <- setup_IO_regions(prepdat,  regY=T, regY1=T, regY2=T, regB=T, regB3=T, regB2=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 head(prepdat2)
-dat <- dataclean_KR(prepdat2, yearlim = 2017, splist = splist)
+dat <- dataclean_KR(prepdat2, yearlim = 2018, splist = splist)
 save(prepdat,dat,file="KRdat.RData")
 
 load(file="KRdat.RData")
@@ -486,6 +486,7 @@ savePlot("CPUEmap5_SKJ",type="png")
 # Start the analysis proper
 # ===================================================================================
 #Clustering
+#----- Clustering ----
 
 library("date")
 library("lubridate")
@@ -506,13 +507,15 @@ library("beanplot")
 
 library("cpue.rfmo")
 
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")
 kralysis_dir <- paste0(krdir, "analyses/")
 krfigs <- paste0(krdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(krdir,"clustering/")
+
+dir.create(clustdir)
 
 setwd(clustdir)
 load(file=paste0(kralysis_dir, "KRdat.RData"))
@@ -522,14 +525,14 @@ dat <- data.frame(dat)
 kr_splist <-  c("alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj","swo","yft")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = kr_allsp, flag = "KR", mfr = c(4,3))
-plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = kr_allsp, flag = "KR", mfr = c(4,3))
+plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = kr_splist, flag = "KR", mfr = c(4,3))
+plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = kr_splist, flag = "KR", mfr = c(4,3))
 
 # Put chosen species here
-use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbt","sas")
+use_splist <- c("alb","bet","blm","bum","mls","oth","sbt","swo","yft")
 
 # Variables to use
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB1","regB2","regA","regA1","regA2","regA3")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB2","regA","regA1","regA2","regA3")
 str(dat[,allabs])
 
 # Determine the number of clusters. Come back and edit this.
@@ -539,7 +542,7 @@ reglist$regA5 <- list(allreg = 1,   ncl = 5)
 reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
 reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
 reglist$regY <-  list(allreg = 1:6, ncl = c(4,5,4,5,4,4))
-reglist$regY2 <- list(allreg = 1:7, ncl = c(4,4,4,5,4,5,5))
+reglist$regY2 <- list(allreg = 1:7, ncl = c(3,4,4,5,4,5,5))
 flag="KR"
 
 # Covariates to pass to next stage
@@ -547,10 +550,10 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
 
 
 # ========================================================
@@ -576,7 +579,7 @@ library("survival")
 
 library("cpue.rfmo")
 
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")
 kralysis_dir <- paste0(krdir, "analyses/")
@@ -641,12 +644,12 @@ regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,4
 runpars <- list()
 runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss)
 runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
-runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
+runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)
 runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)
 
-regstr <- "regA4"; runreg <- 2; keepd <- TRUE; doflags <- "KR"
+regstr <- "regY2"; runreg <- 2; keepd <- TRUE; doflags <- "KR"
 maxyr <- 2018
-for (regstr in c("regA4")) {
+for (regstr in c("regY2")) {
   rp <- runpars[[regstr]]
   runsp <- rp$runsp
   addcl <- rp$addcl

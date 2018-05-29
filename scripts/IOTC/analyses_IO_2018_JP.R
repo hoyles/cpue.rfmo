@@ -59,22 +59,27 @@ cc <- "iiiiiiiciiiiiiiiiiiiicci"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
 # Load initial test segment of data
-a <- read_fwf(file=paste0(datadir1,"/JPNLL_20180524.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+a <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_20180527.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+names(a)
 names(a) <- nms
+head(data.frame(a))
 
 # Load the entire dataset
-dat5216 <- read_fwf(file=paste0(datadir1,"/JPNLL_20180524.dat"),fwf_widths(wdths),col_types=cc)
-problems(dat5216) # Report problems
-names(dat5216) <- nms
-table(dat5216$trip_st==0,dat5216$op_yr)
-table(dat5216$op_yr)
+dat5217 <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_20180527.dat"),fwf_widths(wdths),col_types=cc)
+a <- problems(dat5217) # Report problems
+a[160:200,]
+names(dat5217) <- nms
+table(dat5217$trip_st==0,dat5217$op_yr)
+table(dat5217$op_yr)
 
 # Prepare and check the data
-rawdat <- dat5216
+rawdat <- dat5217
 pd1 <- dataprep_JPIO(rawdat)
-pd2 <- setup_IO_regions(pd1, regY=T, regY1=T, regB=T, regB1=T, regB2=T)
+pd2 <- setup_IO_regions(pd1, regY=T, regY1=T, regY2=T, regB=T, regB3=T, regB2=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 
-clndat <- dataclean_JPIO(rawdat)
+allsp <- c("sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")
+
+clndat <- dataclean_JPIO(rawdat, splist = allsp)
 prepdat1 <- dataprep_JPIO(clndat)
 prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 save(pd1, pd2, prepdat, file="prepdat.RData")

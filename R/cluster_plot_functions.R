@@ -452,9 +452,9 @@ plot_spfreqyq <- function(indat, reg_struc, splist, flag, mfr = c(5,3)){
   doreg <- sort(unique(indat[,reg_struc]))
   for (r in doreg) {
     windows(15,12);
-    par(mfrow = mfr, mar = c(3,2,2,1), oma = c(0,0,2,0))
+    par(mfrow = mfr, mar = c(3,4,2,1), oma = c(0,0,2,0))
     a <- indat[indat[,reg_struc] == r,]
-    for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+    for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp, ylab = "Mean catch (mt)", pch = 19, cex.axis = 1.3, cex.lab = 1.3)
     title(paste(reg_struc, "Region", r ), outer = TRUE)
     savePlot(filename = paste("spfreq", flag, reg_struc, "R", r, "allyrs", sep = "_"), type = "png")
   }

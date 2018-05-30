@@ -41,7 +41,7 @@ regstr = "regB"
 vartype = "dellog"
 mdn=4
 
-prep_indices(resdirs=alldirs[3], reg_strs=c("regY2","regB3"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
+prep_indices(resdirs=alldirs[3], reg_strs=c("regY2","regY"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
 
   # Overlay national plots for comparison. ICCAT.

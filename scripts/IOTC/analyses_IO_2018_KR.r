@@ -472,17 +472,17 @@ plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = kr_splist, flag = "KR",
 use_splist <- c("alb","bet","blm","bum","mls","oth","sbt","swo","yft")
 
 # Variables to use
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB2","regA","regA1","regA2","regA3")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regA","regA1","regA2","regA3","regA4","regA5")
 str(dat[,allabs])
 
 # Determine the number of clusters. Come back and edit this.
 reglist <- list()
-reglist$regA4 <- list(allreg = 1:4, ncl = c(5,5,4,4))
+reglist$regA4 <- list(allreg = 2, ncl = c(5,4,4,4))
 reglist$regA5 <- list(allreg = 1,   ncl = 5)
 reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
 reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
-reglist$regY <-  list(allreg = 1:6, ncl = c(4,5,4,5,4,4))
-reglist$regY2 <- list(allreg = 1:7, ncl = c(3,4,4,5,4,5,5))
+reglist$regY <-  list(allreg = 4, ncl = c(3,5,4,4,4,4))
+reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,4,5,4,5,4))
 flag="KR"
 
 # Covariates to pass to next stage
@@ -490,9 +490,9 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn)
-run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn)
+run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY",  allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
 run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
 
 
@@ -528,49 +528,20 @@ Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(krdir,"clustering/")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
-clkeepJP_A4 <- list("alb"=list(c(), c(), c(), c()))
-clkeepKR_A4 <- list("alb"=list(c(), c(), c(), c()))
-clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
-clkeepSY_A4 <- list("alb"=list(c(), c(), c(), c()))
-clk_A4 <- list(JP=clkeepJP_A4, KR=clkeepKR_A4, TW=clkeepTW_A4, SY=clkeepSY_A4)
+clkeepKR_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4), c(1,3,4), c(2,3,4)))
+clk_A4 <- list(KR=clkeepKR_A4)
 
-clkeepJP_A5 <- list("alb"=list(c(2,4)))
-clkeepKR_A5 <- list("alb"=list(c(5)))
-clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
-clkeepSY_A5 <- list("alb"=list(c(1,2,4)))
-clk_A5 <- list(JP=clkeepJP_A5,KR=clkeepKR_A5,TW=clkeepTW_A5,SY=clkeepSY_A5)
+clkeepKR_A5 <- list("alb"=list(c(2,3,5)))
+clk_A5 <- list(KR=clkeepKR_A5)
 
-clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
-clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0)))
-clkeepTW_Y <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5)),c(0))
-clkeepSY_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0)))
-clk_Y <- list(JP=clkeepJP_Y,KR=clkeepKR_Y,TW=clkeepTW_Y,SY=clkeepSY_Y)
+clkeepKR_Y <- list("yft"=list(c(1,2,3),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clk_Y <- list(KR=clkeepKR_Y)
 
-clkeepJP_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4)))
-clkeepKR_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepTW_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4)))
-clkeepSY_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4)))
-clk_B2 <- list(JP=clkeepJP_B2, KR=clkeepKR_B2, TW=clkeepTW_B2, SY=clkeepSY_B2)
+clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3,4)))
+clk_Y2 <- list(KR=clkeepKR_Y2)
 
-clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0),c(1,2,3,4)))
-clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0),c(1,2,3,4)))
-clkeepTW_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5),c(0),c(1,2,3,4,5)))
-clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0),c(1,2,3,4)))
-clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2,SY=clkeepSY_Y2)
-
-clkeepJP_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4,5)))
-clkeepKR_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepTW_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4),c(1,2,3,4,5)))
-clkeepSY_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4),c(1,2,3,4)))
-clk_B3 <- list(JP=clkeepJP_B3,KR=clkeepKR_B3,TW=clkeepTW_B3,SY=clkeepSY_B3)
-
-minqtrs_Y  <- c(1,8,2,2,5,1)
-minqtrs_Y2  <- c(1,7,2,2,5,1,7)
-minqtrs_B2 <- c(8,8,2,2)
-minqtrs_B3 <- c(7,8,2,2,7)
-
-use_splist <- c("alb","bet","yft")
-stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
+std_splist <- c("alb","bet","yft")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",std_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
 ## ---------------------------------------------
 # Run various standardization scenarios. Only one here now, and for bigeye instead of YFT and ALB.

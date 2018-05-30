@@ -27,6 +27,8 @@ run_clustercode_byreg(indat, reg_struc, allsp, allabs, ncl = "lst",
 
 \item{flag}{Fleet code to use in figure titles.}
 
+\item{dohbf}{Include HBF in cluster plots if TRUE.}
+
 \item{cvnames}{Names of covariates to return with dataset.}
 
 \item{rgl}{A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.}

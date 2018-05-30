@@ -129,3 +129,100 @@ do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, ru
 #                          addcl = addcl, keepd = keepd)
 # }
 
+
+#' Run standardization models.
+#'
+#' The function runs delta lognormal models.
+#' @param runpars The 'runpars' object with all variables.
+#' @param doflags Include HBF in the models.
+#' @param regstr The name of the regional structure to be run.
+#' @param maxyr Include no times after the start of this year.
+#' @param do_early If TRUE, run the additional pre-1979 and post-1979 standardizations.
+#'
+run_standardization <- function(runpars, doflags, regstr, maxyr, do_early) {
+  rp <- runpars[[regstr]]
+  runsp <- rp$runsp
+  addcl <- rp$addcl
+  dohbf <- rp$dohbf
+  jdat <- data.frame()
+  for (flag in doflags) {
+    for (r in rp$doregs) {
+      load(paste0(projdir,flag,"/clustering/",paste(flag,regstr,r,sep = "_"),".RData"))
+      dataset$flag <- flag
+      dataset$qtr <- revtrunc(defactor(dataset$yrqtr))
+      jdat <- rbind(jdat,dataset[,stdlabs])
+      rm(dataset)
+    }
+  }
+  jdat <- jdat[jdat$yrqtr < maxyr,]
+  jdat$vessidx <- jdat$vessid
+  jdat$vessid <- paste0(jdat$flag,jdat$vessid)
+  jdat$vessid <- as.factor(jdat$vessid)
+
+  vars <- c("vessid","hooks","yrqtr","latlong","hbf")
+  for (runreg in rp$doregs) {
+    glmdat <- select_data_IO2(jdat,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars)
+    if (nrow(glmdat) > 60000) glmdat <- samp_strat_data(glmdat,60)
+    glmdat$.wtt   <- mk_wts(glmdat,wttype = "area")
+
+    if (do_early) {
+      glmdat5279 <- select_data_IO2(jdat,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1952,1980))
+      if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,60)
+      a <- jdat[jdat$vessid != "JP1",]
+      glmdat79nd <- select_data_IO2(jdat,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1979,maxyr))
+      if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,60)
+      glmdat5279$.wtt   <- mk_wts(glmdat5279,wttype="area")
+      glmdat79nd$.wtt   <- mk_wts(glmdat79nd,wttype="area")
+    }
+
+    fmla.oplogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = T,nhbf = 3, dohook = rp$dohook)
+    fmla.oplogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = F,nhbf = 3, dohook = rp$dohook)
+    fmla.boatlogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = T,nhbf = 3, dohook = rp$dohook)
+    fmla.boatlogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = F,nhbf = 3, dohook = rp$dohook)
+    glmdat$mn <- with(glmdat,0.1 *  mean(get(runsp)/hooks))
+
+    modlab = "lognC_novess_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
+    if (lu(glmdat$clust) > 1)
+    { model <- glm(fmla.oplogn,     data = glmdat, weights = glmdat$.wtt, family = "gaussian", model = keepd);gc() } else
+    { model <- glm(fmla.oplogn_ncl, data = glmdat, weights = glmdat$.wtt, family = "gaussian", model = keepd);gc() }
+    summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    modlab = "lognC_boat_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
+    if (lu(glmdat$clust) > 1)
+    { model <- glm(fmla.boatlogn,    data = glmdat, weights = glmdat$.wtt, family = "gaussian", model = keepd);gc() } else
+    { model <- glm(fmla.boatlogn_ncl,data = glmdat, weights = glmdat$.wtt, family = "gaussian", model = keepd);gc() }
+    summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    if (do_early) {
+      modlab="lognC_novess_5279"; fname <- paste0("Joint_",regstr,"_R",runreg)
+      glmdat5279$mn <- with(glmdat5279,0.1* mean(get(runsp)/hooks))
+      if(lu(glmdat5279$clust) > 1)
+      { model <- glm(fmla.oplogn,     data=glmdat5279, weights = glmdat5279$.wtt, family="gaussian");gc() } else
+      { model <- glm(fmla.oplogn_ncl, data=glmdat5279, weights = glmdat5279$.wtt, family="gaussian");gc() }
+      summarize_and_store(mod=model,dat=glmdat5279,fname,modlab,dohbf=dohbf, keepd = keepd);rm(model)
+
+      modlab="lognC_vessid_79nd"; fname <- paste0("Joint_",regstr,"_R",runreg)
+      glmdat79nd$mn <- with(glmdat79nd,0.1* mean(get(runsp)/hooks))
+      if(lu(glmdat79nd$clust) > 1)
+      { model <- glm(fmla.boatlogn,     data = glmdat79nd, weights = glmdat79nd$.wtt, family="gaussian");gc() } else
+      { model <- glm(fmla.boatlogn_ncl, data = glmdat79nd, weights = glmdat79nd$.wtt, family="gaussian");gc() }
+      summarize_and_store(mod=model,dat=glmdat79nd,fname,modlab,dohbf=dohbf, keepd = keepd);rm(model)
+    }
+
+    # delta lognormal
+    modlab = "dellog_novess_allyrs"; fname <- paste0("Joint_", regstr,"_R",runreg);
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = rp$dohook)
+
+    modlab = "dellog_boat_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = rp$dohook)
+
+    if (do_early) {
+      modlab="dellog_novess_5279"; fname <- paste0("Joint_",regstr,"_R",runreg)
+      do_deltalog(dat=glmdat5279,dohbf=dohbf,addboat=F,addcl=addcl,nhbf=3,runsp=runsp,fname=fname,modlab=modlab, keepd = keepd, dohook = rp$dohook)
+
+      modlab="dellog_vessid_79nd"; fname <- paste0("Joint_",regstr,"_R",runreg)
+      do_deltalog(dat=glmdat79nd,dohbf=dohbf,addboat=T,addcl=addcl,nhbf=3,runsp=runsp,fname=fname,modlab=modlab, keepd = keepd, dohook = rp$dohook)
+    }
+    graphics.off()
+  }
+}

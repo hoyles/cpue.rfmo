@@ -108,6 +108,7 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
 #' @param clustid Name of variable to aggregate across for trip-level clustering.
 #' @param allclust Generate plots for all clustering methods if TRUE.
 #' @param flag Fleet code to use in figure titles.
+#' @param dohbf Include HBF in cluster plots if TRUE.
 #' @param cvnames Names of covariates to return with dataset.
 #' @param rgl A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
 #' @return Nothing is returned but each dataset is saved.

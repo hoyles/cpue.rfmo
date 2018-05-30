@@ -1,7 +1,7 @@
 ### --- DATA PREPARATION ----
 
 ### --- Paths ----
-projdir <- "G:/Taiwan062018-CPUE-workshop/workshop2018/cpue.rfmo/scripts/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 sydir <- paste0(projdir,"SY/")
 datadir1 <- paste0(sydir,"data/catcheffort/")
 syalysis_dir <- paste0(sydir,"analyses/")
@@ -86,7 +86,7 @@ save(dat,file=paste(datadir1,"SYdat.RData",sep=""))
 
 ### DATA CLUSTERING ----
 
-projdir <- "G:/Taiwan062018-CPUE-workshop/workshop2018/cpue.rfmo/scripts/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 sydir <- paste0(projdir, "SY/")
 datadir1 <- paste0(sydir, "data/catcheffort/")
 syalysis_dir <- paste0(sydir, "analyses/")
@@ -171,7 +171,7 @@ run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allab
 ### CPUE STANDARDISATION ----
 
 ### --- Paths ----
-projdir <- "G:/Taiwan062018-CPUE-workshop/workshop2018/cpue.rfmo/scripts/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 sydir <- paste0(projdir,"SY/")
 datadir1 <- paste0(sydir,"data/catcheffort/")
 syalysis_dir <- paste0(sydir,"analyses/")

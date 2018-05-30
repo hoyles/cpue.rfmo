@@ -133,7 +133,7 @@ boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regty
   }
   wd = table(dat[, cl])
     for (sp in allsp) {
-        boxplot(dat[, sp]/dat$hooks ~ dat[, cl], width = wd, main = sp, outline = outL, pars = list(boxwex = 1))
+        boxplot(dat[, sp]/dat$hooks ~ dat[, cl], width = wd, main = toupper(sp), outline = outL, pars = list(boxwex = 1))
     }
     title(paste(ti, cl), outer = T, line = -1, cex.main = 1.5)
     savePlot(paste0(ti, "_boxplots_spCL", cl, ".png"), type = "png")
@@ -170,7 +170,7 @@ boxplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, 
   }
   wd = table(dat[, cl])
     for (sp in allsp) {
-        boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = sp, outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
+        boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = toupper(sp), outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
     }
     title(paste(gsub("_", " ", ti), cl), outer = T, line = -1, cex.main = 1.5)
     savePlot(paste0(ti, "_boxplots_spCLcomp", cl, ".png"), type = "png")
@@ -212,7 +212,7 @@ boxplots_spPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype =
           par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
         }
         for (sp in allsp) {
-            boxplot(dat[, sp]/dat$Total ~ ppq, main = sp, outline = outL, ylim = c(0, 1))
+            boxplot(dat[, sp]/dat$Total ~ ppq, main = toupper(sp), outline = outL, ylim = c(0, 1))
         }
         title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 1.5)
         savePlot(paste0(ti, "_boxplots_spPCA", ppc, ".png"), type = "png")
@@ -252,7 +252,7 @@ boxplots_spTPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype 
           par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
         }
         for (sp in allsp) {
-            boxplot(dat[, sp]/dat$Total ~ ppq, main = sp, outline = outL, ylim = c(0, 1))
+            boxplot(dat[, sp]/dat$Total ~ ppq, main = toupper(sp), outline = outL, ylim = c(0, 1))
         }
         title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 1.5)
         savePlot(paste0(ti, "_boxplots_spTPCA", ppc, ".png"), type = "png")
@@ -385,8 +385,8 @@ beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
     }
     wd = table(dat[, cl])
     for (sp in allsp) {
-        beanplot(dat[, sp]/dat$Total ~ dat[, cl], cutmin = 0, cutmax = 1, bw = 0.01, what = c(1, 1, 1, 0), ylim = c(0, 1), log = "", main = sp)
-        # boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = sp, outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
+        beanplot(dat[, sp]/dat$Total ~ dat[, cl], cutmin = 0, cutmax = 1, bw = 0.01, what = c(1, 1, 1, 0), ylim = c(0, 1), log = "", main = toupper(sp))
+        # boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = toupper(sp), outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
     }
     title(paste(gsub("_", " ", ti), cl), outer = T, line = -1, cex.main = 1.5)
     nm <- paste0(ti, "_beanplots_spCLcomp", cl)

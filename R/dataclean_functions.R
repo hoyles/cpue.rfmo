@@ -174,9 +174,13 @@ dataclean_SY <- function(dat, rmssp, splist) {
     dat[,sp] <- as.numeric(dat[,sp])
     if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
   }
+  ### Replace NA by 0 values
+  indic.column.species <- which(names(dat) %in% splist)
+  dat[,indic.column.species][is.na(dat[,indic.column.species])] <- 0
+
   # hooks
   dat <- dat[!is.na(dat$hooks), ] # Remove operations without information on effort
-  dat <- dat[dat$hooks < 6000, ]  # Remove operations with number of hooks >6000
+  dat <- dat[dat$hooks < 5000, ]  # Remove operations with number of hooks >5000
   dat <- dat[dat$hooks > 200, ]   # Remove operations with nunmber of hooks <200
   # geographic positions
   dat$lat <- as.numeric(dat$lat)   # Convert lat to numeric values

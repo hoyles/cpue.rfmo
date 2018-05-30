@@ -297,23 +297,33 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
     if (mt == "deltapos")
       gdat <- gdat[gdat[, runsp] > 0, ]
 
+    # Data cleaning
     yqll <- paste(gdat$yrqtr, gdat$latlong)
     a <- table(yqll)
-    a <- apply(a > minyqll, 1, sum)
-    gdat <- gdat[yqll %in% names(a), ]
+    a <- apply(a >= minyqll, 1, sum)
+    gdat <- gdat[yqll %in% names(a), ] # Each stratum has at least minyqll sets
+
     a <- table(gdat$vessid, gdat$yrqtr)
     a <- apply(a > 0, 1, sum, na.rm = TRUE)
-    a <- a[a >= minqtrs]  # Vessel fishes in at least 'minqtrs' quarters
+    a <- a[a >= minqtrs]  # Each vessel fishes in at least 'minqtrs' quarters
+
     gdat <- gdat[gdat$vessid %in% names(a), ]
     a <- table(gdat$yrqtr)
-    a <- a[a >= minyrqtr]  # At least 'minyrqtr' sets in the yrqtr
+    a <- a[a >= minyrqtr]  # Each yrqtr has at least 'minyrqtr' sets
+
     gdat <- gdat[gdat$yrqtr %in% names(a), ]
     a <- table(gdat$latlong)
-    a <- a[a >= minll]  # At least 'minll' sets in the cell
+    a <- a[a >= minll]  # Each latlong cell at least 'minll' sets
+
     gdat <- gdat[gdat$latlong %in% names(a), ]
     a <- table(gdat$vessid)
-    a <- a[a >= minvess]  # At least 'minvess' sets by the vessel
+    a <- a[a >= minvess]  # Each vessel has at least 'minvess' sets
+
     gdat <- gdat[gdat$vessid %in% names(a), ]
+    yqll <- paste(gdat$yrqtr, gdat$latlong)
+    a <- table(yqll)
+    a <- apply(a >= minyqll, 1, sum)
+    gdat <- gdat[yqll %in% names(a), ] # Each stratum has at least minyqll sets
 
     if (!is.na(addpca))
       vars <- c(vars, addpca)

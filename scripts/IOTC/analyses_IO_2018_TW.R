@@ -338,9 +338,8 @@ twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(twdir,"clustering/")
 
-# Define the clusters to be used. Will need to set this up after checking the cluster allocations
-use_splist <- c("alb","bet","yft")
-stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",use_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
+std_splist <- c("alb","bet","yft")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",std_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
 
 ## ---------------------------------------------
 # Run various standardization scenarios. Only one here now, and for bigeye instead of YFT and ALB.

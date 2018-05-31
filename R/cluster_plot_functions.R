@@ -115,6 +115,10 @@ boxplots_PCA <- function(dat, nPCA = 3, ti = "", dohbf = T, lat5 = F, regtype = 
 #' @param allsp Vector of species to use in the cluster plots.
 #'
 boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
+  if (nsp %in% c(5,6)) {
+    windows(30, 20)
+    par(mfrow = c(2, 3), mar = c(3, 3, 3, 3))
+  }
   if (nsp %in% c(7,8)) {
     windows(30, 20)
     par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
@@ -152,6 +156,10 @@ boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regty
 #' @param allsp Vector of species to use in the cluster plots.
 #'
 boxplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
+  if (nsp %in% c(5,6)) {
+    windows(30, 20)
+    par(mfrow = c(2, 3), mar = c(3, 3, 3, 3))
+  }
   if (nsp %in% c(7,8)) {
     windows(30, 20)
     par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
@@ -195,6 +203,10 @@ boxplots_spPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype =
         bk <- quantile(pp, seq(0, 1, length.out = 11), include.lowest = TRUE)
         if (length(bk) == length(unique(bk)))
             ppq <- cut(pp, breaks = bk) else ppq <- cut(pp, breaks = 11)
+        if (nsp %in% c(5,6)) {
+          windows(30, 20)
+          par(mfrow = c(2, 3), mar = c(3, 3, 3, 3))
+        }
         if (nsp %in% c(7,8)) {
           windows(30, 20)
           par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
@@ -235,6 +247,10 @@ boxplots_spTPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype 
     for (ppc in paste0("TPC", 1:nPCA)) {
         pp <- with(dat, get(ppc))
         ppq <- cut(pp, breaks = quantile(pp, seq(0, 1, length.out = 11), include.lowest = TRUE))
+        if (nsp %in% c(5,6)) {
+          windows(30, 20)
+          par(mfrow = c(2, 3), mar = c(3, 3, 3, 3))
+        }
         if (nsp %in% c(7,8)) {
           windows(30, 20)
           par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))
@@ -367,6 +383,10 @@ mapTPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r) {
 #' @param allsp Vector of species to use in the cluster plots.
 #'
 beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regtype = regtype, r = r, allsp) {
+  if (nsp %in% c(5,6)) {
+    windows(30, 20)
+    par(mfrow = c(2, 3), mar = c(3, 3, 3, 3))
+  }
   if (nsp %in% c(7,8)) {
     windows(30, 20)
         par(mfrow = c(2, 4), mar = c(3, 3, 3, 3))

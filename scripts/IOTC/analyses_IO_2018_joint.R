@@ -3,7 +3,7 @@
 # Remove TW before 2005
 # Joint standardization
 
-projdir <- "~/IOTC/2017_CPUE/"
+projdir <- "~/IOTC/2018_CPUE/"
 Rdir <- paste0(projdir, "Rfiles/")
 
 jpdir <- paste0(projdir, "JP/")
@@ -34,26 +34,27 @@ library(cluster)
 library(beanplot)
 library(survival)
 
-source(paste0(Rdir, "support_functions.r"))
+clkeepJP_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4,5), c(1,2,3,4), c(1,2,3,4)))
+clkeepKR_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4), c(1,3,4), c(2,3,4)))
+clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
+clk_A4 <- list(JP=clkeepJP_A4,KR=clkeepKR_A4,TW=clkeepTW_A4)
 
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
-            "Total","lat","lon","lat5","lon5","reg","flag","qtr")
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","alb","bet","yft","hcltrp",
-            "lat","lon","lat5","lon5","reg","flag","qtr")
-
-clkeepJP_A2 <- list("alb"=list(c(2,4),c(3),c(3,4),c(1,3)))
-clkeepKR_A2 <- list("alb"=list(c(3,4),c(3),c(3,4),c(4)))
-clkeepTW_A2 <- list("alb"=list(c(1),c(1),c(1,2),c(1,4)))
-
-clkeepJP_A5 <- list("alb"=list(c(2,4)))
-clkeepKR_A5 <- list("alb"=list(c(5)))
+clkeepJP_A5 <- list("alb"=list(c(2,3,4)))
+clkeepKR_A5 <- list("alb"=list(c(2,3,5)))
 clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
+clk_A5 <- list(JP=clkeepJP_A5,KR=clkeepKR_A5,TW=clkeepTW_A5)
 
-clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
-clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0)))
-clkeepTW_Y <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5)),c(0))
+clkeepJP_Y <- list("yft"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
+clkeepKR_Y <- list("yft"=list(c(1,2,3),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepTW_Y <- list("yft"=list(c(1,2,3), c(1,2,3,4), c(1,2,3), c(1,2,3,4),   c(1,2,3,4,5)), c(1,2,3,4,5))
 clkeepSY_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0)))
 clk_Y <- list(JP=clkeepJP_Y,KR=clkeepKR_Y,TW=clkeepTW_Y,SY=clkeepSY_Y)
+
+clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3,4)))
+clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3,4)))
+clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
+clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0),c(1,2,3,4)))
+clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2,SY=clkeepSY_Y2)
 
 clkeepJP_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4)))
 clkeepKR_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
@@ -61,39 +62,94 @@ clkeepTW_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4)))
 clkeepSY_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4)))
 clk_B2 <- list(JP=clkeepJP_B2, KR=clkeepKR_B2, TW=clkeepTW_B2, SY=clkeepSY_B2)
 
-clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0),c(1,2,3,4)))
-clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0),c(1,2,3,4)))
-clkeepTW_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5),c(0),c(1,2,3,4,5)))
-clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0),c(1,2,3,4)))
-clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2,SY=clkeepSY_Y2)
-
 clkeepJP_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4,5)))
 clkeepKR_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepTW_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4),c(1,2,3,4,5)))
 clkeepSY_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4),c(1,2,3,4)))
 clk_B3 <- list(JP=clkeepJP_B3,KR=clkeepKR_B3,TW=clkeepTW_B3,SY=clkeepSY_B3)
 
-minqtrs_Y  <- c(1,8,2,2,5,1)
-minqtrs_Y2  <- c(1,7,2,2,5,1,7)
-minqtrs_B2 <- c(8,8,2,2)
-minqtrs_B3 <- c(7,8,2,2,7)
+std_splist <- c("alb","bet","yft")
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",std_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
 
-### Run main effects bigreg cl nohbf
-# DONE
-resdir <- paste0(jntalysis_dir,"std_cl_nohbf/")
+## ---------------------------------------------
+# Run various standardization scenarios.
+## ---------------------------------------------
+
+# The runpars define the approach to be used in this run
+regA4_minss <- list(minq_byreg = c(3,2,5,5), minvess=c(60,40,100,100), minll=c(30,20,50,50), minyrqtr = c(30,20,50,50), minyqll = c(3,3,5,5))
+regA5_minss <- list(minq_byreg = c(5), minvess=c(100), minll=c(50), minyrqtr = c(50), minyqll = c(5))
+regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
+regY_minss <-  list(minq_byreg = c(2,5,5,2,5,2), minvess=c(40,100,100,40,100,40), minll=c(20,50,50,20,50,20), minyrqtr = c(20,50,50,20,50,20), minyqll = c(3,5,5,3,5,3))
+regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
+
+runpars <- list()
+runpars[["regA4"]] <-list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss, nsubsamp = 50)
+runpars[["regA5"]] <-list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss, nsubsamp = 50)
+runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, nsubsamp = 50)
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, nsubsamp = 50)
+
+regstr <- "regA4"; runreg <- 2; keepd <- TRUE; doflags <- "TW"
+maxyr <- 2018
+
+# with clusters, hooks, no hbf
+resdir <- paste0(jntalysis_dir,"cl1_hb0_hk1/")
 dir.create(resdir)
 setwd(resdir)
 
-runpars <- list()
-runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp", minq_byreg = c())
-runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp", minq_byreg = c())
-runpars[["regY2"]] <- list(runsp = "yft",  regtype2 = "Y2",  clk = clk_Y2,  doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, cltype = "hcltrp", minq_byreg = c())
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
 
-runreg=2; runsp="yft"
+# with clusters, hooks, hbf
+resdir <- paste0(jntalysis_dir,"cl1_hb1_hk1/")
+dir.create(resdir)
+setwd(resdir)
 
-clk <- clk_B2   # for testing
-minqtrs_byreg = c(8,8,2,2,5,5,5,5)
-vars <- c("vessid","hooks","yrqtr","latlong")
+runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+runpars[["regA4"]] <-list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+runpars[["regA5"]] <-list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+
+# no clusters, with hooks, hbf
+resdir <- paste0(jntalysis_dir,"cl0_hb1_hk1/")
+dir.create(resdir)
+setwd(resdir)
+
+clkeepJP_A4 <- list("alb"=list(c(1,2,3), c(1,2,3,5), c(2,4), c(2,4)))
+clkeepKR_A4 <- list("alb"=list(c(1,2,3,5), c(1,2,3,4), c(1,3,4), c(2,4)))
+clkeepTW_A4 <- list("alb"=list(c(1,2,3), c(1:4), c(1,2), c(1:5)))
+clk_A4 <- list(JP=clkeepJP_A4,KR=clkeepKR_A4,TW=clkeepTW_A4)
+
+clkeepJP_A5 <- list("alb"=list(c(2,3,4)))
+clkeepKR_A5 <- list("alb"=list(c(5)))
+clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
+clk_A5 <- list(JP=clkeepJP_A5,KR=clkeepKR_A5,TW=clkeepTW_A5)
+
+clkeepJP_Y <- list("yft"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,3), c(1,2,4),c(1,2,3,4)))
+clkeepKR_Y <- list("yft"=list(c(1,3),c(1,2,3,4),c(1,2,3),c(2),c(1,3,4),c(1,2,3,4)))
+clkeepTW_Y <- list("yft"=list(c(1,2,3), c(1,2,3,4), c(1,2,3), c(1,2,3,4),   c(1,2,3,4,5)), c(1,2,3,4,5))
+clk_Y <- list(JP=clkeepJP_Y,KR=clkeepKR_Y,TW=clkeepTW_Y)
+
+clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3)))
+clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3,4)))
+clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
+clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2)
+
+runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+runpars[["regA4"]] <-list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+runpars[["regA5"]] <-list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss, nsubsamp = 50)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs)
+
+# ------------------------------
 
 maxyr = 2018; keepd = TRUE;
 for(runsp in c("bet", "yft")) {

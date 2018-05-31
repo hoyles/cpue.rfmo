@@ -45,11 +45,11 @@ library(scales)       #color gradient with alpha()
 library(cpue.rfmo)
 
 ### Sources functions updated through the GitHub (instead of loading the library as it needs to be built)
-source("../../../../../R/dataclean_functions.R")
-source("../../../../../R/dataprep_functions.R")
+# source("../../../../../R/dataclean_functions.R")
+# source("../../../../../R/dataprep_functions.R")
 
 ### Read the data set ----
-fulldataset <- read.csv(paste0(datadir1,"LL_CE_N0_2016.csv"),sep = ",", header = TRUE)
+fulldataset <- read.csv(paste0(datadir1,"LL_CE_N0.csv"),sep = ",", header = TRUE)
 names(fulldataset[,19:40])  # 22 species reported
 
 ### Add TripHistoryID that is missing: Generate a new one from vesselid and year-month
@@ -79,7 +79,7 @@ prepdat <- dataprep_SY(clndat, region = "IO", splist = c("alb","bet","blm","bsh"
 dat <- setup_IO_regions(prepdat, regY=TRUE, regY1=FALSE, regY2=TRUE,regB=TRUE,regB1=TRUE, regB2=TRUE, regB3=TRUE, regA=FALSE, regA1=FALSE, regA2=FALSE, regA3=FALSE, regA4=FALSE, regA5=FALSE)
 
 ### Save the data ----
-save(dat,file=paste(datadir1,"SYdat.RData",sep=""))
+save(dat,file=paste(datadir1,"SYdatx.RData",sep=""))
 
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,6 +120,7 @@ library("beanplot",quietly=TRUE)
 
 ### Load the data ----
 load(file=paste0(datadir1,"SYdat.RData"))
+load(file=paste0(datadir1,"SYdatx.RData"))
 str(dat)
 
 ### Set the working directory ----
@@ -127,43 +128,47 @@ setwd(clusdir)
 
 # Set up input variables for clustering and standardization
 # Generate a group of billfish (mls = striped marlin, bum = blue marlin, blm = black marlin, bxq = marlins nei)
-dat$Total3 <- apply(dat[,c('mls','bum','blm','bxq')],1,sum,na.rm=T)
+dat$bll <- apply(dat[,c('mls','bum','blm','bxq')],1,sum,na.rm=T)
 
 ### Set up input variables for clustering and standardization
-sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbf","skh")
+summary(dat)
+sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbf","skh","bxq","sfa","sbf","rsk","oil","mzz","bsh","bll")
 
 ### Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-plot_spfreqyq(indat = dat, reg_struc = "regY", splist = sy_splist, flag = "SY", mfr = c(4,3))
+plot_spfreqyq(indat = dat, reg_struc = "regY", splist = sy_splist, flag = "SY", mfr = c(5,4))
 plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(4,3))
 
 # Put chosen species here
-use_splist <- c("bet","yft","swo","oil")
+cl_splist <- c("alb","bet","yft","swo","oil","mzz","bll")
+
 # Variables to use
-allabs <- c("op_yr","op_mon","vessid","yrqtr","latlong","hooks","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY2","regB","regB1","regB2")
+dat$hbf <- 0 # Not used for anything, but needed to make the standardization code work.
+allabs <- c("op_yr","op_mon","vessid","yrqtr","latlong","hooks","hbf","tripidmon","moon",cl_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY2","regB","regB1","regB2")
 str(dat[,allabs])
 #allabs[!(allabs %in% names(dat))]
 
 ### Determine the number of clusters. Come back and edit this
 reglist <- list()
-reglist$regY <-  list(allreg = 2:4, ncl = c(5,3,3))
-reglist$regY2 <- list(allreg = 1:7, ncl = c(4,5,4,3,5,5,5))
+reglist$regY <-  list(allreg = c(1,2,3,4,5), ncl = c(3,4,5,4,5))
+reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,5,4,5,5,4))
 flag="SY"
 
 ### Covariates to pass to next stage
-cvn <- c("yrqtr","latlong","hooks","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
+#cvn <- c("yrqtr","latlong","hooks",      "vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 ### r parameter?
 r <- 4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
 
 ### Read the cluster functions new version
-source("../../../../../R/cluster_functions.R")
+#source("../../../../../R/cluster_functions.R")
 
 # RegionY
-run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf=F)
 
 # Region Y2
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf=F)
 
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -200,38 +205,17 @@ library("survival")
 library("cpue.rfmo")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
-clkeepJP_A5 <- list("alb"=list(c(2,4)))
-clkeepKR_A5 <- list("alb"=list(c(5)))
-clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
-
-clkeepJP_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0)))
-clkeepKR_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0)))
-clkeepTW_Y <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5)),c(0))
 clkeepSY_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0)))
-clk_Y <- list(JP=clkeepJP_Y,KR=clkeepKR_Y,TW=clkeepTW_Y,SY=clkeepSY_Y)
+clk_Y <- list(SY=clkeepSY_Y)
 
-clkeepJP_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4)))
-clkeepKR_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepTW_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4)))
-clkeepSY_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4)))
-clk_B2 <- list(JP=clkeepJP_B2, KR=clkeepKR_B2, TW=clkeepTW_B2, SY=clkeepSY_B2)
-
-clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,5),c(1,2,3,4),c(0),c(1,2,3,4)))
-clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2,3,5),c(1,2,3,4),c(0),c(1,2,3,4)))
-clkeepTW_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2),c(1,2,3,4,5),c(0),c(1,2,3,4,5)))
 clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0),c(1,2,3,4)))
-clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2,SY=clkeepSY_Y2)
+clk_Y2 <- list(SY=clkeepSY_Y2)
 
-clkeepJP_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4,5)))
-clkeepKR_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepTW_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4),c(1,2,3,4,5)))
+clkeepSY_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4)))
+clk_B2 <- list(SY=clkeepSY_B2)
+
 clkeepSY_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4),c(1,2,3,4)))
-clk_B3 <- list(JP=clkeepJP_B3,KR=clkeepKR_B3,TW=clkeepTW_B3,SY=clkeepSY_B3)
-
-minqtrs_Y  <- c(1,8,2,2,5,1)
-minqtrs_Y2  <- c(1,7,2,2,5,1,7)
-minqtrs_B2 <- c(8,8,2,2)
-minqtrs_B3 <- c(7,8,2,2,7)
+clk_B3 <- list(SY=clkeepSY_B3)
 
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")

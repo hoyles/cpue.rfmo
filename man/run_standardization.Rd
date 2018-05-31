@@ -4,7 +4,8 @@
 \alias{run_standardization}
 \title{Run standardization models.}
 \usage{
-run_standardization(runpars, doflags, regstr, maxyr, do_early)
+run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
+  twlimit = 2005)
 }
 \arguments{
 \item{runpars}{The 'runpars' object with all variables.}

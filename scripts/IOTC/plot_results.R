@@ -177,125 +177,10 @@ mdt="boat_allyrs"; mdt="vessid_79nd"; mdt="novess_5279"; mdt="novess_allyrs";
 vartype="lognC"
 
 reg_strs <- c("regY","regY2","regA4","regA5")
-#reg_strs <- c("regA4","regA5")
 
-for (resdir in alldirs[1:2]) {
-  outdir <- paste0(resdir,"/diags/")
-  dir.create(outdir)
-  for(regstr in reg_strs) {
-    sp <- splist[[regstr]]
-    for(runreg in reglist[[regstr]]) {
-      for(vartype in c("lognC")) {
-        for(mdn in 1:4) {
-          mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-          mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-          modtype <- paste(vartype,mdt,sep="_")
-          fname <- paste0("Joint_",regstr,"_R",runreg)
-          if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
-            load(paste0(resdir,fname,"_",modtype,"_model.RData"))
-            if(resdir %in% alldirs[5:6]) mod <- mod1
-            a <- mod$data
-            b <- mod$residuals
-            ncl <- length(unique(a$clust))
-            mf <- c(5,5)
-            if (ncl <= 20) mf <- c(5,4)
-            if (ncl <= 16) mf <- c(4,4)
-            if (ncl <= 9) mf <- c(3,3)
-            if (ncl <= 4) mf <- c(2,2)
-            if (ncl == 1) mf <- c(1,1)
-            windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
-            for (cl in sort(unique(a$clust))) {
-              loc <- as.character(a$clust)==cl
-              bb <- tapply(b[loc],as.numeric(as.character(a$yrqtr[loc])),median)
-              plot(as.numeric(names(bb)),bb,xlab="Year-quarter",ylab="Median of residuals",main=cl)
-              mtext(paste(fname,modtype),side=3,outer=T,line=0)
-            }
-            savePlot(paste0(outdir,fname,"_",modtype,"_medres_by_yq_cl.png"),type="png")
-          }
-        }
-        graphics.off()
-      }
-    }
-  }
-}
-
- for (resdir in alldirs[1:3]) {
-  outdir <- paste0(resdir,"/diags/")
-  dir.create(outdir)
-  for(regstr in reg_strs) {
-    sp <- splist[[regstr]]
-    for(runreg in reglist[[regstr]]) {
-      for(vartype in c("lognC")) {
-        for(mdn in 1:4) {
-          mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-          mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-          modtype <- paste(vartype,mdt,sep="_")
-          fname <- paste0("Joint_",regstr,"_R",runreg)
-          if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
-            load(paste0(resdir,fname,"_",modtype,"_model.RData"))
-            if(resdir %in% alldirs[5:6]) mod <- mod1
-            a <- mod$data
-            b <- mod$residuals
-            a$flag <- substring(as.character(a$vessid),1,1)
-            nfl <- length(unique(a$flag))
-            mf <- c(2,2)
-            if (nfl == 1) mf <- c(1,1)
-            windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
-            xrange=range(as.numeric(as.character(a$yrqtr)))
-            for (fl in sort(unique(a$flag))) {
-              loc <- as.character(a$flag)==fl
-              bb <- tapply(b[loc],as.numeric(as.character(a$yrqtr[loc])),median)
-              plot(as.numeric(names(bb)),bb,xlim=xrange,xlab="Year-quarter",ylab="Median of residuals",main=switch(fl,J="JP",K="KR",T="TW",S="SY", U = "US"))
-              mtext(paste(fname,modtype),side=3,outer=T,line=0)
-            }
-            savePlot(paste0(outdir,fname,"_",modtype,"_medres_by_yq_flg.png"),type="png")
-          }
-        }
-        graphics.off()
-      }
-    }
-  }
-}
 
 for (resdir in alldirs[1:3]) {
-  outdir <- paste0(resdir,"/diags/")
-  dir.create(outdir)
-  for(regstr in reg_strs) {
-    sp <- splist[[regstr]]
-    for(runreg in reglist[[regstr]]) {
-      for(vartype in c("lognC")) {
-        for(mdn in 1:4) {
-          mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-          mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-          modtype <- paste(vartype,mdt,sep="_")
-          fname <- paste0("Joint_",regstr,"_R",runreg)
-          if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
-            load(paste0(resdir,fname,"_",modtype,"_model.RData"))
-            if(resdir %in% alldirs[5:6]) mod <- mod1
-            a <- mod$data
-            b <- mod$residuals
-            a$flag <- substring(as.character(a$vessid),1,1)
-            nfl <- length(unique(a$flag))
-            mf <- c(2,2)
-            if (nfl == 1) mf <- c(1,1)
-            windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
-            xrange=range(as.numeric(as.character(a$yrqtr)))
-            for (fl in sort(unique(a$flag))) {
-              loc <- as.character(a$flag)==fl
-              boxplot(b[loc] ~ as.numeric(as.character(a$yrqtr[loc])),xlab="Year-quarter",ylab="Residuals",main=switch(fl,J="JP",K="KR",T="TW",S="SY"))
-              mtext(paste(fname,modtype),side=3,outer=T,line=0)
-            }
-            savePlot(paste0(outdir,fname,"_",modtype,"_allres_by_yq_flg.png"),type="png")
-          }
-        }
-        graphics.off()
-      }
-    }
-  }
-}
-
-for (resdir in alldirs[1:2]) {
-  outdir <- paste0(resdir,"/diags/")
+  outdir <- paste0(resdir,"/test/")
   dir.create(outdir)
   for(regstr in reg_strs) {
     sp <- splist[[regstr]]
@@ -318,115 +203,19 @@ for (resdir in alldirs[1:2]) {
             if (ncl <= 9) mf <- c(3,3)
             if (ncl <= 4) mf <- c(2,2)
             if (ncl == 1) mf <- c(1,1)
-            windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
-            for (cl in sort(unique(a$clust))) {
-              loc <- as.character(a$clust)==cl
-              boxplot(b[loc] ~ as.numeric(as.character(a$yrqtr[loc])),xlab="Year-quarter",ylab="Residuals",main=cl)
-              mtext(paste(fname,modtype),side=3,outer=T,line=0)
-            }
-            savePlot(paste0(outdir,fname,"_",modtype,"_allres_by_yq_cl.png"),type="png")
-          }
-        }
-        graphics.off()
-      }
-    }
-  }
-}
-
-library(maps)
-library(maptools)
-library(mapdata)
-
-for (resdir in alldirs[1:3]) {
-  outdir <- paste0(resdir,"/diags/")
-  dir.create(outdir)
-  for(regstr in reg_strs) {
-    sp <- splist[[regstr]]
-    for(runreg in reglist[[regstr]]) {
-      for(vartype in c("lognC")) {
-        for(mdn in 1:4) {
-          mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-          mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-          modtype <- paste(vartype,mdt,sep="_")
-          fname <- paste0("Joint_",regstr,"_R",runreg)
-          if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
-            load(paste0(resdir,fname,"_",modtype,"_model.RData"))
-            if(resdir %in% alldirs[5:6]) mod <- mod1
-            a <- mod$data
-            b <- mod$residuals
+            resplot_med_by_yq_cl(a,b,mf,outdir,fname,modtype)
+            resplot_all_by_yq_cl(a,b,mf,outdir,fname,modtype)
+            resplot_med_by_map_cl(a,b,mf,outdir,fname,modtype)
             a$flag <- substring(as.character(a$vessid),1,1)
             nfl <- length(unique(a$flag))
             mf <- c(2,2)
             if (nfl == 1) mf <- c(1,1)
-            windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
-            for (fl in sort(unique(a$flag))) {
-              loc <- as.character(a$flag)==fl
-              bb <- tapply(b[loc],as.character(a$latlong[loc]),median)
-              ll <- as.numeric(unlist(strsplit(names(bb),"_")))
-              bb2 <- data.frame(med=bb)
-              bb2$lat <- ll[seq(1,length(ll),2)]
-              bb2$lon <- ll[seq(2,length(ll),2)]
-              bb3 <- tapply(bb2$med,list(bb2$lon,bb2$lat),mean)
-              if(min(dim(bb3)) > 1) {
-                image(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,xlab="Lon",ylab="Lat",main=switch(fl,J="JP",K="KR",T="TW",S="SY"),breaks=seq(-1.5,1.5,length.out=31),col=heat.colors(30))
-                contour(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,add=T,breaks=seq(-5,5,length.out=101))
-                map(add=TRUE,fill=TRUE)
-                mtext(paste(fname,modtype),side=3,outer=T,line=0)
-              }
-            }
-            savePlot(paste0(outdir,fname,"_",modtype,"_medpres_by_map_flg.png"),type="png")
+            resplot_med_by_yq_flg(a,b,mf,outdir,fname,modtype)
+            resplot_all_by_yq_flg(a,b,mf,outdir,fname,modtype)
+            resplot_med_by_map_flg(a,b,mf,outdir,fname,modtype)
+            graphics.off()
           }
         }
-        graphics.off()
-      }
-    }
-  }
-}
-
-for (resdir in alldirs[1:2]) {
-  outdir <- paste0(resdir,"/diags/")
-  dir.create(outdir)
-  for(regstr in reg_strs) {
-    sp <- splist[[regstr]]
-    for(runreg in reglist[[regstr]]) {
-      for(vartype in c("lognC")) {
-        for(mdn in 1:4) {
-          mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-          mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
-          modtype <- paste(vartype,mdt,sep="_")
-          fname <- paste0("Joint_",regstr,"_R",runreg)
-          if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
-            load(paste0(resdir,fname,"_",modtype,"_model.RData"))
-            if(resdir %in% alldirs[5:6]) mod <- mod1
-            a <- mod$data
-            b <- mod$residuals
-            ncl <- length(unique(a$clust))
-            mf <- c(5,5)
-            if (ncl <= 20) mf <- c(5,4)
-            if (ncl <= 16) mf <- c(4,4)
-            if (ncl <= 9) mf <- c(3,3)
-            if (ncl <= 4) mf <- c(2,2)
-            if (ncl == 1) mf <- c(1,1)
-            windows(10,10);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
-            for (cl in sort(unique(a$clust))) {
-              loc <- as.character(a$clust)==cl
-              bb <- tapply(b[loc],as.character(a$latlong[loc]),median)
-              ll <- as.numeric(unlist(strsplit(names(bb),"_")))
-              bb2 <- data.frame(med=bb)
-              bb2$lat <- ll[seq(1,length(ll),2)]
-              bb2$lon <- ll[seq(2,length(ll),2)]
-              bb3 <- tapply(bb2$med,list(bb2$lon,bb2$lat),mean)
-              if(min(dim(bb3)) > 1) {
-                image(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,xlab="Lon",ylab="Lat",main=cl,breaks=seq(-1.5,1.5,length.out=31),col=heat.colors(30))
-                contour(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,add=T,breaks=seq(-5,5,length.out=101))
-                map(add=TRUE,fill=TRUE)
-                mtext(paste(fname,modtype),side=3,outer=T,line=0)
-              }
-            }
-            savePlot(paste0(outdir,fname,"_",modtype,"_medres_by_map_cl.png"),type="png")
-          }
-        }
-        graphics.off()
       }
     }
   }
@@ -522,6 +311,264 @@ for (resdir in alldirs[1:3]) {
     }
   }
 }
+
+#########################################################
+# Replaced by the more efficient code above.
+#
+# for (resdir in alldirs[1:2]) {
+#   outdir <- paste0(resdir,"/diags/")
+#   dir.create(outdir)
+#   for(regstr in reg_strs) {
+#     sp <- splist[[regstr]]
+#     for(runreg in reglist[[regstr]]) {
+#       for(vartype in c("lognC")) {
+#         for(mdn in 1:4) {
+#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
+#           modtype <- paste(vartype,mdt,sep="_")
+#           fname <- paste0("Joint_",regstr,"_R",runreg)
+#           if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
+#             load(paste0(resdir,fname,"_",modtype,"_model.RData"))
+#             if(resdir %in% alldirs[5:6]) mod <- mod1
+#             a <- mod$data
+#             b <- mod$residuals
+#             ncl <- length(unique(a$clust))
+#             mf <- c(5,5)
+#             if (ncl <= 20) mf <- c(5,4)
+#             if (ncl <= 16) mf <- c(4,4)
+#             if (ncl <= 9) mf <- c(3,3)
+#             if (ncl <= 4) mf <- c(2,2)
+#             if (ncl == 1) mf <- c(1,1)
+#             windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+#             for (cl in sort(unique(a$clust))) {
+#               loc <- as.character(a$clust)==cl
+#               bb <- tapply(b[loc],as.numeric(as.character(a$yrqtr[loc])),median)
+#               plot(as.numeric(names(bb)),bb,xlab="Year-quarter",ylab="Median of residuals",main=cl)
+#               mtext(paste(fname,modtype),side=3,outer=T,line=0)
+#             }
+#             savePlot(paste0(outdir,fname,"_",modtype,"_medres_by_yq_cl.png"),type="png")
+#           }
+#         }
+#         graphics.off()
+#       }
+#     }
+#   }
+# }
+#
+#  for (resdir in alldirs[1:3]) {
+#   outdir <- paste0(resdir,"/diags/")
+#   dir.create(outdir)
+#   for(regstr in reg_strs) {
+#     sp <- splist[[regstr]]
+#     for(runreg in reglist[[regstr]]) {
+#       for(vartype in c("lognC")) {
+#         for(mdn in 1:4) {
+#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
+#           modtype <- paste(vartype,mdt,sep="_")
+#           fname <- paste0("Joint_",regstr,"_R",runreg)
+#           if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
+#             load(paste0(resdir,fname,"_",modtype,"_model.RData"))
+#             if(resdir %in% alldirs[5:6]) mod <- mod1
+#             a <- mod$data
+#             b <- mod$residuals
+#             a$flag <- substring(as.character(a$vessid),1,1)
+#             nfl <- length(unique(a$flag))
+#             mf <- c(2,2)
+#             if (nfl == 1) mf <- c(1,1)
+#             windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+#             xrange=range(as.numeric(as.character(a$yrqtr)))
+#             for (fl in sort(unique(a$flag))) {
+#               loc <- as.character(a$flag)==fl
+#               bb <- tapply(b[loc],as.numeric(as.character(a$yrqtr[loc])),median)
+#               plot(as.numeric(names(bb)),bb,xlim=xrange,xlab="Year-quarter",ylab="Median of residuals",main=switch(fl,J="JP",K="KR",T="TW",S="SY", U = "US"))
+#               mtext(paste(fname,modtype),side=3,outer=T,line=0)
+#             }
+#             savePlot(paste0(outdir,fname,"_",modtype,"_medres_by_yq_flg.png"),type="png")
+#           }
+#         }
+#         graphics.off()
+#       }
+#     }
+#   }
+# }
+#
+# for (resdir in alldirs[1:3]) {
+#   outdir <- paste0(resdir,"/diags/")
+#   dir.create(outdir)
+#   for(regstr in reg_strs) {
+#     sp <- splist[[regstr]]
+#     for(runreg in reglist[[regstr]]) {
+#       for(vartype in c("lognC")) {
+#         for(mdn in 1:4) {
+#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
+#           modtype <- paste(vartype,mdt,sep="_")
+#           fname <- paste0("Joint_",regstr,"_R",runreg)
+#           if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
+#             load(paste0(resdir,fname,"_",modtype,"_model.RData"))
+#             if(resdir %in% alldirs[5:6]) mod <- mod1
+#             a <- mod$data
+#             b <- mod$residuals
+#             a$flag <- substring(as.character(a$vessid),1,1)
+#             nfl <- length(unique(a$flag))
+#             mf <- c(2,2)
+#             if (nfl == 1) mf <- c(1,1)
+#             windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+#             xrange=range(as.numeric(as.character(a$yrqtr)))
+#             for (fl in sort(unique(a$flag))) {
+#               loc <- as.character(a$flag)==fl
+#               boxplot(b[loc] ~ as.numeric(as.character(a$yrqtr[loc])),xlab="Year-quarter",ylab="Residuals",main=switch(fl,J="JP",K="KR",T="TW",S="SY"))
+#               mtext(paste(fname,modtype),side=3,outer=T,line=0)
+#             }
+#             savePlot(paste0(outdir,fname,"_",modtype,"_allres_by_yq_flg.png"),type="png")
+#           }
+#         }
+#         graphics.off()
+#       }
+#     }
+#   }
+# }
+#
+# for (resdir in alldirs[1:2]) {
+#   outdir <- paste0(resdir,"/diags/")
+#   dir.create(outdir)
+#   for(regstr in reg_strs) {
+#     sp <- splist[[regstr]]
+#     for(runreg in reglist[[regstr]]) {
+#       for(vartype in c("lognC")) {
+#         for(mdn in 1:4) {
+#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
+#           modtype <- paste(vartype,mdt,sep="_")
+#           fname <- paste0("Joint_",regstr,"_R",runreg)
+#           if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
+#             load(paste0(resdir,fname,"_",modtype,"_model.RData"))
+#             if(resdir %in% alldirs[5:6]) mod <- mod1
+#             a <- mod$data
+#             b <- mod$residuals
+#             ncl <- length(unique(a$clust))
+#             mf <- c(5,5)
+#             if (ncl <= 20) mf <- c(5,4)
+#             if (ncl <= 16) mf <- c(4,4)
+#             if (ncl <= 9) mf <- c(3,3)
+#             if (ncl <= 4) mf <- c(2,2)
+#             if (ncl == 1) mf <- c(1,1)
+#             windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+#             for (cl in sort(unique(a$clust))) {
+#               loc <- as.character(a$clust)==cl
+#               boxplot(b[loc] ~ as.numeric(as.character(a$yrqtr[loc])),xlab="Year-quarter",ylab="Residuals",main=cl)
+#               mtext(paste(fname,modtype),side=3,outer=T,line=0)
+#             }
+#             savePlot(paste0(outdir,fname,"_",modtype,"_allres_by_yq_cl.png"),type="png")
+#           }
+#         }
+#         graphics.off()
+#       }
+#     }
+#   }
+# }
+#
+# library(maps)
+# library(maptools)
+# library(mapdata)
+#
+# for (resdir in alldirs[1:3]) {
+#   outdir <- paste0(resdir,"/diags/")
+#   dir.create(outdir)
+#   for(regstr in reg_strs) {
+#     sp <- splist[[regstr]]
+#     for(runreg in reglist[[regstr]]) {
+#       for(vartype in c("lognC")) {
+#         for(mdn in 1:4) {
+#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
+#           modtype <- paste(vartype,mdt,sep="_")
+#           fname <- paste0("Joint_",regstr,"_R",runreg)
+#           if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
+#             load(paste0(resdir,fname,"_",modtype,"_model.RData"))
+#             if(resdir %in% alldirs[5:6]) mod <- mod1
+#             a <- mod$data
+#             b <- mod$residuals
+#             a$flag <- substring(as.character(a$vessid),1,1)
+#             nfl <- length(unique(a$flag))
+#             mf <- c(2,2)
+#             if (nfl == 1) mf <- c(1,1)
+#             windows(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+#             for (fl in sort(unique(a$flag))) {
+#               loc <- as.character(a$flag)==fl
+#               bb <- tapply(b[loc],as.character(a$latlong[loc]),median)
+#               ll <- as.numeric(unlist(strsplit(names(bb),"_")))
+#               bb2 <- data.frame(med=bb)
+#               bb2$lat <- ll[seq(1,length(ll),2)]
+#               bb2$lon <- ll[seq(2,length(ll),2)]
+#               bb3 <- tapply(bb2$med,list(bb2$lon,bb2$lat),mean)
+#               if(min(dim(bb3)) > 1) {
+#                 image(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,xlab="Lon",ylab="Lat",main=switch(fl,J="JP",K="KR",T="TW",S="SY"),breaks=seq(-1.5,1.5,length.out=31),col=heat.colors(30))
+#                 contour(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,add=T,breaks=seq(-5,5,length.out=101))
+#                 map(add=TRUE,fill=TRUE)
+#                 mtext(paste(fname,modtype),side=3,outer=T,line=0)
+#               }
+#             }
+#             savePlot(paste0(outdir,fname,"_",modtype,"_medres_by_map_flg.png"),type="png")
+#           }
+#         }
+#         graphics.off()
+#       }
+#     }
+#   }
+# }
+#
+# for (resdir in alldirs[1:2]) {
+#   outdir <- paste0(resdir,"/diags/")
+#   dir.create(outdir)
+#   for(regstr in reg_strs) {
+#     sp <- splist[[regstr]]
+#     for(runreg in reglist[[regstr]]) {
+#       for(vartype in c("lognC")) {
+#         for(mdn in 1:4) {
+#           mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+#           mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid","1979-present vessid")[mdn]
+#           modtype <- paste(vartype,mdt,sep="_")
+#           fname <- paste0("Joint_",regstr,"_R",runreg)
+#           if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
+#             load(paste0(resdir,fname,"_",modtype,"_model.RData"))
+#             if(resdir %in% alldirs[5:6]) mod <- mod1
+#             a <- mod$data
+#             b <- mod$residuals
+#             ncl <- length(unique(a$clust))
+#             mf <- c(5,5)
+#             if (ncl <= 20) mf <- c(5,4)
+#             if (ncl <= 16) mf <- c(4,4)
+#             if (ncl <= 9) mf <- c(3,3)
+#             if (ncl <= 4) mf <- c(2,2)
+#             if (ncl == 1) mf <- c(1,1)
+#             windows(10,10);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
+#             for (cl in sort(unique(a$clust))) {
+#               loc <- as.character(a$clust)==cl
+#               bb <- tapply(b[loc],as.character(a$latlong[loc]),median)
+#               ll <- as.numeric(unlist(strsplit(names(bb),"_")))
+#               bb2 <- data.frame(med=bb)
+#               bb2$lat <- ll[seq(1,length(ll),2)]
+#               bb2$lon <- ll[seq(2,length(ll),2)]
+#               bb3 <- tapply(bb2$med,list(bb2$lon,bb2$lat),mean)
+#               if(min(dim(bb3)) > 1) {
+#                 image(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,xlab="Lon",ylab="Lat",main=cl,breaks=seq(-1.5,1.5,length.out=31),col=heat.colors(30))
+#                 contour(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,add=T,breaks=seq(-5,5,length.out=101))
+#                 map(add=TRUE,fill=TRUE)
+#                 mtext(paste(fname,modtype),side=3,outer=T,line=0)
+#               }
+#             }
+#             savePlot(paste0(outdir,fname,"_",modtype,"_medres_by_map_cl.png"),type="png")
+#           }
+#         }
+#         graphics.off()
+#       }
+#     }
+#   }
+# }
+#
+#
 
 ############ End of residual plots ##################
 

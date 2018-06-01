@@ -4,8 +4,8 @@
 \alias{run_standardization}
 \title{Run standardization models.}
 \usage{
-run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
-  twlimit = 2005)
+run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs, projdir,
+  twlimit = 2005, keepd = TRUE)
 }
 \arguments{
 \item{runpars}{The 'runpars' object with all variables.}
@@ -17,6 +17,14 @@ run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
 \item{maxyr}{Include no times after the start of this year.}
 
 \item{do_early}{If TRUE, run the additional pre-1979 and post-1979 standardizations.}
+
+\item{stdlabs}{The variables from the clustered dataset to make available to the standardization.}
+
+\item{projdir}{Base folder for the project. The fleet and joint folders are under this one.}
+
+\item{twlimit}{The earliest time limit for including Taiwanese data in the model.}
+
+\item{keepd}{Keep data in the model object if TRUE.}
 }
 \description{
 The function runs delta lognormal models.

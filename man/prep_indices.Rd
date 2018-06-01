@@ -5,7 +5,7 @@
 \title{Prepare indices, save files and plots.}
 \usage{
 prep_indices(resdirs, reg_strs, rgl, vartypes = c("lognC", "dellog"),
-  yr1 = 1952)
+  yr1 = 1952, outdirname = "outputs/")
 }
 \arguments{
 \item{resdirs}{Directories to work through.}
@@ -17,6 +17,8 @@ prep_indices(resdirs, reg_strs, rgl, vartypes = c("lognC", "dellog"),
 \item{vartypes}{One or both of 'lognC' and 'dellog'.}
 
 \item{yr1}{First year of the early model, for titles.}
+
+\item{outdirname}{The default name of the folder to create for the outputs.}
 }
 \description{
 The function takes a list of directories with output file.

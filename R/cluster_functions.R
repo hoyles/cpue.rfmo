@@ -11,13 +11,14 @@
 #' @param clustid Name of variable to aggregate across for trip-level clustering.
 #' @param allclust Generate plots for all clustering methods if TRUE.
 #' @param flag Fleet code to use in figure titles.
+#' @param dbh If TRUE, create plots of HBF by cluster.
 #' @param cllist cllist
 #' @param fnhead File name head
 #' @param ll5 If TRUE, ll5 variables are used instead of 1 degree versions
 #' @param covarnames Names of covariates to return with dataset.
 #' @return The original dataset with added columns for the clusters and PCAs;
 #'
-clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP",dbh = TRUE,
+clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP", dbh = TRUE,
     cllist = NA, fnhead = "", ll5=F, covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr", "op_mon")) {
     datr <- ddd[with(ddd, get(regtype)) == r, allabs]
     datr$reg <- datr[, regtype]
@@ -117,7 +118,7 @@ run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", pl
   if (ncl == "lst") ncl <- rgl[[reg_struc]]$ncl
   for(r in rgl[[reg_struc]]$allreg) {
     fnh <- paste(flag,reg_struc,r,sep="_")
-    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r],plotPCA=F,clustid="tripidmon",allclust=F,flag=flag,dbh = dohbf, fnhead=fnh,covarnames=cvnames)
+    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r], plotPCA=F, clustid="tripidmon", allclust=F, flag=flag, dbh = dohbf, fnhead=fnh,covarnames=cvnames)
     save(dataset,file=paste0(fnh,".RData"))
   }
 }

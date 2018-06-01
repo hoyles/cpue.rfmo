@@ -262,7 +262,7 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
   if("minhbf" %in% names(runpars))  minhbf <- runpars$minhbf else minhbf <- 5
   if("addpca" %in% names(runpars))  addpca <- runpars$addpca else addpca <- NA
   if("samp" %in% names(runpars))    samp <- runpars$samp else samp <- NA
-  if("strsmp" %in% names(runpars))  strsmp <- runpars$strsmp else strsmp <- 30
+  if("strsmp" %in% names(runpars))  strsmp <- runpars$strsmp else strsmp <- NA
   if("llstrat" %in% names(runpars)) llstrat <- runpars$llstrat else llstrat <- 5
 
   gdat <- indat[indat$reg == runreg, ]
@@ -318,11 +318,12 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
     gdat <- gdat[gdat$latlong %in% names(a), ]
     a <- table(gdat$vessid)
     a <- a[a >= minvess]  # Each vessel has at least 'minvess' sets
-
     gdat <- gdat[gdat$vessid %in% names(a), ]
+
     yqll <- paste(gdat$yrqtr, gdat$latlong)
     a <- table(yqll)
-    a <- apply(a >= minyqll, 1, sum)
+    #a <- apply(a >= minyqll, 1, sum)
+    a <- a[a >= minyqll]
     gdat <- gdat[yqll %in% names(a), ] # Each stratum has at least minyqll sets
 
     if (!is.na(addpca))

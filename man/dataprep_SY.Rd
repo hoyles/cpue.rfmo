@@ -12,8 +12,6 @@ dataprep_SY(dat, region, splist)
 \item{region}{IO or AO.}
 
 \item{splist}{Define the species in the dataset}
-
-\item{alldat}{Not used.}
 }
 \value{
 Modified dataset.

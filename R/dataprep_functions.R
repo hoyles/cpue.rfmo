@@ -347,7 +347,6 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
 #'
 #' The function prepares Seychelles longline data for IO analyses.
 #' @param dat Input dataset
-#' @param alldat Not used.
 #' @param region IO or AO.
 #' @param splist Define the species in the dataset
 #' @return Modified dataset.

@@ -31,6 +31,8 @@ clust_PCA_run(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T,
 
 \item{flag}{Fleet code to use in figure titles.}
 
+\item{dbh}{If TRUE, create plots of HBF by cluster.}
+
 \item{cllist}{cllist}
 
 \item{fnhead}{File name head}

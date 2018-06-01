@@ -45,10 +45,11 @@ doplot_yr_cpue <- function(a,vartype, mdti, regstr, runreg) {
 #' @param rgl A list of the regions to plot in each regional structure.
 #' @param vartypes One or both of 'lognC' and 'dellog'.
 #' @param yr1 First year of the early model, for titles.
+#' @param outdirname The default name of the folder to create for the outputs.
 #'
-prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"), yr1=1952) {
+prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"), yr1=1952, outdirname = "outputs/") {
   for (resdir in resdirs) {
-    outdir <- paste0(resdir,"/outputs_test/")
+    outdir <- paste0(resdir,outdirname)
     dir.create(outdir)
     setwd(resdir)
     for(regstr in reg_strs) {

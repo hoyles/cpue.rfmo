@@ -106,6 +106,8 @@ dataprep_JPIO <- function(dat, alldat = T) {
   dat$tripid[dat$vessid == 1] <- NA
   dat$tripid[dat$trip_st == 0] <- NA
 
+  dat <- make_lbidmon(dat) # This sets up the clustering variable.
+
   dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
   # a <- table(dat$tripid) dat$sets_per_trip <- NA dat$sets_per_trip <- a[match(dat$tripid, names(a))] noms <- c('vessid', 'yrqtr', 'latlong',
   # 'op_yr', 'op_mon', 'hbf', 'hooks', 'tripid', 'tripidmon', 'trip_yr', 'moon', 'alb', 'bet', 'yft', 'swo', 'mls', 'bum', 'blm', 'sbt', 'Total',
@@ -164,7 +166,9 @@ dataprep_JP <- function(dat, alldat = T, region = "IO", splist = c("bft","sbt","
   dat$tripid[dat$vessid == 1] <- NA
   dat$tripid[dat$trip_st == 0] <- NA
 
-  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  dat <- make_lbidmon(dat) # This sets up the clustering variable.
+
+    dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
   return(dat)
 }
 

@@ -246,7 +246,7 @@ combine_delta <- function(fnamedelta, fnamepos, fname, runsp, runreg) {
   a <- match(names(coefsdeltapos.base), names(coefsdeltabin.base))
   coefs.base <- coefsdeltabin.base[a] * coefsdeltapos.base
   coefs.boat <- coefsdeltabin.boat[a] * coefsdeltapos.boat
-  fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye")
+  fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye", alb = "Albacore")
   plot_slope_ratio(coefs.base, coefs.boat, yrpos, titl = paste("Region", runreg, fishlab, "Delta lognormal combined"))
   par(mar = c(5, 4, 1, 1))
   plot(yrpos, coefs.base, type = "l", ylab = "Relative abundance estimate", xlab = "Year", ylim = c(0, 2.5))
@@ -272,7 +272,7 @@ combine_delta_xl <- function(fnamedelta, fnamepos, runsp, runreg) {
   coefs.boat <- xl_delta[pos, 5] * xl_pos[, 5]
   coefs.base <- xl_delta[pos, 3] * xl_pos[, 3]
   yrpos <- xl_delta[pos, 2]
-  fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye")
+  fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye", alb = "Albacore")
   plot_slope_ratio(coefs.base, coefs.boat, yrpos, titl = paste("Region", runreg, fishlab, "Delta lognormal combined"))
   # par(mar = c(5, 4, 1, 1)) plot(yrpos, coefs.base, type = 'l', ylab = 'Relative abundance estimate', xlab = 'Year', ylim = c(0, 2.5)) lines(yrpos,
   # coefs.boat, col = 'red')
@@ -293,7 +293,7 @@ combine_delta_xl_indices <- function(fnamedelta, fnamepos, runsp) {
   xl_delta <- read.csv(paste(fnamedelta, ".csv", sep = ""))
   xl_pos <- read.csv(paste(fnamedelta, ".csv", sep = ""))
   coefs.boat <- xl_delta[, 3] * xl_pos[, 3]
-  fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye")
+  fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye", alb = "Albacore")
   yrpos <- xl_delta[, 2]
   dev.new()
   par(mar = c(5, 4, 1, 1))

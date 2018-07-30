@@ -7,40 +7,71 @@
 #' @param splist List of species codes
 #' @return Modified dataset.
 #'
+dataclean_CNIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")) {
+  dat$op_yr <- as.numeric(dat$op_yr)
+  dat$op_mon <- as.numeric(dat$op_mon)
+  dmy <- as.Date(dat$date)
+  dat <- dat[!is.na(dmy), ]
+  dat <- dat[!is.na(dat$lat), ]
+  dat <- dat[!is.na(dat$lon), ]
+#  dat <- dat[!is.na(dat$hooks), ]
+  hist(dat$hooks, useNA = "always")
+  dat$hbf <- as.numeric(dat$hbf)
+  for (sp in splist) {
+    dat[,sp] <- as.numeric(dat[,sp])
+    if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
+  }
+  dat <- dat[!is.na(dat$hooks), ]
+  dat <- dat[dat$hooks < 5000, ]  # clean up outliers
+  dat <- dat[dat$hooks > 200, ]
+  dat <- dat[(!is.na(dat$hbf) & dat$hbf < 26) | (dat$op_yr < 1976 & is.na(dat$hbf)), ]
+  return(dat)
+}
+
+
+#' Clean data.
+#'
+#' The function sets up variables and removes bad data. Originally developed for Japanese data in the IO.
+#' @param dat Input dataset
+#' @param checktg If TRUE, remove effort identified as not targetng tuna. Not generally used.
+#' @param allHBF Deprecated.
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
 dataclean_JPIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")) {
-    dat$op_yr <- as.numeric(dat$op_yr)
-    dat$op_mon <- as.numeric(dat$op_mon)
-    dat$op_day <- as.numeric(dat$op_day)
-    dat <- dat[dat$op_day < 32, ]
-    dat <- dat[!is.na(dat$op_day), ]
-    dmy <- as.Date(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = "-"))
-    dat <- dat[!is.na(dmy), ]
-    dat$lat <- as.numeric(dat$lat)
-    dat <- dat[!is.na(dat$lat), ]
-    dat <- dat[!is.na(dat$lon), ]
-    dat$latcode <- as.numeric(dat$latcode)
-    dat$lon <- as.numeric(dat$lon)
-    dat$loncode <- as.numeric(dat$loncode)
-    dat <- dat[dat$loncode %in% c(1, 2), ]
-    dat$hbf <- as.numeric(dat$hbf)
-    # dat$tonnage <- as.numeric(dat$tonnage)
-    dat$hooks <- as.numeric(dat$hooks)
-    for (sp in splist) {
-      dat[,sp] <- as.numeric(dat[,sp])
-      if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
-    }
-    dat <- dat[!is.na(dat$hooks), ]
-    dat <- dat[dat$hooks < 5000, ]  # clean up outliers
-    dat <- dat[dat$hooks > 200, ]
-    # dat <- dat[dat$yft < 250, ] dat <- dat[dat$bet < 250, ] dat <- dat[dat$alb < 250, ] dat <- dat[dat$tonnage < 30000 | is.na(dat$tonnage), ]
-    # dat[dat$fishingcat == '0', ] dat <- dat[dat$fishingcat != '.', ] dat <- dat[dat$fishingcat != '0', ] dat <- dat[dat$hbf != ' .', ] dat <-
-    # dat[is.na(dat$hbf) == FALSE | dat$op_yr < 1976, ] dat <- dat[dat$hbf < 26 | is.na(dat$hbf) == TRUE, ]
-    dat <- dat[(!is.na(dat$hbf) & dat$hbf < 26) | (dat$op_yr < 1976 & is.na(dat$hbf)), ]
-    # if (allHBF == F) { dat[dat$hbf > 22, ]$hbf <- 22 # pool hbf > 22 into 22 dat <- dat[dat$hbf > 4, ] # remove swordfish targeting in R1 and R2 }
-    # dat$ncrew <- as.numeric(dat$ncrew)
-    if (checktg)
-        dat <- dat[dat$target == 3 | is.na(dat$target), ]  # tuna target  (remove to avoid a change in 1994 - but recent trend is more important)
-    return(dat)
+  dat$op_yr <- as.numeric(dat$op_yr)
+  dat$op_mon <- as.numeric(dat$op_mon)
+  dat$op_day <- as.numeric(dat$op_day)
+  dat <- dat[dat$op_day < 32, ]
+  dat <- dat[!is.na(dat$op_day), ]
+  dmy <- as.Date(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = "-"))
+  dat <- dat[!is.na(dmy), ]
+  dat$lat <- as.numeric(dat$lat)
+  dat <- dat[!is.na(dat$lat), ]
+  dat <- dat[!is.na(dat$lon), ]
+  dat$latcode <- as.numeric(dat$latcode)
+  dat$lon <- as.numeric(dat$lon)
+  dat$loncode <- as.numeric(dat$loncode)
+  dat <- dat[dat$loncode %in% c(1, 2), ]
+  dat$hbf <- as.numeric(dat$hbf)
+  # dat$tonnage <- as.numeric(dat$tonnage)
+  dat$hooks <- as.numeric(dat$hooks)
+  for (sp in splist) {
+    dat[,sp] <- as.numeric(dat[,sp])
+    if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
+  }
+  dat <- dat[!is.na(dat$hooks), ]
+  dat <- dat[dat$hooks < 5000, ]  # clean up outliers
+  dat <- dat[dat$hooks > 200, ]
+  # dat <- dat[dat$yft < 250, ] dat <- dat[dat$bet < 250, ] dat <- dat[dat$alb < 250, ] dat <- dat[dat$tonnage < 30000 | is.na(dat$tonnage), ]
+  # dat[dat$fishingcat == '0', ] dat <- dat[dat$fishingcat != '.', ] dat <- dat[dat$fishingcat != '0', ] dat <- dat[dat$hbf != ' .', ] dat <-
+  # dat[is.na(dat$hbf) == FALSE | dat$op_yr < 1976, ] dat <- dat[dat$hbf < 26 | is.na(dat$hbf) == TRUE, ]
+  dat <- dat[(!is.na(dat$hbf) & dat$hbf < 26) | (dat$op_yr < 1976 & is.na(dat$hbf)), ]
+  # if (allHBF == F) { dat[dat$hbf > 22, ]$hbf <- 22 # pool hbf > 22 into 22 dat <- dat[dat$hbf > 4, ] # remove swordfish targeting in R1 and R2 }
+  # dat$ncrew <- as.numeric(dat$ncrew)
+  if (checktg)
+    dat <- dat[dat$target == 3 | is.na(dat$target), ]  # tuna target  (remove to avoid a change in 1994 - but recent trend is more important)
+  return(dat)
 }
 
 #' Clean data.

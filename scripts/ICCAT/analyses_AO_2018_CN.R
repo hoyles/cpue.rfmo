@@ -1,4 +1,5 @@
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/../OneDrive_personal/OneDrive/Consulting/ICCAT/2018_Bigeye/"
+#projdir <- "~/ICCAT/2018_Bigeye/"
 cndir <- paste0(projdir, "CN/")
 datadir1 <- paste0(cndir, "data/")
 cnalysis_dir <- paste0(cndir, "analyses/")
@@ -6,6 +7,7 @@ cnfigs <- paste0(cndir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 
 dir.create(cndir)
+dir.create(cnfigs)
 dir.create(cnalysis_dir)
 setwd(cnalysis_dir)
 
@@ -45,14 +47,49 @@ nms <- c("vessel","date","op_yr", "op_mon", "lat","lon","hooks","hbf", "alb","al
 
 # Prepare the data
 rawdat <- a
+names(rawdat) <- nms
+head(rawdat)
+
 #pd1 <- dataprep_JPIO(rawdat) # No changes between IO and AO functions
 #pd2 <- setup_AO_regions(pd1, regB=T) # Later will also need YFT regions, and possibly alternative BET regions
 
 # Clean the data
-#clndat <- dataclean_CNIO(rawdat)
-#prepdat1 <- dataprep_CNIO(clndat)
-prepdat <- setup_AO_regions(a, regB=T) # Later will also need YFT regions, and possibly alternative BET regions
-save(pd1, pd2, prepdat, file="prepdat.RData")
+prepdat <- setup_AO_regions(rawdat, regB=T) # Later will also need YFT regions, and possibly alternative BET regions
+hist(prepdat$hbf)
+hist(prepdat$hooks)
+prepdat$dmy <- as.Date(prepdat$date)
+dat <- prepdat
+
+a <- table(dat$hbf, useNA = "always")
+names(a)[is.na(names(a))] <- "NA"
+windows()
+barplot(a, names.arg = names(a))
+savePlot(file = paste0(cnfigs, "HBF_frequency"), type = "png")
+
+a <- dat$hooks
+a[is.na(a)] <- 0
+windows()
+a <- hist(a, nclass = 40)
+savePlot(file = paste0(cnfigs, "hooks_frequency"), type = "png")
+
+table(is.na(dat$hooks), dat$op_yr, useNA = "always")
+table(is.na(dat$hooks), dat$vessel, useNA = "always")
+table(is.na(dat$hooks), dat$yft, useNA = "always")
+table(is.na(dat$hooks), dat$alb, useNA = "always")
+table(is.na(dat$hooks), dat$bet, useNA = "always")
+
+
+
+sum(year(prepdat$dmy) != prepdat$op_yr, na.rm = TRUE) # 0
+table(year(prepdat$dmy), useNA = "always")
+prepdat[is.na(year(prepdat$dmy)),] # feb 29 2010, not a leap year
+
+clndat <- dataclean_CNIO(rawdat)
+prepdat1 <- dataprep_CNIO(clndat)
+
+save(prepdat, file="prepdat.RData")
+
+
 
 dat <- make_clid(prepdat)
 dat <- make_lbidmon(dat)

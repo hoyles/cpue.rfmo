@@ -47,7 +47,9 @@ doplot_yr_cpue <- function(a,vartype, mdti, regstr, runreg) {
 #' @param yr1 First year of the early model, for titles.
 #' @param outdirname The default name of the folder to create for the outputs.
 #'
-prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"), yr1=1952, outdirname = "outputs/") {
+prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"), yr1=1952, outdirname = "outputs/",
+                         mdt_all = c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd"),
+                         mdti_all = c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")) {
   for (resdir in resdirs) {
     outdir <- paste0(resdir,outdirname)
     dir.create(outdir)
@@ -61,8 +63,10 @@ prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"),
           yrdev <- dev.cur()
           saveit <- FALSE
           for(mdn in 1:4) {
-            mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
-            mdti <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1978 no vessid"),"1978-present vessid")[mdn]
+            # mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+            # mdti <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")[mdn]
+            mdt <- mdt_all[mdn]
+            mdti <- mdti_all[mdn]
             modtype <- paste(vartype,mdt,sep="_")
             fname <- paste0("Joint_",regstr,"_R",runreg)
             if(vartype != "dellog") {

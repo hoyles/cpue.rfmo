@@ -14,7 +14,14 @@ alldirs <- c(paste0(jointdir,"analyses/cl1_hb0_hk1/"),
              paste0(jointdir,"analyses/cl1_hb1_hk1/"),
              paste0(jointdir,"analyses/cl0_hb1_hk1/"))
 
-reglist <- list("regA4" = c(1:4), "regA5" = 1, "regB3" = c(1,2,3,4,5), "regY" = c(2:5), "regY2" = c(2,7))
+natdirs <- c(paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
+             paste0(KRdir,"std/"),
+             paste0(TWdir,"analyses/std/"))
+
+
+
+
+reglist <- list("regA4" = c(1:4), "regA5" = 1, "regB3" = c(1,2,3,4,5), "regY" = c(2:5), "regY2" = c(2:5,7))
 splist <- list("regA4" = "alb", "regA5" = "alb", "regB3" = "bet", "regY" = "yft", "regY2" = "yft")
 
 library("beanplot")
@@ -44,7 +51,7 @@ keepd <- TRUE
 yr1 = 1952
 
 mdt_all <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")
-mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1978 no vessid"),"1978-present vessid")
+mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")
 reg_strs <- c("regY","regY2","regA4","regA5")
 #reg_strs <- c("regY","regY2")
 
@@ -52,6 +59,8 @@ reg_strs <- c("regY","regY2","regA4","regA5")
 #resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
 prep_indices(resdirs=alldirs[1:3], reg_strs=c("regY","regY2","regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
+
+prep_indices(resdirs=natdirs[2], reg_strs=c("regY","regY2","regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
 
 # # Overlay national plots for comparison. ICCAT.
@@ -124,11 +133,11 @@ for(dirnum in 3) {
         assign(nm_wt, mk_wts(mod$data,wttype="area"))
         mn <- with(mod$data,0.1 * mean(get(runsp)/hooks))
         # check variables
-        doltln <- isTRUE(grep("latlong", mod$formula) > 0)
-        dohbf  <- isTRUE(grep("hbf", mod$formula) > 0)
-        dohook <- isTRUE(grep("hooks", mod$formula) > 0)
-        dovess <- isTRUE(grep("vessid", mod$formula) > 0)
-        doclust <- isTRUE(grep("clust", mod$formula) > 0)
+        doltln <- isTRUE(grep("latlong", mod$formula)[1] > 0)
+        dohbf  <- isTRUE(grep("hbf", mod$formula)[1] > 0)
+        dohook <- isTRUE(grep("hooks", mod$formula)[1] > 0)
+        dovess <- isTRUE(grep("vessid", mod$formula)[1] > 0)
+        doclust <- isTRUE(grep("clust", mod$formula)[1] > 0)
         infve=Influence$new(mod)
         infve$calc()
         windows()

@@ -5,7 +5,10 @@
 \title{Prepare indices, save files and plots.}
 \usage{
 prep_indices(resdirs, reg_strs, rgl, vartypes = c("lognC", "dellog"),
-  yr1 = 1952, outdirname = "outputs/")
+  yr1 = 1952, outdirname = "outputs/", mdt_all = c("novess_allyrs",
+  "boat_allyrs", "novess_5279", "vessid_79nd"), mdti_all = c(paste0(yr1,
+  "-present no vessid"), paste0(yr1, "-present vessid"), paste0(yr1,
+  "-1979 no vessid"), "1979-present vessid"))
 }
 \arguments{
 \item{resdirs}{Directories to work through.}

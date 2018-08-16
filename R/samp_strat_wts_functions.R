@@ -65,44 +65,12 @@ make_strat <- function(dat) {
 #'
 #' The function returns a vector indicating a statistical weight to apply to the row, based on the stratum of which the row is a member.
 #' @param dat Input dataset
-#' @param wttype Type of statistical weighting method; 'equal' gives equal weight to all rows, 'area' weights rows in invrse proportion to the number of rows per stratum; and 'catch' weights rows in proportion to the catch in the stratum divided by the number of rows in the stratum.
-#' @param catch An optional vector of catch per stratum.
-#' @return A vector indicating the statistical weight to apply to the stratum of which the row is a member.
-#'
-mk_wts_integer <- function(dat, wttype, catch = NULL) {
-  if (wttype == "equal")
-    wts <- NULL
-  if (wttype == "area") {
-    a <- tapply(dat$latlong, list(dat$latlong, dat$yrqtr), length)
-    i <- match(dat$latlong, rownames(a))
-    j <- match(dat$yrqtr, colnames(a))
-    n <- mapply("[", list(a), i, j)
-    wts <- 1/n
-    wts <- floor(10 * max(n) * wts)
-  }
-  if (wttype == "catch") {
-    if (is.null(catch))
-      catch <- tapply(dat$bet, list(dat$latlong), sum)
-    a <- tapply(dat$latlong, list(dat$latlong, dat$yrqtr), length)
-    i <- match(dat$latlong, rownames(a))
-    j <- match(dat$yrqtr, colnames(a))
-    n <- mapply("[", list(a), i, j)
-    cwts <- mapply("[", list(catch), i)/sum(catch)
-    wts <- cwts/n
-  }
-  return(wts)
-}
-
-#' Allocate statistical weights to each row.
-#'
-#' The function returns a vector indicating a statistical weight to apply to the row, based on the stratum of which the row is a member.
-#' @param dat Input dataset
-#' @param wttype Type of statistical weighting method; 'equal' gives equal weight to all rows, 'area' weights rows in invrse proportion to the number of rows per stratum; and 'catch' weights rows in proportion to the catch in the stratum divided by the number of rows in the stratum.
+#' @param wttype Type of statistical weighting method; 'equal' gives equal weight to all rows, 'area' weights rows in inverse proportion to the number of rows per stratum; 'catch' weights rows in proportion to the catch in the stratum divided by the number of rows in the stratum; cell_area weights rows in proportion to the ocean area of the stratum divided by the number of rows in the stratum
 #' @param catch An optional vector of catch per stratum.
 #' @param sp The species to be used for catch weighting.
 #' @return A vector indicating the statistical weight to apply to the stratum of which the row is a member.
 #'
-mk_wts <- function(dat, wttype, catch = NULL, sp = NULL) {
+mk_wts <- function(dat, wttype, catch = NULL, sp = NULL, cell_areas = NA) {
   if (wttype == "equal")
     wts <- NULL
   if (wttype == "propn")
@@ -113,6 +81,14 @@ mk_wts <- function(dat, wttype, catch = NULL, sp = NULL) {
     j <- match(dat$yrqtr, colnames(a))
     n <- mapply("[", list(a), i, j)
     wts <- 1/n
+  }
+  if (wttype == "cell_area") {
+    areas <- cell_areas$garea[match(dat$latlong, cell_areas$latlong)]
+    a <- tapply(dat$latlong, list(dat$latlong, dat$yrqtr), length)
+    i <- match(dat$latlong, rownames(a))
+    j <- match(dat$yrqtr, colnames(a))
+    n <- mapply("[", list(a), i, j)
+    wts <- areas/n
   }
   if (wttype == "catch") {
     if (is.null(catch))

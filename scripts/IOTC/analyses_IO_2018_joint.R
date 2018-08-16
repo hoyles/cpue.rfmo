@@ -79,7 +79,7 @@ stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",std_splis
 regA4_minss <- list(minq_byreg = c(3,2,5,5), minvess=c(60,40,100,100), minll=c(30,20,50,50), minyrqtr = c(30,20,50,50), minyqll = c(3,3,5,5))
 regA5_minss <- list(minq_byreg = c(5), minvess=c(100), minll=c(50), minyrqtr = c(50), minyqll = c(5))
 regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
-regY_minss <-  list(minq_byreg = c(2,5,5,2,5,2), minvess=c(40,100,100,40,100,40), minll=c(20,50,50,20,50,20), minyrqtr = c(20,50,50,20,50,20), minyqll = c(3,5,5,3,5,3))
+regY_minss <-  list(minq_byreg = c(2,5,5,2,5,2),   minvess=c(40,100,100,40,100,40),     minll=c(20,50,50,20,50,20),    minyrqtr = c(20,50,50,20,50,20),    minyqll = c(3,5,5,3,5,3))
 regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
 
 runpars <- list()

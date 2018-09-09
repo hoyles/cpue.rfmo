@@ -4,12 +4,12 @@
 \alias{mk_wts}
 \title{Allocate statistical weights to each row.}
 \usage{
-mk_wts(dat, wttype, catch = NULL, sp = NULL)
+mk_wts(dat, wttype, catch = NULL, sp = NULL, cell_areas = NA)
 }
 \arguments{
 \item{dat}{Input dataset}
 
-\item{wttype}{Type of statistical weighting method; 'equal' gives equal weight to all rows, 'area' weights rows in invrse proportion to the number of rows per stratum; and 'catch' weights rows in proportion to the catch in the stratum divided by the number of rows in the stratum.}
+\item{wttype}{Type of statistical weighting method; 'equal' gives equal weight to all rows, 'area' weights rows in inverse proportion to the number of rows per stratum; 'catch' weights rows in proportion to the catch in the stratum divided by the number of rows in the stratum; cell_area weights rows in proportion to the ocean area of the stratum divided by the number of rows in the stratum}
 
 \item{catch}{An optional vector of catch per stratum.}
 

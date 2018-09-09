@@ -47,7 +47,7 @@ plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY", tripid="t
 #' @param axes If TRUE, create x and y axes.
 #' @param tcol Text colour.
 #'
-plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", newm = T, lwdm = 3, axes = T, tcol = "red") {
+plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", newm = T, lwdm = 3, axes = T, tcol = "red", mapfill = TRUE) {
   lims <- uselims
   if (newm) {
     plot(1, 1, yaxt = "n", xaxt = "n", type = "n", xlim = c(lims[1], lims[2]), ylim = c(lims[3], lims[4]), ylab = "", xlab = "", bg = "lightblue")
@@ -157,7 +157,7 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     text(115 + xoffset, -11 - yoffset, "N", col = tcol, cex = 1.5)
     text(115 + xoffset, -40 - yoffset, "S", col = tcol, cex = 1.5)
   }
-  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
+  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = mapfill)
   if (axes) {
     box(lwd = 3)
     axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)

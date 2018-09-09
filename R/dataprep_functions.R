@@ -419,8 +419,12 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
       mutate(regY = replace(regY,which(lat5 <  -15 & lat5 >= -25 & lon5 >= 35 & lon5 < 60 & !is.na(lat5)),3))  %>%
       mutate(regY = replace(regY,which(lat5 <  -25 & lat5 >= -30 & lon5 >= 30 & lon5 < 60 & !is.na(lat5)),3))  %>%
       mutate(regY = replace(regY,which(lat5 <  -30 & lat5 >= -40 & lon5 >= 20 & lon5 < 40 & !is.na(lat5)),3))  %>%
+<<<<<<< HEAD
       mutate(regY = replace(regY,which(lat5 <  -15 & lat5 >= -20 & lon5 >= 60 & lon5 < 125 & !is.na(lat5)),4)) %>%
       mutate(regY = replace(regY,which(lat5 <  -20 & lat5 >= -40 & lon5 >= 60 & lon5 < 120 & !is.na(lat5)),4)) %>%
+=======
+      mutate(regY = replace(regY,which(lat5 <  -15 & lat5 >= -40 & lon5 >= 60 & lon5 < 120 & !is.na(lat5)),4)) %>%
+>>>>>>> 110963aad7cc0474c9cfbb6e7fb0de1acb087f61
       mutate(regY = replace(regY,which(lat5 <  -30 & lat5 >= -40 & lon5 >= 40 & lon5 < 60 & !is.na(lat5)),4))  %>%
       mutate(regY = replace(regY,which(lat5 < 10 & lat5 >= -15 & lon5 >= 75 & lon5 < 100 & !is.na(lat5)),5))   %>%
       mutate(regY = replace(regY,which(lat5 < -5 & lat5 >= -15 & lon5 >= 100 & lon5 < 110 & !is.na(lat5)),5))  %>%
@@ -467,13 +471,21 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
       mutate(regB = replace(regB, which(lat5 < -15 & lat5 >= -20 & lon5 >= 35 & lon5 < 46 & !is.na(lat5)), 1)) %>%
       mutate(regB = replace(regB, which(lat5 < 10 & lat5 >= -15 & lon5 >= 80 & lon5 < 100 & !is.na(lat5)), 2)) %>%
       mutate(regB = replace(regB, which(lat5 < -3 & lat5 >= -15 & lon5 >= 100 & lon5 < 110 & !is.na(lat5)), 2)) %>%
+<<<<<<< HEAD
       mutate(regB = replace(regB, which(lat5 < -8 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)), 2)) %>%
+=======
+      mutate(regB = replace(regB, which(lat5 < -7 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)), 2)) %>%
+>>>>>>> 110963aad7cc0474c9cfbb6e7fb0de1acb087f61
       mutate(regB = replace(regB, which(lat5 < -20 & lat5 >= -25 & lon5 >= 35 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB = replace(regB, which(lat5 < -25 & lat5 >= -30 & lon5 >= 30 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB = replace(regB, which(lat5 < -30 & lat5 >= -35 & lon5 >= 20 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB = replace(regB, which(lat5 < -15 & lat5 >= -35 & lon5 >= 46 & lon5 < 75 & !is.na(lat5)), 3)) %>%
+<<<<<<< HEAD
       mutate(regB = replace(regB, which(lat5 < -15 & lat5 >= -20 & lon5 >= 75 & lon5 < 125 & !is.na(lat5)), 3)) %>%
       mutate(regB = replace(regB, which(lat5 < -20 & lat5 >= -35 & lon5 >= 75 & lon5 < 120 & !is.na(lat5)), 3))
+=======
+      mutate(regB = replace(regB, which(lat5 < -15 & lat5 >= -35 & lon5 >= 75 & lon5 < 120 & !is.na(lat5)), 3))
+>>>>>>> 110963aad7cc0474c9cfbb6e7fb0de1acb087f61
   }
 
   if (regB1) {
@@ -490,7 +502,11 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
       mutate(regB2 = replace(regB2, which(lat5 < -15 & lat5 >= -20 & lon5 >= 35 & lon5 < 46 & !is.na(lat5)), 1)) %>%
       mutate(regB2 = replace(regB2, which(lat5 < 10 & lat5 >= -15 & lon5 >= 80 & lon5 < 100 & !is.na(lat5)), 2)) %>%
       mutate(regB2 = replace(regB2, which(lat5 < -3 & lat5 >= -15 & lon5 >= 100 & lon5 < 110 & !is.na(lat5)), 2)) %>%
+<<<<<<< HEAD
       mutate(regB2 = replace(regB2, which(lat5 < -8 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)), 2)) %>%
+=======
+      mutate(regB2 = replace(regB2, which(lat5 < -7 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)), 2)) %>%
+>>>>>>> 110963aad7cc0474c9cfbb6e7fb0de1acb087f61
       mutate(regB2 = replace(regB2, which(lat5 < -20 & lat5 >= -25 & lon5 >= 35 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB2 = replace(regB2, which(lat5 < -25 & lat5 >= -30 & lon5 >= 30 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB2 = replace(regB2, which(lat5 < -30 & lat5 >= -35 & lon5 >= 20 & lon5 < 75 & !is.na(lat5)), 3)) %>%
@@ -508,7 +524,11 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
       mutate(regB3 = replace(regB3, which(lat5 < -15 & lat5 >= -20 & lon5 >= 35 & lon5 < 46 & !is.na(lat5)), 1)) %>%
       mutate(regB3 = replace(regB3, which(lat5 < 10 & lat5 >= -15 & lon5 >= 80 & lon5 < 100 & !is.na(lat5)), 2)) %>%
       mutate(regB3 = replace(regB3, which(lat5 < -3 & lat5 >= -15 & lon5 >= 100 & lon5 < 110 & !is.na(lat5)), 2)) %>%
+<<<<<<< HEAD
       mutate(regB3 = replace(regB3, which(lat5 < -8 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)), 2)) %>%
+=======
+      mutate(regB3 = replace(regB3, which(lat5 < -7 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)), 2)) %>%
+>>>>>>> 110963aad7cc0474c9cfbb6e7fb0de1acb087f61
       mutate(regB3 = replace(regB3, which(lat5 < -20 & lat5 >= -25 & lon5 >= 35 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB3 = replace(regB3, which(lat5 < -25 & lat5 >= -30 & lon5 >= 30 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB3 = replace(regB3, which(lat5 < -30 & lat5 >= -35 & lon5 >= 20 & lon5 < 75 & !is.na(lat5)), 3)) %>%

@@ -5,7 +5,7 @@
 \title{Map of the Indian Ocean.}
 \usage{
 plot_IO(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT",
-  newm = T, lwdm = 3, axes = T, tcol = "red")
+  newm = T, lwdm = 3, axes = T, tcol = "red", mapfill = TRUE)
 }
 \arguments{
 \item{plot_title}{Plot title.}
@@ -21,6 +21,8 @@ plot_IO(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT",
 \item{axes}{If TRUE, create x and y axes.}
 
 \item{tcol}{Text colour.}
+
+\item{mapfill}{If TRUE, fill the land area of the map.}
 }
 \description{
 Function to make a map of the Indian Ocean, with regional boundaries.

@@ -46,6 +46,7 @@ plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY", tripid="t
 #' @param lwdm Line width for boundaries.
 #' @param axes If TRUE, create x and y axes.
 #' @param tcol Text colour.
+#' @param mapfill If TRUE, fill the land area of the map.
 #'
 plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", newm = T, lwdm = 3, axes = T, tcol = "red", mapfill = TRUE) {
   lims <- uselims
@@ -70,7 +71,8 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     lines(c(75, 75), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-    lines(c(120, 120), c(-40, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-40, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(125, 125), c(-20, -15), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(40, 60), c(-30, -30), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(60, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
@@ -94,7 +96,8 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     lines(c(75, 75), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-    lines(c(120, 120), c(-40, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-40, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(125, 125), c(-20, -15), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(40, 60), c(-30, -30), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(60, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
@@ -116,7 +119,8 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     lines(c(80, 80), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-    lines(c(120, 120), c(-35, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-35, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(125, 125), c(-20, -15), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(47, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(35, 45), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
@@ -133,7 +137,8 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     lines(c(80, 80), c(-15, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(100, 100), c(-5, 10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(110, 110), c(-10, -5), lwd = lwdm, col = "slate grey", lty = 1)
-    lines(c(120, 120), c(-35, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(120, 120), c(-35, -30), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(125, 125), c(-20, -15), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(130, 130), c(-15, -10), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(47, 130), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(35, 45), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)

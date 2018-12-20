@@ -47,12 +47,13 @@ plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY", tripid="t
 #' @param axes If TRUE, create x and y axes.
 #' @param tcol Text colour.
 #' @param mapfill If TRUE, fill the land area of the map.
+#' @param bgc Background colour
 #'
-plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", newm = T, lwdm = 3, axes = T, tcol = "red", mapfill = TRUE) {
+plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", newm = T, lwdm = 3, axes = T, tcol = "red", mapfill = TRUE, bgc = "lightblue") {
   lims <- uselims
   if (newm) {
-    plot(1, 1, yaxt = "n", xaxt = "n", type = "n", xlim = c(lims[1], lims[2]), ylim = c(lims[3], lims[4]), ylab = "", xlab = "", bg = "lightblue")
-    polygon(c(lims[1] - 5, lims[2] + 5, lims[2] + 5, lims[1] - 5), c(lims[3] - 5, lims[3] - 5, lims[4] + 5, lims[4] + 5), col = "lightblue")
+    plot(1, 1, yaxt = "n", xaxt = "n", type = "n", xlim = c(lims[1], lims[2]), ylim = c(lims[3], lims[4]), ylab = "", xlab = "", bg = bgc)
+    polygon(c(lims[1] - 5, lims[2] + 5, lims[2] + 5, lims[1] - 5), c(lims[3] - 5, lims[3] - 5, lims[4] + 5, lims[4] + 5), col = bgc)
   }
   if (sp == "ALB") {
     lines(c(34.5, 44.2), c(-20, -20), lwd = lwdm, col = "slate grey", lty = 1)
@@ -107,9 +108,9 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     lines(c(40, 75), c(0, 0), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
     text(62.5, 17.5, "R1", col = tcol, cex = 1.5)
-    text(57.5, 2.5, "R2N", col = tcol, cex = 1.5)
-    text(57.5, -7.5, "R2S", col = tcol, cex = 1.5)
-    text(52.5, -27.5, "R3", col = tcol, cex = 1.5)
+    text(62.5, 6, "R2N", col = tcol, cex = 1.5)
+    text(62.5, -5, "R2S", col = tcol, cex = 1.5)
+    text(52.5, -25, "R3", col = tcol, cex = 1.5)
     text(82.5, -27.5, "R4", col = tcol, cex = 1.5)
     text(85, -2.5, "R5", col = tcol, cex = 1.5)
     text(90, 17.5, "R6", col = tcol, cex = 1.5)
@@ -147,8 +148,8 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     lines(c(100, 110), c(-5, -5), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(40, 80), c(0, 0), lwd = lwdm, col = "slate grey", lty = 1)
     lines(c(40, 100), c(10, 10), lwd = lwdm, col = "slate grey", lty = 1)
-    text(57.5, 2.5, "R1N", col = tcol, cex = 1.5)
-    text(67.5, -2.5, "R1S", col = tcol, cex = 1.5)
+    text(62.5, 6, "R1N", col = tcol, cex = 1.5)
+    text(62.5, -5, "R1S", col = tcol, cex = 1.5)
     text(87.5, -2.5, "R2", col = tcol, cex = 1.5)
     text(72.5, -27.5, "R3", col = tcol, cex = 1.5)
   }

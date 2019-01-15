@@ -28,7 +28,7 @@ library("maptools")
 library("data.table")
 library("lunar")
 library(lubridate)
-library(readr)
+library(tidyverse)
 library(plyr)
 library(dplyr)
 library(dtplyr)
@@ -84,7 +84,7 @@ prepdat1 <- dataprep_JPIO(clndat)
 prepdat <- setup_IO_regions(prepdat1,  regY=F, regY1=F, regY2=F, regB=F, regB1 = F, regB2=F, regB3=F, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 save(pd1, pd2, prepdat, file="prepdat.RData")
 
-dat <- dat5217
+dat <- make_lbidmon(prepdat)
 save(dat,file="JPdat.RData")
 load(file="JPdat.RData")
 
@@ -358,7 +358,7 @@ library("beanplot")
 
 library("cpue.rfmo")
 
-projdir <- "~/IOTC/2018_CPUE/"
+projdir <- "~/IOTC/2019_CPUE_ALB/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -376,8 +376,8 @@ dat <- data.frame(dat)
 jp_allsp <-  c("alb","bet","yft","swo","mls","bum","blm","sbt","sas","shk")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-plot_spfreqyq(indat = dat, reg_struc = "regY", splist = jp_allsp, flag = "JP", mfr = c(4,3))
-plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = jp_allsp, flag = "JP", mfr = c(4,3))
+# plot_spfreqyq(indat = dat, reg_struc = "regY", splist = jp_allsp, flag = "JP", mfr = c(4,3))
+# plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = jp_allsp, flag = "JP", mfr = c(4,3))
 plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = jp_allsp, flag = "JP", mfr = c(4,3))
 plot_spfreqyq(indat = dat, reg_struc = "regA5", splist = jp_allsp, flag = "JP", mfr = c(4,3))
 graphics.off()
@@ -385,7 +385,7 @@ graphics.off()
 # Put chosen species here
 use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbt")
 # Variables to use
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","regY2","regB","regB1","regB2","regA","regA1","regA2","regA3","regA4","regA5")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regA","regA1","regA2","regA3","regA4","regA5")
 str(dat[,allabs])
 
 # Determine the number of clusters. Come back and edit this.
@@ -404,8 +404,8 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
+# run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
+# run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
 run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
 run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
 
@@ -432,7 +432,7 @@ library("survival")
 
 library("cpue.rfmo")
 
-projdir <- "~/IOTC/2018_CPUE/"
+projdir <- "~/IOTC/2019_CPUE_ALB/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -492,7 +492,7 @@ runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs 
 runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)
 runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)
 
-regstr <- "regY2"; runreg <- 7; keepd <- TRUE; doflags <- "JP"
+regstr <- "regY2"; runreg <- 7; keepd <- TRUE; doflags <- "JP" # Values used for testing
 maxyr <- 2018
 for (regstr in c("regY2")) {
   rp <- runpars[[regstr]]

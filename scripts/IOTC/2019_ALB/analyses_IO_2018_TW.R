@@ -3,6 +3,7 @@ projdir <- "~/IOTC/2019_CPUE_ALB/"
 twdir <- paste0(projdir, "TW/")
 datadir <- paste0(twdir, "data/1979-2017/")
 datadir_oil <- paste0(twdir, "data/revisedoildatav2/")
+datadir_2019 <- paste0(twdir, "data/")
 twylisis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -18,6 +19,7 @@ setwd(twylisis_dir)
 #install.packages("dtplyr")
 #install.packages("tm")
 #install.packages("devtools")
+#install.packages("tidyverse")
 #devtools::install_github("hadley/readr")
 
 # Load packages
@@ -29,12 +31,13 @@ library("maptools")
 library("data.table")
 library("lunar")
 library(lubridate)
-library(readr)
 library(plyr)
 library(dplyr)
 library(dtplyr)
 library(tm)
 library(devtools)
+library(tidyverse)
+#library(readr)
 
 # The new library 'cpue.rfmo' replaces the 'support functions.r' file.
 # The command 'install_github("hoyles/cpue.rfmo")' should install cpue.rfmo, but currently doesn't work,
@@ -61,6 +64,21 @@ cc     <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
 wdths_oil <- c(5,4,2,2,4,3,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2,1,1,1,1,1,3,2,1,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
 cc_oil <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiciiiicccccccccccccccc"
 
+cbind(c(0,0,wdths), wdths_oil)
+c(0,0,wdths)- wdths_oil
+
+# Load data from Sheng-Ping's file
+# datNE <- read.csv(paste0(datadir_2019,"CE_Cluster_NE.csv"), stringsAsFactors=FALSE)
+# datNW <- read.csv(paste0(datadir_2019,"CE_Cluster_NW.csv"), stringsAsFactors=FALSE)
+# datSE <- read.csv(paste0(datadir_2019,"CE_Cluster_SE.csv"), stringsAsFactors=FALSE)
+# datSW <- read.csv(paste0(datadir_2019,"CE_Cluster_SW.csv"), stringsAsFactors=FALSE)
+#
+# rawdat <- rbind(datNE, datNW, datSE, datSW)
+# cbind(nms, nms_oil, names(rawdat))
+#
+# nms <- c("callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","pbf","sbf","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","pbf_w","sbf_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oilv","foc","rem")
+# nms2 <- c("op_yr","op_mon","")
+
 # Load names and widths provided by TW; compare locations and widths
 ffo <- read.csv(paste0(datadir,"outcodeP2.csv"), stringsAsFactors=FALSE)
 ffo_oil <- read.csv(paste0(datadir_oil,"outcodeP2oil.csv"), stringsAsFactors=FALSE)
@@ -69,16 +87,16 @@ wdths==ffo$width; sum(wdths!=ffo$width)
 wdths_oil==ffo_oil$width; sum(wdths_oil!=ffo_oil$width)
 
 # Load example to check processing
-a <- read_fwf(file=paste0(datadir,"LOG2005.IND"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+a <- read_fwf(file=paste0(datadir,"LOG2005.IND"),col_positions=fwf_widths(wdths),col_types=cc,n_max=20);gc()
 names(a); dim(a)
 names(a) <- nms
-head(a)
+head(data.frame(a))
 cbind(nms,wdths,cumsum(c(wdths)),unlist(strsplit(cc,"")))
 
-a <- read_fwf(file=paste0(datadir_oil,"LOG2005.IND"),fwf_widths(wdths_oil),col_types=cc_oil,n_max=20);gc()
-names(a); dim(a)
-names(a) <- nms_oil
-head(a)
+ao <- read_fwf(file=paste0(datadir_oil,"LOG2005.IND"),fwf_widths(wdths_oil),col_types=cc_oil,n_max=20);gc()
+names(ao); dim(ao)
+names(ao) <- nms_oil
+head(as.data.frame(ao))
 
 # Load all the files
 yy <- 1979:2017;yy <- paste0("/LOG",yy,".IND")
@@ -177,7 +195,7 @@ for(fld in c("regY","regY1","regY2","regB","regB1","regB2","regB3","regA","regA1
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
   text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
-  map(add=T)
+  maps::map(database = "world", add=T, fill = F)
   savePlot(paste0("map_",fld),type="png")
 }
 
@@ -243,7 +261,7 @@ library("boot")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/IOTC/2018_CPUE/"
+projdir <- "~/IOTC/2019_CPUE_ALB/"
 twdir <- paste0(projdir, "TW/")
 twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -255,8 +273,8 @@ load(file="../analyses/TW_newdat.RData")
 tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "sha", "ot2", "sbt")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-plot_spfreqyq(indat = dat, reg_struc = "regY", splist = tw_allsp, flag = "TW", mfr = c(5,3))
-plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+# plot_spfreqyq(indat = dat, reg_struc = "regY", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+# plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 plot_spfreqyq(indat = dat, reg_struc = "regA5", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 
@@ -287,26 +305,26 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon"
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
 run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
 run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+# run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+# run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
 
 clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
 clk_A4 <- list(TW=clkeepTW_A4)
 
-clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
+clkeepTW_A5 <- list("alb"=list(c(1:5)))
 clk_A5 <- list(TW=clkeepTW_A5)
 
-clkeepTW_Y <- list("yft"=list(c(1,2,3), c(1,2,3,4), c(1,2,3), c(1,2,3,4),   c(1,2,3,4,5)), c(1,2,3,4,5))
-clk_Y <- list(TW=clkeepTW_Y)
-
-clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
-clk_Y2 <- list(TW=clkeepTW_Y2)
-
-clkeepTW_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4)))
-clk_B2 <- list(TW=clkeepTW_B2)
-
-clkeepTW_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4),c(1,2,3,4,5)))
-clk_B3 <- list(TW=clkeepTW_B3)
+# clkeepTW_Y <- list("yft"=list(c(1,2,3), c(1,2,3,4), c(1,2,3), c(1,2,3,4),   c(1,2,3,4,5)), c(1,2,3,4,5))
+# clk_Y <- list(TW=clkeepTW_Y)
+#
+# clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
+# clk_Y2 <- list(TW=clkeepTW_Y2)
+#
+# clkeepTW_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4)))
+# clk_B2 <- list(TW=clkeepTW_B2)
+#
+# clkeepTW_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4),c(1,2,3,4,5)))
+# clk_B3 <- list(TW=clkeepTW_B3)
 
 # ========================================================
 # Standardizations, TW only
@@ -332,7 +350,7 @@ library("survival")
 library("cpue.rfmo")
 
 
-projdir <- "~/IOTC/2018_CPUE/"
+projdir <- "~/IOTC/2019_CPUE_ALB/"
 twdir <- paste0(projdir, "TW/")
 twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")

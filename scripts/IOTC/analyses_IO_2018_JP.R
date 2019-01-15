@@ -84,6 +84,7 @@ prepdat1 <- dataprep_JPIO(clndat)
 prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
 save(pd1, pd2, prepdat, file="prepdat.RData")
 
+dat <- make_lbidmon(prepdat)
 save(dat,file="JPdat.RData")
 load(file="JPdat.RData")
 

@@ -48,7 +48,7 @@ dataprep_KR <- function(dat, splist) {
  dat$lat[dat$NS == 2] <- (dat$Lat01[dat$NS == 2] + 1) * -1
  dat$lon[dat$EW == 2] <- 360 - (dat$Long01[dat$EW == 2] + 1)
  dat <- dat[dat$lon >= 0, ]
- dat$lon[dat$lon > 180] <- dat$lon[dat$lon > 180] - 360
+ dat$lon[dat$lon >= 180] <- dat$lon[dat$lon >= 180] - 360
  dat <- dat[dat$lat < 29, ]
 
  dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
@@ -310,7 +310,7 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
   if(region == "AO") {
     dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] <- (dat$lat[is.na(dat$NS) == F & dat$NS %in% c(3, 7)] + 1) * -1
     dat$lon[is.na(dat$EW) == F & dat$EW == 2] <- 360 - (dat$lon[is.na(dat$EW) == F & dat$EW == 2] + 1)
-    dat$lon[!is.na(dat$lon) & dat$lon > 180] <- dat$lon[!is.na(dat$lon) & dat$lon > 180] - 360
+    dat$lon[!is.na(dat$lon) & dat$lon >= 180] <- dat$lon[!is.na(dat$lon) & dat$lon >= 180] - 360
   }
   la <- as.integer(substring(dat$op_area, 1, 2))
   lo <- as.integer(substring(dat$op_area, 3, 4))

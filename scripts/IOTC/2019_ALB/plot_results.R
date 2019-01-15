@@ -21,7 +21,8 @@ natdirs <- c(paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
 
 
 
-reglist <- list("regA4" = c(1:4), "regA5" = 1, "regB3" = c(1,2,3,4,5), "regY" = c(2:5), "regY2" = c(2:5,7))
+# reglist <- list("regA4" = c(1:4), "regA5" = 1, "regB3" = c(1,2,3,4,5), "regY" = c(2:5), "regY2" = c(2:5,7))
+reglist <- list("regA4" = c(1:4), "regA5" = 1)
 splist <- list("regA4" = "alb", "regA5" = "alb", "regB3" = "bet", "regY" = "yft", "regY2" = "yft")
 
 library("beanplot")
@@ -42,6 +43,7 @@ library("maps")
 library("maptools")
 library("mapdata")
 
+library("cpue.rfmo")
 
 mdtn <- "novess_allyrs"
 mdtv <- "boat_allyrs"
@@ -58,9 +60,9 @@ reg_strs <- c("regY","regY2","regA4","regA5")
 
 #resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
-prep_indices(resdirs=alldirs[1:3], reg_strs=c("regY","regY2","regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
+prep_indices(resdirs=alldirs[1:3], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
-prep_indices(resdirs=natdirs[2], reg_strs=c("regY","regY2","regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
+prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
 
 # # Overlay national plots for comparison. ICCAT.
@@ -115,7 +117,7 @@ prep_indices(resdirs=natdirs[2], reg_strs=c("regY","regY2","regA4","regA5"), reg
 
 
 fl = c("jnt","jnt","jnt")
-for(dirnum in 3) {
+for(dirnum in 1:2) {
   setwd(alldirs[dirnum])
   for(regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
@@ -185,10 +187,10 @@ getwd()
 mdt="boat_allyrs"; mdt="vessid_79nd"; mdt="novess_5279"; mdt="novess_allyrs";
 vartype="lognC"
 
-reg_strs <- c("regY","regY2","regA4","regA5")
+reg_strs <- c("regA4","regA5")
 
 
-for (resdir in alldirs[1:3]) {
+for (resdir in alldirs[1:2]) {
   outdir <- paste0(resdir,"/test/")
   dir.create(outdir)
   for(regstr in reg_strs) {
@@ -232,7 +234,7 @@ for (resdir in alldirs[1:3]) {
 
 
 # Spatial temporal residual plots
-for (resdir in alldirs[1:3]) {
+for (resdir in alldirs[1:2]) {
   for (regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
       outdir <- paste0(resdir,"diags/")

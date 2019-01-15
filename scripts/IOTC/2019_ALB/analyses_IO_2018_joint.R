@@ -13,6 +13,7 @@ twdir <- paste0(projdir, "TW/")
 jointdir <- paste0(projdir, "joint/")
 
 jntalysis_dir <- paste0(jointdir, "analyses/")
+dir.create(jntalysis_dir)
 
 #install.packages("survival")
 #install.packages("stringr")
@@ -34,14 +35,17 @@ library(cluster)
 library(beanplot)
 library(survival)
 
+library(cpue.rfmo)
+
+#clkeepKR_A5 <- list("alb"=list(c(2,3,5)))
 clkeepJP_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4,5), c(1,2,3,4), c(1,2,3,4)))
-clkeepKR_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4), c(1,3,4), c(2,3,4)))
+clkeepKR_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4), c(1:4), c(1:4)))
 clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
 clk_A4 <- list(JP=clkeepJP_A4,KR=clkeepKR_A4,TW=clkeepTW_A4)
 
 clkeepJP_A5 <- list("alb"=list(c(2,3,4)))
-clkeepKR_A5 <- list("alb"=list(c(2,3,5)))
-clkeepTW_A5 <- list("alb"=list(c(1,2,4)))
+clkeepKR_A5 <- list("alb"=list(c(1:4)))
+clkeepTW_A5 <- list("alb"=list(c(1:5)))
 clk_A5 <- list(JP=clkeepJP_A5,KR=clkeepKR_A5,TW=clkeepTW_A5)
 
 
@@ -55,43 +59,43 @@ stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",std_splis
 # The runpars define the approach to be used in this run
 regA4_minss <- list(minq_byreg = c(3,2,5,5), minvess=c(60,40,100,100), minll=c(30,20,50,50), minyrqtr = c(30,20,50,50), minyqll = c(3,3,5,5))
 regA5_minss <- list(minq_byreg = c(5), minvess=c(100), minll=c(50), minyrqtr = c(50), minyqll = c(5))
-regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
-regY_minss <-  list(minq_byreg = c(2,5,5,2,5,2),   minvess=c(40,100,100,40,100,40),     minll=c(20,50,50,20,50,20),    minyrqtr = c(20,50,50,20,50,20),    minyqll = c(3,5,5,3,5,3))
-regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
+# regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
+# regY_minss <-  list(minq_byreg = c(2,5,5,2,5,2),   minvess=c(40,100,100,40,100,40),     minll=c(20,50,50,20,50,20),    minyrqtr = c(20,50,50,20,50,20),    minyqll = c(3,5,5,3,5,3))
+# regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
 
 runpars <- list()
-runpars[["regA4"]] <-list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss, strsmp = 30)
+runpars[["regA4"]] <-list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 3:4, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss, strsmp = 30)
 runpars[["regA5"]] <-list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss, strsmp = 30)
-runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, strsmp = 30)
-runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
+# runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, strsmp = 30)
+# runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
 
 regstr <- "regA4"; runreg <- 2; keepd <- TRUE; doflags <- "TW"
 maxyr <- 2018
 
 # with clusters, hooks, no hbf
-resdir <- paste0(jntalysis_dir,"cl1_hb0_hk1/")
-resdir <- paste0(jntalysis_dir,"test/")
+resdir <- paste0(jntalysis_dir,"cl1_hb0_hk1_b/")
+#resdir <- paste0(jntalysis_dir,"test/")
 dir.create(resdir)
 setwd(resdir)
 
-run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
-run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+# run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+# run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir, twlimit=0 , jplimit = list(reg=4, yr=2005))
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir, twlimit=0, jplimit = list(reg=4, yr=2005))
 
 # with clusters, hooks, hbf
 resdir <- paste0(jntalysis_dir,"cl1_hb1_hk1/")
 dir.create(resdir)
 setwd(resdir)
 
-runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
-runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+# runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, strsmp = 30)
+# run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+# runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
+# run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
 runpars[["regA4"]] <-list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir, twlimit=0, jplimit = list(reg=4, yr=0))
 runpars[["regA5"]] <-list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir, twlimit=0, jplimit = list(reg=4, yr=0))
 
 # no clusters, with hooks, hbf
 resdir <- paste0(jntalysis_dir,"cl0_hb1_hk1/")
@@ -118,14 +122,14 @@ clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(
 clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
 clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2)
 
-runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
-runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+# runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs = 2:5, addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss, strsmp = 30)
+# run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY",  maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+# runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
+# run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY2", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
 runpars[["regA4"]] <-list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA4", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir, twlimit=0, jplimit = list(reg=4, yr=0))
 runpars[["regA5"]] <-list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = FALSE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss, strsmp = 30)
-run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir)
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regA5", maxyr = 2018, do_early = TRUE, stdlabs = stdlabs, projdir = projdir, twlimit=0, jplimit = list(reg=4, yr=0))
 
 # ------------------------------
 

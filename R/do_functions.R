@@ -143,12 +143,14 @@ do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, ru
 #' @param twlimit The earliest time limit for including Taiwanese data in the model.
 #' @param keepd Keep data in the model object if TRUE.
 #'
-run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdlabs, projdir, twlimit = 2005, keepd = TRUE) {
+run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdlabs, projdir, twlimit = 2005, jplimit = list(reg=4, yr=0), keepd = TRUE) {
   rp <- runpars[[regstr]]
   runsp <- rp$runsp
   addcl <- rp$addcl
   dohbf <- rp$dohbf
   jdat <- data.frame()
+  if("strsmp" %in% names(rp))  strsmp <- rp$strsmp else strsmp <- NA
+
   for (flag in doflags) {
     for (r in rp$doregs) {
       load(paste0(projdir,flag,"/clustering/",paste(flag,regstr,r,sep = "_"),".RData"))
@@ -166,16 +168,22 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdla
 
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for (runreg in rp$doregs) {
-    glmdat <- select_data_IO2(jdat,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars)
-#    if (nrow(glmdat) > 60000) glmdat <- samp_strat_data(glmdat,nsubsamp)
+    jdat2 <- jdat[jdat$yrqtr > jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
+    glmdat <- select_data_IO2(jdat2,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars)
+    if (!is.na(strsmp) & nrow(glmdat) > 60000)
+      glmdat <- samp_strat_data(glmdat, strsmp)
+
     glmdat$.wtt   <- mk_wts(glmdat,wttype = "area")
 
     if (do_early) {
-      glmdat5279 <- select_data_IO2(jdat,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1952,1980))
-#      if(nrow(glmdat5279)>60000) glmdat5279 <- samp_strat_data(glmdat5279,nsubsamp)
-      a <- jdat[jdat$vessid != "JP1",]
-      glmdat79nd <- select_data_IO2(jdat,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1979,maxyr))
-#      if(nrow(glmdat79nd)>60000) glmdat79nd <- samp_strat_data(glmdat79nd,nsubsamp)
+      glmdat5279 <- select_data_IO2(jdat2,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1952,1980))
+      if (!is.na(strsmp) & nrow(glmdat5279) > 60000)
+        glmdat5279 <- samp_strat_data(glmdat5279, strsmp)
+
+      a <- jdat2[jdat2$vessid != "JP1",]
+      glmdat79nd <- select_data_IO2(a,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1979,maxyr))
+      if (!is.na(strsmp) & nrow(glmdat79nd) > 60000)
+        glmdat79nd <- samp_strat_data(glmdat79nd, strsmp)
       glmdat5279$.wtt   <- mk_wts(glmdat5279,wttype="area")
       glmdat79nd$.wtt   <- mk_wts(glmdat79nd,wttype="area")
     }

@@ -319,6 +319,10 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
     a <- a[a >= minvess]  # Each vessel has at least 'minvess' sets
     gdat <- gdat[gdat$vessid %in% names(a), ]
 
+    yqll <- paste(gdat$yrqtr, gdat$latlong)
+    a <- table(yqll)
+    a <- a[a >= minyqll]
+    gdat <- gdat[yqll %in% names(a), ] # Each stratum has at least minyqll sets
 
     if (!is.na(addpca))
       vars <- c(vars, addpca)

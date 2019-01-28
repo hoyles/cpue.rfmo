@@ -4,8 +4,8 @@
 \alias{summarize_and_store}
 \title{Summarize and store GLM results.}
 \usage{
-summarize_and_store(mod, dat, fname, modlab, dohbf = dohbf, addcl = addcl,
-  docl = docl, keepd = TRUE)
+summarize_and_store(mod, dat, fname, modlab, dohbf = dohbf,
+  addcl = addcl, docl = docl, keepd = TRUE)
 }
 \arguments{
 \item{mod}{The model result file from the glm.}

@@ -4,10 +4,11 @@
 \alias{select_data_JointIO}
 \title{Select joint data for the GLM.}
 \usage{
-select_data_JointIO(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2,
-  maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100,
-  llstrat = 5, addcl = F, cltype = NA, addpca = NA, samp = NA,
-  strsmp = 30, yrlims = NA, oneflag = NA, minhbf = 5, minyqll = 1)
+select_data_JointIO(indat, runreg, clk = NA, runsp, mt, vars,
+  minqtrs = 2, maxqtrs = 500, minvess = 100, minll = 100,
+  minyrqtr = 100, llstrat = 5, addcl = F, cltype = NA,
+  addpca = NA, samp = NA, strsmp = 30, yrlims = NA, oneflag = NA,
+  minhbf = 5, minyqll = 1)
 }
 \arguments{
 \item{indat}{Input dataset}

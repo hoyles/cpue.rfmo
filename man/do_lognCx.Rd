@@ -4,9 +4,9 @@
 \alias{do_lognCx}
 \title{Run lognormal positive models with interactions.}
 \usage{
-do_lognCx(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, runsp,
-  fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T, bcorr = FALSE,
-  cell_areas)
+do_lognCx(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3,
+  runsp, fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T,
+  bcorr = FALSE, cell_areas)
 }
 \arguments{
 \item{dat}{Input dataset.}

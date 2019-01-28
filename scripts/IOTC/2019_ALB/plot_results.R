@@ -14,6 +14,8 @@ alldirs <- c(paste0(jointdir,"analyses/cl1_hb0_hk1/"),
              paste0(jointdir,"analyses/cl1_hb1_hk1/"),
              paste0(jointdir,"analyses/cl0_hb1_hk1/"))
 
+alldirs <- c(paste0(jointdir,"analyses/cl1_hb0_hk1_b/"))
+
 natdirs <- c(paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
              paste0(KRdir,"std/"),
              paste0(TWdir,"analyses/std/"))
@@ -54,15 +56,16 @@ yr1 = 1952
 
 mdt_all <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")
 mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")
-reg_strs <- c("regY","regY2","regA4","regA5")
+#reg_strs <- c("regY","regY2","regA4","regA5")
+reg_strs <- c("regA4")
 #reg_strs <- c("regY","regY2")
 
 
 #resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
-prep_indices(resdirs=alldirs[1:3], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
+prep_indices(resdirs=alldirs[1], reg_strs=c("regA4"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
-prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
+#prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
 
 # # Overlay national plots for comparison. ICCAT.
@@ -117,7 +120,7 @@ prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes 
 
 
 fl = c("jnt","jnt","jnt")
-for(dirnum in 1:2) {
+for(dirnum in 1) {
   setwd(alldirs[dirnum])
   for(regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
@@ -187,10 +190,10 @@ getwd()
 mdt="boat_allyrs"; mdt="vessid_79nd"; mdt="novess_5279"; mdt="novess_allyrs";
 vartype="lognC"
 
-reg_strs <- c("regA4","regA5")
+reg_strs <- c("regA4")
 
 
-for (resdir in alldirs[1:2]) {
+for (resdir in alldirs) {
   outdir <- paste0(resdir,"/test/")
   dir.create(outdir)
   for(regstr in reg_strs) {
@@ -234,7 +237,7 @@ for (resdir in alldirs[1:2]) {
 
 
 # Spatial temporal residual plots
-for (resdir in alldirs[1:2]) {
+for (resdir in alldirs) {
   for (regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
       outdir <- paste0(resdir,"diags/")
@@ -316,7 +319,7 @@ for (resdir in alldirs[1:2]) {
       samps <- tapply(a$latlong, list(a$latlong, a$yrqtr), length)
       windows()
       table(samps)
-      hist(samps, breaks = seq(0, 1000, 1), xlim = range(samps, na.rm = TRUE), main = paste0(fname," Histogram of sample sizes by stratum"))
+      hist(samps, breaks = seq(0, 1000, 1), xlim = c(0, max(samps, na.rm = TRUE)), main = paste0(fname," Histogram of sample sizes by stratum"))
       savePlot(paste0(outdir,fname,"ss_by_stratum_R", r, ".png"), type = "png")
       graphics.off()
     }

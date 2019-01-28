@@ -4,8 +4,8 @@
 \alias{summarize_and_store_dl}
 \title{Summarize and store GLM results for delta lognormal.}
 \usage{
-summarize_and_store_dl(modb, modp, dat, datpos, fname, modlab, dohbf = dohbf,
-  addcl = addcl, keepd = TRUE)
+summarize_and_store_dl(modb, modp, dat, datpos, fname, modlab,
+  dohbf = dohbf, addcl = addcl, keepd = TRUE)
 }
 \arguments{
 \item{modb}{The model result file from the binomial glm.}

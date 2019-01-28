@@ -4,8 +4,8 @@
 \alias{map_clusters}
 \title{Maps of cluster distribution.}
 \usage{
-map_clusters(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "regY",
-  ncl, r = r)
+map_clusters(ddd, cl = "hclustcl", ti = "", lat5 = F,
+  regtype = "regY", ncl, r = r)
 }
 \arguments{
 \item{ddd}{Input dataset}

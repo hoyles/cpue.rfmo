@@ -168,7 +168,7 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdla
 
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for (runreg in rp$doregs) {
-    jdat2 <- jdat[jdat$yrqtr > jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
+    jdat2 <- jdat[jdat$yrqtr < jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
     glmdat <- select_data_IO2(jdat2,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars)
     if (!is.na(strsmp) & nrow(glmdat) > 60000)
       glmdat <- samp_strat_data(glmdat, strsmp)

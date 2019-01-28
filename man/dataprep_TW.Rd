@@ -5,8 +5,8 @@
 \title{Prepare Taiwanese longline data.}
 \usage{
 dataprep_TW(dat, alldat = F, region = "IO", splist = c("alb", "bet",
-  "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf",
-  "sbt"))
+  "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth",
+  "pbf", "sbt"))
 }
 \arguments{
 \item{dat}{Input dataset}

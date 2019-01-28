@@ -4,7 +4,8 @@
 \alias{mapTPCA}
 \title{Maps of TCPA distribution.}
 \usage{
-mapTPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r)
+mapTPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY",
+  r = r)
 }
 \arguments{
 \item{ddd}{Input dataset}

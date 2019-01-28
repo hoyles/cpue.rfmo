@@ -4,7 +4,8 @@
 \alias{select_data_IO2}
 \title{Select joint data for the GLM, updated 2018.}
 \usage{
-select_data_IO2(indat, runreg, runpars, mt, vars, yrlims = NA, oneflag = NA)
+select_data_IO2(indat, runreg, runpars, mt, vars, yrlims = NA,
+  oneflag = NA)
 }
 \arguments{
 \item{indat}{Input dataset}

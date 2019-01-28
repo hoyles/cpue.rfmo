@@ -5,8 +5,8 @@
 \title{Select JP data for the GLM.}
 \usage{
 select_data_JPIO(indat, runreg, runsp, mt, minqtrs = 2, maxqtrs = 500,
-  minvess = 100, minll = 100, minyrqtr = 100, llstrat = 5, addcl = NA,
-  addpca = NA, samp = NA, strsmp = 30)
+  minvess = 100, minll = 100, minyrqtr = 100, llstrat = 5,
+  addcl = NA, addpca = NA, samp = NA, strsmp = 30)
 }
 \arguments{
 \item{indat}{Input dataset}

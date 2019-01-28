@@ -4,8 +4,8 @@
 \alias{beanplots_spCL_comp}
 \title{Beanplots of species composition by cluster.}
 \usage{
-beanplots_spCL_comp(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
-  regtype = regtype, r = r, allsp)
+beanplots_spCL_comp(dat, cl = "kmeans", ti = "", outL = T,
+  nsp = 13, regtype = regtype, r = r, allsp)
 }
 \arguments{
 \item{dat}{Input dataset}

@@ -356,6 +356,79 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
 #' @return Modified dataset.
 #'
 
+#' Turn YMD data into day month and year.
+#'
+#' The function provides a dmy field.
+#' @param yy Year
+#' @param mm Month
+#' @param dd Day
+#' @return dmy
+#'
+makedmy <- function(yy, mm, dd) {
+  tmp <- data.frame(yy=yy,mm=mm,dd=dd)
+  loc <- !(is.na(tmp$yy) | is.na(tmp$mm) | is.na(tmp$dd) | (tmp$yy==0) | (tmp$dd==0) )
+  tm2 <- tmp[loc,]
+  tm2$a <- paste(tm2$yy, tm2$mm, tm2$dd, sep = " - ")
+  tm2$a1 <- gsub(" ", "", tm2$a)
+  tm2$a2 <- ymd(tm2$a1)
+  tmp$a2 <- NA
+  tmp[loc,]$a2 <- tm2$a2
+  return(tmp$a2)
+}
+
+#' Prepare Taiwanese longline data for the EPO.
+#'
+#' The function prepares Taiwanese longline data for EPO analyses.
+#' @param dat Input dataset
+#' @param alldat Not used.
+#' @param region Only EPO at the moment.
+#' @param splist Define the species in the dataset
+#' @return Modified dataset.
+#'
+dataprep_TW_EPO <- function(dat, alldat = F, region = "EPO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "skx", "oth")) {
+  splist_w <- paste0(splist, "_w")
+  dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+
+  # hist(dat$op_start_dmy, breaks = 'months')
+  dat$lat <- dat$lat1
+  dat$lon <- dat$lon1
+  dat$lonraw5 <- dat$lon5
+  dat$lon[dat$lon < 5 & dat$lon > -5] <- NA
+  dat$lat[dat$lat == 0] <- NA
+  dat$lon[dat$lon < 0 & !is.na(dat$lon)] <- dat$lon[dat$lon < 0 & !is.na(dat$lon)] + 360
+  dat$lon5[dat$lon5 < 0 & !is.na(dat$lon5)] <- dat$lon5[dat$lon5 < 0 & !is.na(dat$lon5)] + 360
+  dat$lonx <- dat$lon - 360
+  dat$lonx5 <- dat$lon5 - 360
+
+  dat$tonnage <- as.factor(substring(dat$callsign, 1, 1))
+  a <- levels(dat$tonnage)
+  levs <- cbind(c("0", "1", "2", "3", "4", "5", "6", "7", "8"), c(" < 5", "5 -10", "10 -20", "20 -50", "50 -100", "100 -200", "200 -500", "500 -1000",
+                                                                  " >= 1000"))
+  levels(dat$tonnage) <- levs[match(a, levs[, 1]), 2]
+
+  dat$vessid <- as.factor(as.numeric(as.factor(dat$callsign)))
+  dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
+  dat$tripidwk <- as.factor(paste(dat$vessid, dat$op_yr, week(dat$dmy)))
+  dat$moon <- lunar.illumination(dat$dmy)
+
+  dat$yrqtr <- dat$op_yr + c(0.125,0.125,0.125,.375,.375,.375,.625,.625,.625,.875,.875,.875)[dat$op_mon]
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+  dat$Total <- apply(dat[,splist], 1, sum)
+  dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
+  noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripidmon", "tripidwk", "moon", splist, "Total", "Total2", splist_w, "dmy", "lat", "lon", "lat5", "lon5", "lonx", "lonx5", "lonraw5")
+  dat <- dat[, noms]
+  return(dat)
+}
+
+#' Prepare Seychelles longline data.
+#'
+#' The function prepares Seychelles longline data for IO analyses.
+#' @param dat Input dataset
+#' @param region IO or AO.
+#' @param splist Define the species in the dataset
+#' @return Modified dataset.
+#'
+
 dataprep_SY <- function(dat, region, splist) {
 
   # species
@@ -586,6 +659,36 @@ setup_AO_regions <- function(dat, regB = F, regB1 = F) {
       mutate(regB1 = replace(regB1, which(lat5 < -20 & lat5 >= -35& !is.na(lat5)), 3))
   }
 
+  return(dat)
+}
+
+#' Set up Eastern Pacific Ocean regions
+#'
+#' The function sets up the Eastern Pacific Ocean regions for datasets with lat5 and lon5 variables.
+#' @param dat Input dataset
+#' @param regB If TRUE, set up regB
+#' @param regB1 If TRUE, set up regB1
+#' @return Modified dataset.
+#'
+setup_EPO_regions <- function(dat, regB = F, regB1 = F) {
+  # north of 10N, between 25N and 15S, and south of 15S
+  lat5 <- lon5 <- NULL
+
+  if (regB) {
+    dat$regB <- "X"
+    dat <- mutate(dat,
+                  regB = replace(regB, which(lat5 < 40  & lat5 >   20 & lonx5 > -250 & lonx5 < -190 & !is.na(lat5)), "W1")) %>%
+      mutate(regB = replace(regB, which(lat5 < 40  & lat5 >   20 & lonx5 > -190 & lonx5 < -150 & !is.na(lat5)), "W2")) %>%
+      mutate(regB = replace(regB, which(lat5 < 20  & lat5 >  -10 & lonx5 > -250 & lonx5 < -190 & !is.na(lat5)), "W3")) %>%
+      mutate(regB = replace(regB, which(lat5 < 20  & lat5 >  -10 & lonx5 > -190 & lonx5 < -150 & !is.na(lat5)), "W4")) %>%
+      mutate(regB = replace(regB, which(lat5 < -10 & lat5 >  -40 & lonx5 > -220 & lonx5 < -190 & !is.na(lat5)), "W5")) %>%
+      mutate(regB = replace(regB, which(lat5 < -10 & lat5 >  -40 & lonx5 > -190 & lonx5 < -150 & !is.na(lat5)), "W6")) %>%
+      mutate(regB = replace(regB, which(lat5 >  10 & lonx5 > -110 & lonx5 > -150               & !is.na(lat5)), "E0")) %>%
+      mutate(regB = replace(regB, which(lat5 > -10 & lat5 <   10 & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), "E1")) %>%
+      mutate(regB = replace(regB, which(lat5 > -10 &               lonx5 > -110 & lonx5 < -60  & !is.na(lat5)), "E2")) %>%
+      mutate(regB = replace(regB, which(lat5 > -30 & lat5 <  -10 & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), "E3")) %>%
+      mutate(regB = replace(regB, which(lat5 >  30 & lat5 >  -10 & lonx5 > -110  & lonx5 > -60 & !is.na(lat5)), "E4"))
+  }
   return(dat)
 }
 

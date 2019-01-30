@@ -227,6 +227,51 @@ plot_AO <- function(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "BET",
   mtext(side = 3, line = 0.5, plot_title, font = 2, cex = 1.1)
 }
 
+#' Map of the Pacific Ocean.
+#'
+#' Function to make a map of the Atlantic Ocean, with regional boundaries.
+#' @param plot_title Plot title.
+#' @param uselims Latitudes and Longitudes for the edges of the map.
+#' @param sp Region type code for the region boundaries.
+#' @param newm If TRUE, create a new plot, otherwise add boundaries etc to existing plot.
+#' @param lwdm Line width for boundaries.
+#' @param axes If TRUE, create x and y axes.
+#' @param tcol Text colour.
+#'
+plot_pacific <- function(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "BET", newm = T, lwdm = 3, axes = T, tcol = "red") {
+  lims <- uselims
+  if (newm) {
+    plot(1, 1, yaxt = "n", xaxt = "n", type = "n", xlim = c(lims[1], lims[2]), ylim = c(lims[3], lims[4]), ylab = "", xlab = "", bg = "lightblue")
+    polygon(c(lims[1] - 5, lims[2] + 5, lims[2] + 5, lims[1] - 5), c(lims[3] - 5, lims[3] - 5, lims[4] + 5, lims[4] + 5), col = "lightblue")
+  }
+  if (sp %in% c("BET")) {
+    lines(c(-50, 50), c(210, 210), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(-100, -10), c(25, 25), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(-50, 20), c(-15, -15), lwd = lwdm, col = "slate grey", lty = 1)
+    lines(c(-60, 20), c(-35, -35), lwd = lwdm, col = "slate grey", lty = 1)
+    text(-30, 35, "R1", col = tcol, cex = 1.5)
+    text(-20, 0, "R2", col = tcol, cex = 1.5)
+    text(-10, -25, "R3", col = tcol, cex = 1.5)
+  }
+  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
+  if (axes) {
+    box(lwd = 3)
+    axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)
+    axis(2, at = seq(lims[3], lims[4], by = 5), labels = F)
+    latseq <- seq(lims[3] + 10, lims[4] - 10, by = 10)
+    latseq2 <- as.character(latseq)
+    lonseq <- seq(lims[1] + 20, lims[2] - 10, by = 20)
+    lonseq2 <- as.character(lonseq)
+    latseq2[latseq < 0] <- paste(abs(latseq[latseq < 0]), "S", sep = "")
+    latseq2[latseq > 0] <- paste(latseq[latseq > 0], "N", sep = "")
+    lonseq2[lonseq < 180] <- paste(lonseq2[lonseq < 180], "E", sep = "")
+    lonseq2[lonseq > 180] <- paste(360 - lonseq[lonseq > 180], "W", sep = "")
+    axis(2, at = latseq, labels = latseq2, cex.axis = 0.75)
+    axis(1, at = lonseq, labels = lonseq2, cex.axis = 0.75)
+  }
+  mtext(side = 3, line = 0.5, plot_title, font = 2, cex = 1.1)
+}
+
 #' Make effects plot for a glm object.
 #'
 #' Function to make effects plot for a glm object. Originally developed for Japanese data in the WCPO.

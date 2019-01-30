@@ -154,6 +154,36 @@ dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott",
   return(dat1)
 }
 
+#' Clean TW data.
+#'
+#' The function sets up variables and removes bad data. Originally developed for Taiwanese data in the IO.
+#' @param dat1 Input dataset
+#' @param rmssp If TRUE, remove sets that report catch of only one species.
+#' @param splist List of species codes.
+#' @return Modified dataset.
+#'
+dataclean_TW_EPO <- function(dat1, rmssp = F, splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "skx", "oth")) {
+  dat1 <- dat1[!is.na(dat1$dmy),]
+  dat1 <- dat1[!is.na(dat1$hooks), ]  #
+#  dat1 <- dat1[dat1$hooks < 5000, ]  # clean up outliers
+#  dat1 <- dat1[dat1$hooks > 200, ]
+  dat1[dat1$hbf %in% c(127), "hbf"] <- 17
+  lenzero <- function(x) sum(x > 0)
+  if (rmssp) {
+    ssp <- apply(dat1[, splist], 1, lenzero)
+    dat1 <- dat1[ssp > 1, ]
+  }
+  dat1 <- dat1[!is.na(dat1$yrqtr),]
+  # remove sets where 1 degree location is not in the op_area
+  a <- dat1$lon - dat1$lon5
+  loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
+  dat1 <- dat1[loc,]
+  a <- dat1$lat - dat1$lat5
+  loc <- !a %in% c(seq(-402.5, -3.5, 1), seq(2.5, 40.5, 1))
+  dat1 <- dat1[loc,]
+  return(dat1)
+}
+
 #' Clean SY data.
 #'
 #' The function sets up variables and removes bad data. Originally developed for Taiwanese data in the IO.

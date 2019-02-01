@@ -139,6 +139,7 @@ dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott",
   dat1[dat1$hbf %in% c(26, 30), "hbf"] <- 20
   dat1[dat1$hbf %in% c(25), "hbf"] <- 24
   lenzero <- function(x) sum(x > 0)
+  dat1$nsp <- apply(dat1[, splist], 1, lenzero)
   if (rmssp) {
     ssp <- apply(dat1[, splist], 1, lenzero)
     dat1 <- dat1[ssp > 1, ]
@@ -162,7 +163,7 @@ dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott",
 #' @param splist List of species codes.
 #' @return Modified dataset.
 #'
-dataclean_TW_EPO <- function(dat1, rmssp = F, splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "skx", "oth")) {
+dataclean_TW_EPO <- function(dat1, rmssp = F, splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth")) {
   dat1 <- dat1[!is.na(dat1$dmy),]
   dat1 <- dat1[!is.na(dat1$hooks), ]  #
 #  dat1 <- dat1[dat1$hooks < 5000, ]  # clean up outliers

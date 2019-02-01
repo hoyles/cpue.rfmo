@@ -4,7 +4,7 @@
 \alias{setup_EPO_regions}
 \title{Set up Eastern Pacific Ocean regions}
 \usage{
-setup_EPO_regions(dat, regB = F, regB1 = F)
+setup_EPO_regions(dat, regBall = F, regBepo = F, regBwcpo = F)
 }
 \arguments{
 \item{dat}{Input dataset}

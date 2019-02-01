@@ -11,6 +11,9 @@ dir.create(twfigs)
 
 setwd(twalysis_dir)
 
+#install.packages("RColorBrewer")
+#install.packages("colorspace")
+library(RColorBrewer)
 library(tidyverse)
 library(stringi)
 library(htmlwidgets)
@@ -27,6 +30,7 @@ library("plyr")
 library("dplyr")
 library("dtplyr")
 library("tm")
+library("colorspace")
 
 #install.packages("devtools")
 library(devtools)
@@ -41,7 +45,7 @@ library("cpue.rfmo")
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 
-nms2 <- c( "callsign","op_yr","op_mon","op_day","lon5","lat5","lon1","lat1", "hooks","hbf","alb","bet","yft","ott","swo","mls","bum","blm","otb","skj","skx","oth","alb_w","bet_w","yft_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","skx_w","oth_w")
+nms2 <- c( "callsign","op_yr","op_mon","op_day","lon5","lat5","lon1","lat1", "hooks","hbf","alb","bet","yft","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w")
 # is tun == ott?
 # is bil == otb?
 # is skx == sha?
@@ -59,27 +63,23 @@ indat2 <- type.convert(indat1)
 save(indat2,file = paste0(twalysis_dir, "dat1.RData"))
 load(paste0(twalysis_dir, "dat1.RData"))
 
-# Check data
-# str(dat1)
-# summary(dat1)
-# table(dat1$op_yr)
-# table(is.na(dat1$embark_yr),dat1$op_yr)
-# table(is.na(dat1$debark_yr),dat1$op_yr)
-# table(is.na(dat1$op_start_yr),dat1$op_yr)
-# table(is.na(dat1$op_end_yr),dat1$op_yr)
-# table(is.na(dat1$target),dat1$op_yr)
-# table(is.na(dat1$op_lon),dat1$op_yr)
-# table(is.na(dat1$hbf),dat1$op_yr)
-# table(dat1$op_yr,dat1$op_yr == 1)
-
-
-table(indat2$lon1)
-a <- indat2[indat2$lon1 < 5 & indat2$lon1 > -5,]
-table(a$lon5)
 
 # Prepare data
-splist <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "skx", "oth")
+splist <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth")
 prepdat1 <- dataprep_TW_EPO(indat2, alldat = F, region = "EPO", splist = splist)
+prepdat <- setup_EPO_regions(prepdat1,  regBall = TRUE, regBepo = TRUE, regBwcpo = TRUE)
+
+dat <- dataclean_TW_EPO(prepdat, rmssp = F, splist = splist)
+save(dat,file = "TWdat_all.RData")
+save(dat,file = "TWdat.RData")
+dat <-    dataclean_TW_EPO(prepdat, rmssp = T, splist = splist)
+save(dat,file = "TWdat_nossp.RData")
+
+#----------------------------------------------
+load(file = "TWdat.RData")
+
+
+table(prepdat$regBall)
 
 a <- with(prepdat1, tapply(hooks, list(lon,lat), sum, na.rm = TRUE))
 aa <- dim(a)
@@ -92,10 +92,6 @@ lines(c(250, 250), c(-50, 24.5), lwd = 2, col = "slate grey", lty = 1)
 lines(c(210, 290), c(-10, -10), lwd = 2, col = "slate grey", lty = 1)
 lines(c(210, 250), c(10, 10), lwd = 2, col = "slate grey", lty = 1)
 savePlot("TW_effort_loghooks.png", type = "png")
-
-prepdat <- setup_EPO_regions(prepdat1,  regB = TRUE, regB1 = TRUE)
-prepdat$latf <- factor(prepdat$lat)
-prepdat$lonf <- factor(prepdat$lon)
 
 windows(width=20, height = 12); par(mfrow = c(3,4), mar = c(2,2,2,0.5)+.1, oma = c(3,3,0,0))
 dy <- 5 * floor(prepdat$op_yr/5)
@@ -117,6 +113,9 @@ mtext("Latitude", side = 1, outer = TRUE, line = 1)
 mtext("Longitude", side = 2, outer = TRUE, line = 1)
 savePlot("TW_effort_by_5yrs.png", type = "png")
 
+table(prepdat$tonnage, useNA = "always")
+#   levs <- cbind(c("0", "1", "2", "3", "4", "5", "6", "7", "8"),
+# c(" < 5", "5 -10", "10 -20", "20 -50", "50 -100", "100 -200", "200 -500", "500 -1000"," >= 1000"))
 
 a <- as.data.frame(prepdat)
 head(a)
@@ -169,7 +168,7 @@ table(prepdat$hbf) #
 #18451  7704  2226   987   953   986   341  5237   583   868    83   413    28     5     1
 # Maybe is shallow water, they use less HBF, DO NOT REMOVE
 # 127 is data entry error, should be 17, changed
-prepdat<-prepdat[prepdat$hbf>2,] #Nothing was removed here:
+#prepdat<-prepdat[prepdat$hbf>2,] #Nothing was removed here:
 dim(prepdat)
 #[1] 585632     47
 ###Vessels:
@@ -187,6 +186,7 @@ lenzero <- function(x) sum(x > 0)
 prepdat$nsp <- apply(prepdat[, splist], 1, lenzero)
 table(prepdat$nsp, useNA="always")
 
+# Plot single species distribution
 a <- with(prepdat, tapply(nsp > 1, list(lon,lat), mean, na.rm = TRUE))
 aa <- dim(a)
 windows(width = 15,height = 10)
@@ -219,15 +219,15 @@ mtext("Latitude", side = 1, outer = TRUE, line = 1)
 mtext("Longitude", side = 2, outer = TRUE, line = 1)
 savePlot("TW_single_species_by_5yrs.png", type = "png")
 
+barplot(table(prepdat$nsp))
+str(prepdat)
+
+a <- as.data.frame(prepdat[is.na(prepdat$lon),])
 
 #----------------------------------------------
 
-#splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")
-datold <- dataclean_TW_EPO(prepdat, rmssp = F, splist = splist)
-save(datold,file = "TWdat_all.RData")
-dat <-    dataclean_TW_EPO(prepdat, rmssp = T, splist = splist)
-save(dat,file = "TWdat_nossp.RData")
-load(file = "TWdat_nossp.RData")
+#splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth")
+
 getwd()
 
 
@@ -244,13 +244,13 @@ table(dat$lon,useNA = "always")
 
 # Data map
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
-for (fld in c("regB","regB1")) {
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regBepo","regBwcpo")]
+for (fld in c("regBepo","regBwcpo")) {
 windows(width = 15,height = 10)
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld)
   text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
-  map(add = T)
+  map("world2", add = T, fill = TRUE)
   savePlot(paste0("map_",fld),type = "png")
 }
 
@@ -258,6 +258,9 @@ table(is.na(dat$embark_dmy),dat$op_yr)
 head(dat)
 
 table(prepdat$alb)
+a <- table(prepdat$Total - prepdat$hooks)
+barplot(a)
+a[as.numeric(names(a)) > -1000]
 prepdat[prepdat$alb == 3450,]
 table(prepdat$bet)
 prepdat[prepdat$bet == 1429,]
@@ -267,12 +270,9 @@ prepdat[prepdat$bet > 1000,] # Sets with v large catches are aggregated, note no
 table(dat$bet)
 str(dat)
 table(dat$bft)
-table(dat$sbt)
 table(prepdat$yft)
-table(prepdat$sbt)
-table(prepdat$pbf)
-table(prepdat$whm)
-table(dat1$whm)
+table(prepdat$mls)
+table(dat$mls)
 table(prepdat$ott)
 table(prepdat$swo)
 table(prepdat$mls)
@@ -284,20 +284,19 @@ table(prepdat$sha)   # majority of sets (=719211) with 0 sha. Also one set with 
 table(prepdat$oth)   # set with 2002.
 prepdat[prepdat$oth > 1800,]
 table(prepdat$hbf,useNA = "always")
-table(prepdat$hbf,prepdat$yr,useNA = "always")
-a <- table(dat$yr,round(dat$hbf,0),useNA = "always")
+table(prepdat$hbf,prepdat$op_yr,useNA = "always")
+a <- table(dat$op_yr,round(dat$hbf,0),useNA = "always")
 write.csv(a,"table hbf by year.csv")
 
 
 # Plot and explore data
 #install.packages("rpart")
 library(rpart)
-a <- dat[dat$regB %in% c(1:3),]
+a <- as.data.frame(dat[dat$regBepo %in% c(1,3),])
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
 a$yftcpue <- a$yft/a$hooks
-a$sbtcpue <- a$sbt/a$hooks
 a$swocpue <- a$swo/a$hooks
 a$othcpue <- a$oth/a$hooks
 a$mlscpue <- a$mls/a$hooks
@@ -307,6 +306,22 @@ simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue +
 windows(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
+
+library(randomForest)
+table(is.na(a$lat))
+a <- as.data.frame(dat[dat$regBepo %in% c(1) & !is.na(dat$hbf) & !is.na(dat$lon),])
+a$betcpue <- a$bet/a$hooks
+simplefor <- randomForest(a$betcpue ~ a$lon5 + a$lat5 + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
+print(simplefor)
+windows(width = 11,height = 7)
+varImpPlot(simplefor)
+text(varImpPlot,main = NULL)
+savePlot("Rforest bet cpue",type = "png")
+betfor2 <- randomForest(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$hooks + a$hbf + a$moon)
+windows(width = 11,height = 7)
+varImpPlot(betfor2)
+savePlot("Rforest bet",type = "png")
+save(betfor2, file="betfor2.RData")
 
 
 ########################
@@ -329,9 +344,9 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/IATTC/2019_CPUE/"
 twdir <- paste0(projdir, "TW/")
-datadir1 <- paste0(twdir, "data/catch_effort/")
+datadir1 <- paste0(twdir, "data/")
 twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -342,15 +357,15 @@ dir.create(clustdir_all)
 setwd(clustdir_all)
 load(file = "../analyses/TWdat.RData")
 
-tw_allsp <- c("alb","bet","bft","yft","ott","swo","mls", "blm", "bum", "otb", "skj", "sha", "oth", "sbt")
-use_allsp_allyrs <- c("alb","bet","yft","ott","swo","mls","bum","otb")
+tw_allsp <- c("alb","bet","yft","ott","swo","mls", "blm", "bum", "otb", "skj", "sha", "oth")
+use_allsp_allyrs <- c("alb","bet","yft","swo","mls","bum","otb","skj")
 
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_allyrs,"Total","sst","dmy","lat","lon","lat5","lon5","regB")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripidmon","moon",use_allsp_allyrs,"Total","dmy","lat","lon","lat5","lon5","regBepo")
 
-flag = "TW"
-for (r in c(1:3)) {
-  windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB == r,]
+flag = "TW"; allreg <- c(1,2,3,4)
+for (r in allreg) {
+  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  a <- as.data.frame(dat[dat$regBepo == r,])
   for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, "allyrs", sep = "_"), type = "png")
@@ -359,15 +374,16 @@ for (r in c(1:3)) {
 ##########
 # All years included, YFT regions
 rm(datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2)
-
-nclB = c(3,3,4)
+doreg <- c(1,2,3,4)
+nclB = c(5,4,4,5)
 flag = "TW"
 
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
-regtype = "regB"
-for (r in c(1,2,3)) {
+regtype = "regBepo"
+for (r in doreg) {
+  rnm <- r
   fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_allsp_allyrs,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  dataset <- clust_PCA_run(r,ddd = dat,allsp = use_allsp_allyrs,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 
@@ -376,20 +392,20 @@ clustdir_2005 <- paste0(twdir,"clustering/")
 dir.create(clustdir_2005)
 setwd(clustdir_2005)
 
-use_allsp_2005 <- c("alb","bet","yft","swo","mls", "bum", "otb", "sha", "oth", "sbt")
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_2005,"Total","sst","dmy","lat","lon","lat5","lon5","regB", "regB1")
+use_allsp_2005 <- c("alb","bet","yft","swo","mls", "bum", "otb", "sha", "oth")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_2005,"Total","sst","dmy","lat","lon","lat5","lon5","regBepo", "regBwcpo")
 dat5 <- dat[dat$yrqtr > 2005,]
 
 for (r in c(1:3)) {
   windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat5[dat5$regB == r,]
+  a <- dat5[dat5$regBepo == r,]
   for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, "2005", sep = "_"), type = "png")
 }
 
 nclB = c(4,3,4)
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regBepo","regBwcpo")
 regtype = "regB"
 for (r in c(1,2,3)) {
   fnh <- paste(flag,regtype,r,sep = "_")
@@ -426,7 +442,7 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/IATTC/2019_CPUE/"
 twdir <- paste0(projdir, "TW/")
 datadir1 <- paste0(twdir, "data/Simon_new data_April 20/")
 twalysis_dir <- paste0(twdir, "analyses/")
@@ -452,7 +468,7 @@ clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
 clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regBepo", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 
 runsp <- "bet"; runreg <- 2
 maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5); keepd <- TRUE
@@ -532,7 +548,7 @@ clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
 clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regBepo", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
 runsp <- "bet"; runreg <- 2
 maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5); keepd <- TRUE

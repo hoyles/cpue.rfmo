@@ -21,7 +21,7 @@
 clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP", dbh = TRUE,
     cllist = NA, fnhead = "", ll5=F, covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr", "op_mon")) {
     datr <- ddd[with(ddd, get(regtype)) == r, allabs]
-    datr$reg <- datr[, regtype]
+    datr$reg <- as.data.frame(datr[, regtype])
     spec_dat <- datr[, allsp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
     datr <- datr[spec_dat$sum > 0, ]

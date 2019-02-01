@@ -295,8 +295,7 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
 
   dat$tonnage <- as.factor(substring(dat$callsign, 1, 1))
   a <- levels(dat$tonnage)
-  levs <- cbind(c("0", "1", "2", "3", "4", "5", "6", "7", "8"), c(" < 5", "5 -10", "10 -20", "20 -50", "50 -100", "100 -200", "200 -500", "500 -1000",
-                                                                  " >= 1000"))
+  levs <- cbind(c("0","1","2","3","4","5","6","7","8","9"), c("< 5", "5 - 10","10 - 20","20 - 50","50 - 100","100 - 200","200 - 500","500 - 1000"," >= 1000","undetermined"))
   levels(dat$tonnage) <- levs[match(a, levs[, 1]), 2]
   # table(dat$tonnage, substring(dat$callsign, 1, 1)) table(dat$NS, useNA = 'always') table(dat$EW, useNA = 'always')
 
@@ -385,7 +384,7 @@ makedmy <- function(yy, mm, dd) {
 #' @param splist Define the species in the dataset
 #' @return Modified dataset.
 #'
-dataprep_TW_EPO <- function(dat, alldat = F, region = "EPO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "skx", "oth")) {
+dataprep_TW_EPO <- function(dat, alldat = F, region = "EPO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth")) {
   splist_w <- paste0(splist, "_w")
   dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
 
@@ -399,11 +398,12 @@ dataprep_TW_EPO <- function(dat, alldat = F, region = "EPO", splist = c("alb", "
   dat$lon5[dat$lon5 < 0 & !is.na(dat$lon5)] <- dat$lon5[dat$lon5 < 0 & !is.na(dat$lon5)] + 360
   dat$lonx <- dat$lon - 360
   dat$lonx5 <- dat$lon5 - 360
+  dat$latf <- factor(dat$lat)
+  dat$lonf <- factor(dat$lon)
 
   dat$tonnage <- as.factor(substring(dat$callsign, 1, 1))
   a <- levels(dat$tonnage)
-  levs <- cbind(c("0", "1", "2", "3", "4", "5", "6", "7", "8"), c(" < 5", "5 -10", "10 -20", "20 -50", "50 -100", "100 -200", "200 -500", "500 -1000",
-                                                                  " >= 1000"))
+  levs <- cbind(c("0","1","2","3","4","5","6","7","8","9"), c("< 5", "5 - 10","10 - 20","20 - 50","50 - 100","100 - 200","200 - 500","500 - 1000"," >= 1000","undetermined"))
   levels(dat$tonnage) <- levs[match(a, levs[, 1]), 2]
 
   dat$vessid <- as.factor(as.numeric(as.factor(dat$callsign)))
@@ -415,7 +415,7 @@ dataprep_TW_EPO <- function(dat, alldat = F, region = "EPO", splist = c("alb", "
   dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
   dat$Total <- apply(dat[,splist], 1, sum)
   dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
-  noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripidmon", "tripidwk", "moon", splist, "Total", "Total2", splist_w, "dmy", "lat", "lon", "lat5", "lon5", "lonx", "lonx5", "lonraw5")
+  noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripidmon", "tripidwk", "moon", splist, "Total", "Total2", splist_w, "dmy", "lat", "lon", "lat5", "lon5", "lonx", "lonx5", "lonraw5","latf","lonf")
   dat <- dat[, noms]
   return(dat)
 }
@@ -670,24 +670,53 @@ setup_AO_regions <- function(dat, regB = F, regB1 = F) {
 #' @param regB1 If TRUE, set up regB1
 #' @return Modified dataset.
 #'
-setup_EPO_regions <- function(dat, regB = F, regB1 = F) {
-  # north of 10N, between 25N and 15S, and south of 15S
+setup_EPO_regions <- function(dat, regBall = F, regBepo = F, regBwcpo = F) {
   lat5 <- lon5 <- NULL
 
-  if (regB) {
-    dat$regB <- "X"
+  if (regBall) {
+    dat$regBall <- 0
     dat <- mutate(dat,
-                  regB = replace(regB, which(lat5 < 40  & lat5 >   20 & lonx5 > -250 & lonx5 < -190 & !is.na(lat5)), "W1")) %>%
-      mutate(regB = replace(regB, which(lat5 < 40  & lat5 >   20 & lonx5 > -190 & lonx5 < -150 & !is.na(lat5)), "W2")) %>%
-      mutate(regB = replace(regB, which(lat5 < 20  & lat5 >  -10 & lonx5 > -250 & lonx5 < -190 & !is.na(lat5)), "W3")) %>%
-      mutate(regB = replace(regB, which(lat5 < 20  & lat5 >  -10 & lonx5 > -190 & lonx5 < -150 & !is.na(lat5)), "W4")) %>%
-      mutate(regB = replace(regB, which(lat5 < -10 & lat5 >  -40 & lonx5 > -220 & lonx5 < -190 & !is.na(lat5)), "W5")) %>%
-      mutate(regB = replace(regB, which(lat5 < -10 & lat5 >  -40 & lonx5 > -190 & lonx5 < -150 & !is.na(lat5)), "W6")) %>%
-      mutate(regB = replace(regB, which(lat5 >  10 & lonx5 > -110 & lonx5 > -150               & !is.na(lat5)), "E0")) %>%
-      mutate(regB = replace(regB, which(lat5 > -10 & lat5 <   10 & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), "E1")) %>%
-      mutate(regB = replace(regB, which(lat5 > -10 &               lonx5 > -110 & lonx5 < -60  & !is.na(lat5)), "E2")) %>%
-      mutate(regB = replace(regB, which(lat5 > -30 & lat5 <  -10 & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), "E3")) %>%
-      mutate(regB = replace(regB, which(lat5 >  30 & lat5 >  -10 & lonx5 > -110  & lonx5 > -60 & !is.na(lat5)), "E4"))
+             regBall = replace(regBall, which(lat5 < 50  & lat5 >   20 & lon5 > 120 & lon5 < 170 & !is.na(lat5)), 1)) %>%
+      mutate(regBall = replace(regBall, which(lat5 < 50  & lat5 >   10 & lon5 > 140 & lon5 < 170 & !is.na(lat5)), 1)) %>%
+      mutate(regBall = replace(regBall, which(lat5 < 50  & lat5 >   20 & lon5 > 170 & lon5 < 210 & !is.na(lat5)), 2)) %>%
+      mutate(regBall = replace(regBall, which(lat5 < 10  & lat5 >  -10 & lon5 > 140 & lon5 < 170 & !is.na(lat5)), 3)) %>%
+      mutate(regBall = replace(regBall, which(lat5 < 10  & lat5 >  -10 & lon5 > 170 & lon5 < 210 & !is.na(lat5)), 4)) %>%
+      mutate(regBall = replace(regBall, which(lat5 < -10 & lat5 >  -40 & lon5 > 140 & lon5 < 170 & !is.na(lat5)), 5)) %>%
+      mutate(regBall = replace(regBall, which(lat5 < -10 & lat5 >  -40 & lon5 > 170 & lon5 < 210 & !is.na(lat5)), 6)) %>%
+      mutate(regBall = replace(regBall, which(lat5 <  20 & lat5 >  -10 & lon5 > 110 & lon5 < 140 & !is.na(lat5)), 7)) %>%
+      mutate(regBall = replace(regBall, which(lat5 <   0 & lat5 >  -10 & lon5 > 140 & lon5 < 155 & !is.na(lat5)), 8)) %>%
+      mutate(regBall = replace(regBall, which(lat5 <  -5 & lat5 >  -10 & lon5 > 155 & lon5 < 160 & !is.na(lat5)), 8)) %>%
+      mutate(regBall = replace(regBall, which(lat5 < -15 & lat5 >  -20 & lon5 > 140 & lon5 < 150 & !is.na(lat5)), 9)) %>%
+      mutate(regBall = replace(regBall, which(lat5 >  10               & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), 15)) %>%
+      mutate(regBall = replace(regBall, which(lat5 > -10 & lat5 <   10 & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), 11)) %>%
+      mutate(regBall = replace(regBall, which(lat5 > -10 &               lonx5 > -110 & lonx5 < -60  & !is.na(lat5)), 12)) %>%
+      mutate(regBall = replace(regBall, which(             lat5 <  -10 & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), 13)) %>%
+      mutate(regBall = replace(regBall, which(             lat5 <  -10 & lonx5 > -110 & lonx5 < -60  & !is.na(lat5)), 14))
+  }
+  if (regBepo) {
+    dat$regBepo <- 0
+    dat <-
+      mutate(dat,
+             regBepo = replace(regBepo, which(lat5 >  10                & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), 5)) %>%
+      mutate(regBepo = replace(regBepo, which(lat5 > -10 & lat5 <   10  & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), 1)) %>%
+      mutate(regBepo = replace(regBepo, which(lat5 > -10 &                lonx5 > -110 & lonx5 < -60  & !is.na(lat5)), 2)) %>%
+      mutate(regBepo = replace(regBepo, which(             lat5 <  -10  & lonx5 > -150 & lonx5 < -110 & !is.na(lat5)), 3)) %>%
+      mutate(regBepo = replace(regBepo, which(             lat5 <  -10  & lonx5 > -110 & lonx5 < -60  & !is.na(lat5)), 4))
+  }
+  if (regBwcpo) {
+    dat$regBwcpo <- 0
+    dat <- mutate(dat,
+             regBwcpo = replace(regBwcpo, which(lat5 < 50  & lat5 >   20 & lon5 > 120 & lon5 < 170 & !is.na(lat5)), 1)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 < 50  & lat5 >   10 & lon5 > 140 & lon5 < 170 & !is.na(lat5)), 1)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 < 50  & lat5 >   20 & lon5 > 170 & lon5 < 210 & !is.na(lat5)), 2)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 < 10  & lat5 >  -10 & lon5 > 140 & lon5 < 170 & !is.na(lat5)), 3)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 < 10  & lat5 >  -10 & lon5 > 170 & lon5 < 210 & !is.na(lat5)), 4)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 < -10 & lat5 >  -40 & lon5 > 140 & lon5 < 170 & !is.na(lat5)), 5)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 < -10 & lat5 >  -40 & lon5 > 170 & lon5 < 210 & !is.na(lat5)), 6)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 <  20 & lat5 >  -10 & lon5 > 110 & lon5 < 140 & !is.na(lat5)), 7)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 <   0 & lat5 >  -10 & lon5 > 140 & lon5 < 155 & !is.na(lat5)), 8)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 <  -5 & lat5 >  -10 & lon5 > 155 & lon5 < 160 & !is.na(lat5)), 8)) %>%
+      mutate(regBwcpo = replace(regBwcpo, which(lat5 < -15 & lat5 >  -20 & lon5 > 140 & lon5 < 150 & !is.na(lat5)), 9))
   }
   return(dat)
 }

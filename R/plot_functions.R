@@ -541,13 +541,13 @@ plot_slope_ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
 plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", bgc = "grey") {
     plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
     indat <- cbind(indat, vbl)
-    indat <- indat[indat$lon <= 140, ]
+#    indat <- indat[indat$lon <= 140, ]
     a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lon, lat), sum))
     usr <- par('usr')
     rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, levels = brk2)
-    map(database = "world", add = T, interior = F, fill = T)
+    map(database = "world2", add = T, interior = F, fill = T)
     title(paste(dcd, ti))
 }
 
@@ -565,13 +565,13 @@ plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 1
 plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), ti = "", delta=1) {
     plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
     indat <- cbind(indat, vbl)
-    indat <- indat[indat$lon <= 140, ]
+ #   indat <- indat[indat$lon <= 140, ]
     indat$lo <- factor(indat$lon, levels = seq(min(indat$lon, na.rm = T), max(indat$lon, na.rm = T), delta))
     indat$la <- factor(indat$lat, levels = seq(min(indat$lat, na.rm = T), max(indat$lat, na.rm = T), delta))
     a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lo, la), sum))
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
-    map(database = "world", add = T, interior = F, fill = T)
+    map(database = "world2", add = T, interior = F, fill = T)
     title(paste(dcd, ti))
 }
 
@@ -614,13 +614,13 @@ plot_cpuemap <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(1
 plot_cpuemap2 <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120, 210), ti = "", delta=1) {
     plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
     indat <- cbind(indat, vb1, vb2)
-    indat <- indat[indat$lon <= 210, ]
+#    indat <- indat[indat$lon <= 210, ]
     indat$lo <- factor(indat$lon, levels = seq(min(indat$lon, na.rm = T), max(indat$lon, na.rm = T), delta))
     indat$la <- factor(indat$lat, levels = seq(min(indat$lat, na.rm = T), max(indat$lat, na.rm = T), delta))
     a1 <- with(indat[indat$decade == dcd, ], tapply(vb1, list(lo, la), sum)/tapply(vb2, list(lo, la), sum))
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
-    map(database = "world", add = T, interior = F, fill = T)
+    map(database = "world2", add = T, interior = F, fill = T)
     title(paste(dcd, ti))
 }
 

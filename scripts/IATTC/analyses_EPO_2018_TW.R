@@ -13,8 +13,7 @@ setwd(twalysis_dir)
 
 #install.packages("RColorBrewer")
 #install.packages("colorspace")
-library(RColorBrewer)
-library(tidyverse)
+#library(RColorBrewer)
 library(stringi)
 library(htmlwidgets)
 library("date")
@@ -31,6 +30,7 @@ library("dplyr")
 library("dtplyr")
 library("tm")
 library("colorspace")
+library("tidyverse")
 
 #install.packages("devtools")
 library(devtools)
@@ -58,7 +58,7 @@ DataFile1<-"Logbook_PAC.csv"
 indat1<-read_csv(paste0(datadir1,DataFile1))
 names(indat1)  <- nms2
 
-indat2 <- type.convert(indat1)
+indat2 <- as.data.frame(type.convert(indat1), stringsAsFactors = FALSE)
 
 save(indat2,file = paste0(twalysis_dir, "dat1.RData"))
 load(paste0(twalysis_dir, "dat1.RData"))
@@ -77,7 +77,7 @@ save(dat,file = "TWdat_nossp.RData")
 
 #----------------------------------------------
 load(file = "TWdat.RData")
-
+str(dat)
 
 table(prepdat$regBall)
 
@@ -337,8 +337,6 @@ library("mgcv")
 library("randomForest")
 library("influ")
 library("nFactors")
-library("plyr")
-library("dplyr")
 library("data.table")
 library("cluster")
 library("beanplot")
@@ -377,6 +375,8 @@ rm(datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,l
 doreg <- c(1,2,3,4)
 nclB = c(5,4,4,5)
 flag = "TW"
+str(dat$tripidwk)
+
 
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 regtype = "regBepo"

@@ -21,7 +21,7 @@
 clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP", dbh = TRUE,
     cllist = NA, fnhead = "", ll5=F, covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr", "op_mon")) {
     datr <- ddd[with(ddd, get(regtype)) == r, allabs]
-    datr$reg <- as.data.frame(datr[, regtype])
+    datr$reg <- datr[, regtype]
     spec_dat <- datr[, allsp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
     datr <- datr[spec_dat$sum > 0, ]
@@ -321,7 +321,7 @@ aggregate_data <- function(dat, sp) {
 #'
 aggregate_by_trip <- function(dat, flds) {
   TRIP_NUM <- NULL
-  dt1 <- data.table(dat)
+  dt1 <- as.data.table(dat)
   setkeyv(dt1, cols = "TRIP_NUM")
   df2 <- dt1[, lapply(.SD, mean, na.rm = T), by = list(TRIP_NUM), .SDcols = flds]
   df2 <- data.frame(df2)

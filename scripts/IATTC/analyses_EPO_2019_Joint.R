@@ -3,7 +3,7 @@
 # Remove TW before 2005
 # Joint standardization
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/IATTC/2019_CPUE/"
 
 cndir <- paste0(projdir, "CN/")
 krdir <- paste0(projdir, "KR/")
@@ -14,23 +14,28 @@ jointdir <- paste0(projdir, "joint/")
 
 jntalysis_dir <- paste0(jointdir, "analyses/")
 
-library("stringr")
+library(stringi)
+library(htmlwidgets)
 library("date")
 library("splines")
 library("maps")
 library("mapdata")
 library("maptools")
+library("data.table")
 library("lunar")
-library("mgcv")
-library("randomForest")
-library("influ")
-library("nFactors")
+library("lubridate")
+library("readr")
 library("plyr")
 library("dplyr")
-library("data.table")
-library("cluster")
-library("beanplot")
-library("survival")
+library("dtplyr")
+library("tm")
+library("colorspace")
+library("tidyverse")
+
+#install.packages("devtools")
+library(devtools)
+# This new library replaces the 'support functions.r' file.
+#install_github("hoyles/cpue.rfmo")
 
 library("cpue.rfmo")
 

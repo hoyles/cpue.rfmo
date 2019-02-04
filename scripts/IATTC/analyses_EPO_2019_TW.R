@@ -11,9 +11,6 @@ dir.create(twfigs)
 
 setwd(twalysis_dir)
 
-#install.packages("RColorBrewer")
-#install.packages("colorspace")
-#library(RColorBrewer)
 library(stringi)
 library(htmlwidgets)
 library("date")
@@ -373,7 +370,7 @@ for (r in allreg) {
 # All years included, YFT regions
 rm(datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2)
 doreg <- c(1,2,3,4)
-nclB = c(5,4,4,5)
+nclB = c(3,2,2,2)
 flag = "TW"
 str(dat$tripidwk)
 
@@ -387,31 +384,6 @@ for (r in doreg) {
   save(dataset,file = paste0(fnh,".RData"))
 }
 
-# --------------
-clustdir_2005 <- paste0(twdir,"clustering/")
-dir.create(clustdir_2005)
-setwd(clustdir_2005)
-
-use_allsp_2005 <- c("alb","bet","yft","swo","mls", "bum", "otb", "sha", "oth")
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_2005,"Total","sst","dmy","lat","lon","lat5","lon5","regBepo", "regBwcpo")
-dat5 <- dat[dat$yrqtr > 2005,]
-
-for (r in c(1:3)) {
-  windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat5[dat5$regBepo == r,]
-  for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
-  title(paste("Region", r ), outer = TRUE)
-  savePlot(filename = paste("freq",flag,"Region", r, "2005", sep = "_"), type = "png")
-}
-
-nclB = c(4,3,4)
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regBepo","regBwcpo")
-regtype = "regB"
-for (r in c(1,2,3)) {
-  fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat5,allsp = use_allsp_2005,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
-  save(dataset,file = paste0(fnh,".RData"))
-}
 
 ######################################
 

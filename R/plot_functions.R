@@ -163,7 +163,7 @@ plot_IO <- function(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT", 
     text(115 + xoffset, -11 - yoffset, "N", col = tcol, cex = 1.5)
     text(115 + xoffset, -40 - yoffset, "S", col = tcol, cex = 1.5)
   }
-  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = mapfill)
+  maps::map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = mapfill)
   if (axes) {
     box(lwd = 3)
     axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)
@@ -208,7 +208,7 @@ plot_AO <- function(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "BET",
     text(-20, 0, "R2", col = tcol, cex = 1.5)
     text(-10, -25, "R3", col = tcol, cex = 1.5)
   }
-  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
+  maps::map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
   if (axes) {
     box(lwd = 3)
     axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)
@@ -253,7 +253,7 @@ plot_pacific <- function(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "
     text(-20, 0, "R2", col = tcol, cex = 1.5)
     text(-10, -25, "R3", col = tcol, cex = 1.5)
   }
-  map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
+  maps::map("world", yaxt = "n", xaxt = "n", add = T, resolution = 1, interior = F, fill = T)
   if (axes) {
     box(lwd = 3)
     axis(1, at = seq(lims[1], lims[2], by = 10), labels = F)
@@ -270,6 +270,41 @@ plot_pacific <- function(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "
     axis(1, at = lonseq, labels = lonseq2, cex.axis = 0.75)
   }
   mtext(side = 3, line = 0.5, plot_title, font = 2, cex = 1.1)
+}
+
+#' Map of the Pacific Ocean with EPO boundaries.
+#'
+#' Function to make a map of the Pacific Ocean, with regional boundaries.
+#'
+map_EPO <- function(new=FALSE, latlim = c(-40, 40), lonlim = c(140, 290)) {
+  if(new) {
+    doxax <- "n"
+    plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude",xaxt=doxax)
+  }
+  axis(1, at = c(160, 210, 260), labels = c(-200, -150, -100))
+  maps::map("world2", add = T, interior=F, fill = TRUE)
+  abline(v=210, col = "slate grey", lwd = 2, lty=1)
+  lines(c(250, 250), c(-70, 25), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(110, 280), c(-10, -10), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(210, 250), c(10, 10), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(140, 210), c(-40, -40), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(140, 150), c(-20, -20), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(140, 150), c(-15, -15), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(155, 160), c( -5,  -5), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(140, 155), c(  0,   0), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(140, 210), c( 10,  10), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(110, 140), c( 20,  20), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(140, 210), c( 50,  50), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(110, 110), c(-10,  20), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(120, 120), c( 20,  26), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(140, 140), c(-40,  20), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(150, 150), c(-20, -15), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(155, 155), c(-5,    0), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(160, 160), c(-10,  -5), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(170, 170), c(-40,  50), lwd = 2, col = "slate grey", lty = 1)
+  lines(c(210, 210), c(-40,  50), lwd = 2, col = "slate grey", lty = 1)
+  text(c(140,190,150,185,155,190,130,143,143), c(25,25,5,0,-30,-30,10,-4.5,-15.6), labels = 1:9, cex=1.6, font = 2, col = 4)
+  text(c(230,260,230,260,230), c(0,0,-30,-30,25), labels = c(1:4,0), cex=1.6, font = 2, col = 1)
 }
 
 #' Make effects plot for a glm object.
@@ -336,7 +371,7 @@ plot_effects <- function(model, indat, addmain = F, addbranch = F, addalb = F, a
     coefs2 <- tapply(coefs, list(alon, alat), mean)
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0.5, 2.5), ylab = "Lat", xlab = "Long")
     contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    map(add = TRUE)
+    maps::map(add = TRUE)
 
     index <- sort(unique(indat$vessid))
     b <- match(index, indat$vessid)
@@ -538,8 +573,9 @@ plot_slope_ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
 #' @param ti Title of the plot.
 #' @param bgc Background color of the plot, defaults to grey.
 #'
-plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", bgc = "grey") {
-    plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
+plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", bgc = "grey", maptype = "world2") {
+  if(maptype=="EPO") doxax <- "n" else doxax <- "s"
+  plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude",xaxt=doxax)
     indat <- cbind(indat, vbl)
 #    indat <- indat[indat$lon <= 140, ]
     a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lon, lat), sum))
@@ -547,7 +583,8 @@ plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 1
     rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, levels = brk2)
-    map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }
 
@@ -562,16 +599,20 @@ plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 1
 #' @param ti Title of the plot.
 #' @param delta Lat and long resolution
 #'
-plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), ti = "", delta=1) {
-    plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
+plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), ti = "", delta=1, bgc = "grey", maptype = "world2") {
+  if(maptype=="EPO") doxax <- "n" else doxax <- "s"
+  plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude",xaxt=doxax)
     indat <- cbind(indat, vbl)
  #   indat <- indat[indat$lon <= 140, ]
     indat$lo <- factor(indat$lon, levels = seq(min(indat$lon, na.rm = T), max(indat$lon, na.rm = T), delta))
     indat$la <- factor(indat$lat, levels = seq(min(indat$lat, na.rm = T), max(indat$lat, na.rm = T), delta))
     a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lo, la), sum))
+    usr <- par('usr')
+    rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
-    map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }
 
@@ -588,14 +629,18 @@ plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 
 #' @param brk2 Transition levels for the contour lines.
 #' @param ti Title of the plot.
 #'
-plot_cpuemap <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120, 210), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "") {
-    plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
+plot_cpuemap <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120, 210), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", bgc = "grey", maptype = "world2") {
+  if(maptype=="EPO") doxax <- "n" else doxax <- "s"
+  plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude",xaxt=doxax)
     indat <- cbind(indat, vb1, vb2)
     indat <- indat[indat$lon <= 210, ]
     a1 <- with(indat[indat$decade == dcd, ], tapply(vb1, list(lon, lat), sum)/tapply(vb2, list(lon, lat), sum))
+    usr <- par('usr')
+    rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, levels = brk2)
-    map(database = "world", add = T, interior = F, fill = T)
+    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }
 
@@ -611,16 +656,20 @@ plot_cpuemap <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(1
 #' @param ti Title of the plot.
 #' @param delta The spatial resolution of the data being used.
 #'
-plot_cpuemap2 <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120, 210), ti = "", delta=1) {
-    plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude")
+plot_cpuemap2 <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120, 210), ti = "", delta=1, bgc = "grey", maptype = "world2") {
+  if(maptype=="EPO") doxax <- "n" else doxax <- "s"
+  plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude",xaxt=doxax)
     indat <- cbind(indat, vb1, vb2)
 #    indat <- indat[indat$lon <= 210, ]
     indat$lo <- factor(indat$lon, levels = seq(min(indat$lon, na.rm = T), max(indat$lon, na.rm = T), delta))
     indat$la <- factor(indat$lat, levels = seq(min(indat$lat, na.rm = T), max(indat$lat, na.rm = T), delta))
     a1 <- with(indat[indat$decade == dcd, ], tapply(vb1, list(lo, la), sum)/tapply(vb2, list(lo, la), sum))
+    usr <- par('usr')
+    rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
-    map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }
 
@@ -693,7 +742,7 @@ plot_effects_IO <- function(model, indat, dovess = T, addcl = F, addpca = F, ti 
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0, 4), ylab = "Lat", xlab = "Long")
     if (length(coefs2) > 5)
         contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    map(add = TRUE, fill = TRUE)
+    maps::map(add = TRUE, fill = TRUE)
 
 
     if (dovess) {
@@ -831,7 +880,7 @@ plot_effects_IO_old <- function(model, indat, dovess = T, addcl = F, addpca = F,
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0, 4), ylab = "Lat", xlab = "Long")
     if (length(coefs2) > 5)
         contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    map(add = TRUE, fill = TRUE)
+    maps::map(add = TRUE, fill = TRUE)
 
     if (dovess) {
         index <- sort(unique(indat$vessid))
@@ -977,7 +1026,7 @@ plot_effects_IOx <- function(model, indat, dovess = T, addcl = F, addpca = F, ti
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0.5, 2.5), ylab = "Lat", xlab = "Long")
     if (length(coefs2) > 5)
         contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    map(add = TRUE)
+    maps::map(add = TRUE)
 
     if (dovess) {
         index <- sort(unique(indat$vessid))

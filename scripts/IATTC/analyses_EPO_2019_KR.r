@@ -1,4 +1,4 @@
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/IATTC/2019_CPUE/"
 
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")
@@ -9,11 +9,10 @@ dir.create(kralysis_dir)
 dir.create(krfigs)
 setwd(kralysis_dir)
 
+library(stringi)
+library(htmlwidgets)
 library("date")
 library("splines")
-library("maps")
-library("mapdata")
-library("maptools")
 library("data.table")
 library("lunar")
 library("lubridate")
@@ -22,49 +21,38 @@ library("plyr")
 library("dplyr")
 library("dtplyr")
 library("tm")
-library("readxl")
+library("colorspace")
+library("tidyverse")
+library("maps")
+library("mapdata")
+library("maptools")
 
-
-# install.packages("devtools")
+#install.packages("devtools")
 library(devtools)
 # This new library replaces the 'support functions.r' file.
-# install_github("hoyles/cpue.rfmo")
+#install_github("hoyles/cpue.rfmo")
 
 library("cpue.rfmo")
 
 #source(paste0(Rdir,"support_functions.r"))
 #xsd # stop!
+load("../data/KRdat_CMV.RData")
 
 # ===================================================================================
-# Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
+# Please keep the data format consistent between years and for the IATTC + IOTC analyses.
 #rawdat <- read.csv(paste0(datadir,"KR_AO_LL_DB_20180413.csv"), header = TRUE, stringsAsFactors = FALSE)
-coltypes <- c("text","date",rep("numeric",20))
-rawdat <- read_excel(paste0(datadir,"KR_AO_LL_DB_20180413.xlsx"), sheet = "DB", col_types = coltypes)
 
-str(rawdat)
+str(OpData)
+OpData$lonx <- OpData$lon
+OpData$lonx5 <- OpData$lon5
+OpData$lon <- 360 + OpData$lonx
+OpData$lon5 <- 360 + OpData$lonx5
+OpData$vessid <- as.factor(OpData$VESSEL_CD)
 
-# check the data
-str(rawdat)
-kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","whm","yft")
-a <- c("VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks","floats",kr_splist,"Total")
-cbind(names(rawdat),a)
-names(rawdat) <- a
-head(rawdat)
-str(rawdat)
+prepdat2 <- setup_EPO_regions(OpData,  regBall = TRUE, regBepo = TRUE, regBwcpo = TRUE)
+dat <- prepdat2
 
-
-
-# Prepare and clean the data
-rawdat$op_yr <- year(rawdat$DATE)
-rawdat$op_mon <- month(rawdat$DATE)
-prepdat <- dataprep_KR(rawdat, splist = kr_splist)
-head(prepdat)
-
-prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE)
-head(prepdat2)
-prepdat2 <- as.data.frame(prepdat2)
-dat <- dataclean_KR(prepdat2, yearlim = 2018, splist = kr_splist)
-save(prepdat,dat,file = "KRdat.RData")
+save(dat, file = "../data/KRdat.RData")
 
 
 # ===================================================================================
@@ -81,9 +69,8 @@ table(dat$op_yr,(dat$hooks > 0))
 
 # Sets per day
 windows(width = 15,height = 9)
-hist(prepdat$dmy,breaks = "days",freq = T,xlab = "Date",main = "Sets per day")
+hist(dat$dmy,breaks = "days",freq = T,xlab = "Date",main = "Sets per day")
 savePlot(filename = "sets_per_day.png",type = "png")
-table(prepdat$dmy)
 
 # a <- dat[grep("ZA240",dat$VESSEL_CD),]
 # plot(a$lon,a$lat,type = "b")
@@ -99,28 +86,24 @@ table(prepdat$dmy)
 # cbind(dista,timea,kperday)
 
 windows()
-hist(prepdat$hooks, nclass=200)   # ask if very large # hooks is okay
+hist(dat$hooks, nclass=200)   # ask if very large # hooks is okay
 savePlot("Hook histogram.png",type="png")
 #hist(prepdat$hooks, nclass=200,xlim=c(0,1200),ylim=c(0,500))
-hist(prepdat$floats, nclass=200)   # ask if the sets with 1200 floats are reasonable
+hist(dat$floats, nclass=200)   # ask if the sets with 1200 floats are reasonable
 savePlot("floats histogram.png",type="png")
 
 table(dat$alb)
 table(dat$bet)
-table(dat$bft)
 table(dat$blm)
 table(dat$bum)
 table(dat$skj)
-table(dat$sha)
+#table(dat$sha)
 table(dat$mls)
-table(dat$whm)
-dat$mls <- dat$mls + dat$whm
-dat$whm <- NULL
+#table(dat$whm)
 table(dat$yft)
 table(dat$sfa)
-table(prepdat$floats,useNA = "always")  # 6408 with NA! All in 1973-75
-table(is.na(prepdat$floats),prepdat$op_yr,useNA="always")  # 6408 with NA!
-table(round(prepdat$hbf,0),prepdat$op_yr,useNA="always")  # Looks like 1971-76 have few sets with full data and may not be usable
+table(dat$floats,useNA = "always")  # 0 with NA
+table(round(dat$hbf,0),dat$op_yr,useNA="always")  # Looks like 1971-76 have few sets with full data and may not be usable
 a <- table(prepdat$op_yr,round(prepdat$hbf,0),useNA="always")
 write.csv(a,"table hbf by year.csv")
 
@@ -129,41 +112,32 @@ write.csv(a,"table hbf by year.csv")
 a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm=T)
 
 windows(width = 11,height = 9)
-symbols(x=a[,2],y=a[,1],circles=.001*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude")
-map("world",add=T,interior=F,fill=T)
+symbols(x=a[,2],y=a[,1],circles=.0003*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude")
+map_EPO()
 savePlot(filename = "map_hooks.png",type = "png")
 
-table(dat$EW) # Some data with 2
 a <- log(table(dat$lon,dat$lat))
 windows(width = 15,height = 10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a)
-map("worldHires",add = TRUE, fill = TRUE) # Diagonal stripe?!
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a, xaxt="n")
+maps::map("world2",add = TRUE, fill = TRUE) # Diagonal stripe?!
+map_EPO()
 savePlot("Setmap_logscale.png",type = "png")
 
-a <- dat[dat$lon > 20,]
+a <- dat[dat$lon > 210,]
 dim(a)
 plot(a$lon, a$lat) # lat = -1 * lon
 hist(a$lon)
-table(a$VESSEL_NAME)
+table(a$vessid)
 str(a)
 table(a$EW)
-b <- rawdat[rawdat$Long01 > 20 & rawdat$EW == 1,]
-dim(b)
-plot(b$Long01, b$Lat01) # the problem was in rawdat, i.e. the original data
-table(a$op_yr)
-table(a$op_mon)
-summary(a)
-table(dat$op_yr)
-a1 <- dat[dat$op_yr >= 2014,]
-table(a1$VESSEL_NAME)
-table(a$VESSEL_NAME)
+
 windows(12,12);par(mfrow = c(4,4), mar = c(4,2,3,1))
 for (y in 2001:2016) with(dat[dat$op_yr == y,],plot(lon, lat, main = y))
 
-a <- tapply(dat$regB,list(dat$lon,dat$lat),mean)
+a <- tapply(dat$regBall,list(dat$lon,dat$lat),mean)
 windows(width = 15,height = 10)
-image(as.numeric(dimnames(a)[[1]]) + .5,as.numeric(dimnames(a)[[2]]) + .5,a,col = 1:4)
-map("worldHires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+image(as.numeric(dimnames(a)[[1]]) + .5,as.numeric(dimnames(a)[[2]]) + .5,a,col = 1:length(unique(a)))
+maps::map("world2",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 savePlot("regbet.png",type="png")
 
 # Plot grid squares with sets by region, for each regional structure
@@ -180,20 +154,20 @@ write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA = "always")
 
 windows(20,20);par(mfrow = c(3,3), mar = c(4,4,2,1)+.1)
 for (y in seq(1975,2015,5)) {
-  a <- dat[floor(dat$yrqtr/5)*5 == y & dat$lon < 125 & dat$lat < 25,]
+  a <- dat[floor(dat$yrqtr/5)*5 == y,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean,na.rm = T)
   image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main = y,zlim = c(6,24),col = heat.colors(30),xlab = "Lon",ylab = "Lat",ylim = c(-45,40))
   contour(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,add = T,levels = seq(0,26,2))
-  map("world",add = TRUE, fill = TRUE)
+  maps::map("world",add = TRUE, fill = TRUE)
 }
 savePlot("mean_HBF.png",type = "png")
 windows(20,20);par(mfrow = c(2,2))
 for (y in c(1978,1988,1998,2008)) {
-  a <- dat[dat$yrqtr>y & dat$yrqtr < y+10  & dat$lon < 125,]
+  a <- dat[dat$yrqtr>y & dat$yrqtr < y+10,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean)
-  image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main = y,zlim = c(6,24),col = heat.colors(30),xlab = "Lon",ylab = "Lat",xlim = c(-80,20),ylim = c(-45,40))
+  image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main = y,zlim = c(6,24),col = heat.colors(30),xlab = "Lon",ylab = "Lat",xlim = c(120,290),ylim = c(-45,40))
   contour(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,add = T,levels = seq(0,26,1),col = "dark blue")
-  map("world",add = T, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+  maps::map("world",add = T, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 }
 savePlot("mean_HBF_10yr.png",type = "png")
 
@@ -254,22 +228,23 @@ clustdir <- paste0(krdir,"clustering/")
 dir.create(clustdir)
 setwd(clustdir)
 
-load(file = paste0(kralysis_dir, "KRdat.RData"))
+load(file = paste0(kralysis_dir, "../data/KRdat.RData"))
 
 flag <- "KR"
-kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","yft")
+kr_splist <- c("alb","bet","blm","bum","mls","osh","oth","sfa","skj","swo","yft")
 
-use_splist <- c("alb","bet","bum","mls","sfa","swo","yft")
-allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regB","regB1")
+allabs <- c("op_yr","op_mon","hooks",kr_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regB","regB1")
 dat <- data.frame(dat)
 
-for (r in c(2:3)) {
+for (r in c(1:4)) {
   windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB == r,]
+  a <- dat[dat$regBepo == r,]
   for (sp in kr_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
-  savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
+  savePlot(filename = paste("freq",flag,"Region_Bepo", r, sep = "_"), type = "png")
 }
+
+use_splist <- c("alb","bet","bum","mls","sfa","swo","yft")
 
 nclB <- c(4,4,4)
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
@@ -293,7 +268,7 @@ for (r in 2:3) {
 # R2 - 4 clusters. 1=yft+bet, 2=bet+alb, 3=bet, 4=bet+yft+swo. Use 1,2,3,4
 # R3 - 3 or 4 clusters. 1=alb+bet, 2=bet, 3=yft+bet+alb, 4=alb+bft+sfa. Use 1,2,3
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/IATTC/2019_CPUE/"
 
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")

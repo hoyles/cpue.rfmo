@@ -66,11 +66,10 @@ splist <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj",
 prepdat1 <- dataprep_TW_EPO(indat2, alldat = F, region = "EPO", splist = splist)
 prepdat <- setup_EPO_regions(prepdat1,  regBall = TRUE, regBepo = TRUE, regBwcpo = TRUE)
 
-dat <- dataclean_TW_EPO(prepdat, rmssp = F, splist = splist)
-save(dat,file = "TWdat_all.RData")
-save(dat,file = "TWdat.RData")
 dat <-    dataclean_TW_EPO(prepdat, rmssp = T, splist = splist)
 save(dat,file = "TWdat_nossp.RData")
+dat <- dataclean_TW_EPO(prepdat, rmssp = F, splist = splist)
+save(dat,file = "TWdat.RData")
 
 #----------------------------------------------
 load(file = "TWdat.RData")

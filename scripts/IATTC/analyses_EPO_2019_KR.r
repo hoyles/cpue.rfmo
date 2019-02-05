@@ -48,9 +48,16 @@ OpData$lonx5 <- OpData$lon5
 OpData$lon <- 360 + OpData$lonx
 OpData$lon5 <- 360 + OpData$lonx5
 OpData$vessid <- as.factor(OpData$VESSEL_CD)
+OpData$tripidmon <- paste(OpData$vessid, OpData$op_yr, OpData$op_mon)
+OpData$tripidwk <- as.factor(paste(OpData$vessid, OpData$op_yr, week(OpData$dmy)))
 
 prepdat2 <- setup_EPO_regions(OpData,  regBall = TRUE, regBepo = TRUE, regBwcpo = TRUE)
-dat <- prepdat2
+dat <- as.data.frame(prepdat2)
+names(dat)[names(dat)=="osh"] <- "sha"
+
+lenzero <- function(x) sum(x > 0)
+splist_KR <- c("alb", "bet","blm", "bum", "mls", "oth", "sfa", "skj", "sha", "swo", "yft")
+dat$nsp <- apply(dat[, splist_KR], 1, lenzero)
 
 save(dat, file = "../data/KRdat.RData")
 
@@ -113,13 +120,12 @@ a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm=T)
 
 windows(width = 11,height = 9)
 symbols(x=a[,2],y=a[,1],circles=.0003*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude")
-map_EPO()
+map_EPO(new=FALSE)
 savePlot(filename = "map_hooks.png",type = "png")
 
 a <- log(table(dat$lon,dat$lat))
 windows(width = 15,height = 10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a, xaxt="n")
-maps::map("world2",add = TRUE, fill = TRUE) # Diagonal stripe?!
 map_EPO()
 savePlot("Setmap_logscale.png",type = "png")
 
@@ -127,27 +133,43 @@ a <- dat[dat$lon > 210,]
 dim(a)
 plot(a$lon, a$lat) # lat = -1 * lon
 hist(a$lon)
-table(a$vessid)
+table(factor(a$vessid))
 str(a)
 table(a$EW)
 
 windows(12,12);par(mfrow = c(4,4), mar = c(4,2,3,1))
-for (y in 2001:2016) with(dat[dat$op_yr == y,],plot(lon, lat, main = y))
+for (y in 2002:2017) with(dat[dat$op_yr == y,],plot(lon, lat, main = y), cex= 0.5)
 
 a <- tapply(dat$regBall,list(dat$lon,dat$lat),mean)
 windows(width = 15,height = 10)
-image(as.numeric(dimnames(a)[[1]]) + .5,as.numeric(dimnames(a)[[2]]) + .5,a,col = 1:length(unique(a)))
-maps::map("world2",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
+image(as.numeric(dimnames(a)[[1]]) + .5,as.numeric(dimnames(a)[[2]]) + .5,a,col = 1:length(unique(as.vector(a), na.rm=TRUE)))
+map_EPO()
 savePlot("regbet.png",type="png")
 
 # Plot grid squares with sets by region, for each regional structure
-windows(width = 15,height = 10);par(mfrow=c(1,2))
-plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat,dat$op_yr,mean),xlab = "yr",ylab = "Mean latitude")
-plot(tapply(dat$lon,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab = "yr",xlab = "Mean longitude")
-savePlot("mean_fishing_location 2.png",type = "png")
-plot(tapply(dat$yrqtr,dat$yrqtr,mean),tapply(dat$lat,dat$yrqtr,mean),xlab = "yr",ylab = "Mean latitude")
-plot(tapply(dat$lon,dat$yrqtr,mean),tapply(dat$yrqtr,dat$yrqtr,mean),ylab = "yr",xlab = "Mean longitude")
-savePlot("mean_fishing_location 1.png",type = "png")
+windows(width=15,height=10);par(mfrow=c(1,2))
+ax <- tapply(dat$yrqtr,dat$yrqtr,mean); ay=tapply(dat$lat5,dat$yrqtr,mean)
+plot(ax,ay,xlab="Year and quarter",ylab="Mean latitude",type="n")
+a <- 4*(.125+dat$yrqtr-floor(dat$yrqtr))
+a <- tapply(a,dat$yrqtr,mean)
+text(ax,ay,a,cex=0.7)
+ax=tapply(dat$lon5,dat$yrqtr,mean);ay=tapply(dat$yrqtr,dat$yrqtr,mean)
+plot(ax,ay,ylab="Year and quarter",xlab="Mean longitude",type="n")
+text(ax,ay,a,cex=0.7)
+savePlot("mean_fishing_location1.png",type="png")
+
+windows(width=15,height=10);par(mfrow=c(1,2))
+dat_epo <- dat[dat$regBepo > 0,]
+ax <- tapply(dat_epo$yrqtr,dat_epo$yrqtr,mean); ay=tapply(dat_epo$lat5,dat_epo$yrqtr,mean)
+plot(ax,ay,xlab="Year and quarter",ylab="Mean latitude",type="n")
+a <- 4*(.125+dat_epo$yrqtr-floor(dat_epo$yrqtr))
+a <- tapply(a,dat_epo$yrqtr,mean)
+text(ax,ay,a,cex=0.7)
+ax=tapply(dat_epo$lon5,dat_epo$yrqtr,mean);ay=tapply(dat_epo$yrqtr,dat_epo$yrqtr,mean)
+plot(ax,ay,ylab="Year and quarter",xlab="Mean longitude",type="n")
+text(ax,ay,a,cex=0.7)
+savePlot("mean_fishing_location_EPO1.png",type="png")
+
 
 write.csv(table(round(dat$hbf,0),dat$regB,useNA = "always"),file = "hbf by region.csv")
 write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA = "always"),file = "hbf by region by 5 years.csv")
@@ -158,8 +180,7 @@ for (y in seq(1975,2015,5)) {
   a <- tapply(a$hbf,list(a$lon,a$lat),mean,na.rm = T)
   image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main = y,zlim = c(6,24),col = heat.colors(30),xlab = "Lon",ylab = "Lat",ylim = c(-45,40))
   contour(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,add = T,levels = seq(0,26,2))
-  maps::map("world",add = TRUE, fill = TRUE)
-}
+  map_EPO()}
 savePlot("mean_HBF.png",type = "png")
 windows(20,20);par(mfrow = c(2,2))
 for (y in c(1978,1988,1998,2008)) {
@@ -167,8 +188,7 @@ for (y in c(1978,1988,1998,2008)) {
   a <- tapply(a$hbf,list(a$lon,a$lat),mean)
   image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,main = y,zlim = c(6,24),col = heat.colors(30),xlab = "Lon",ylab = "Lat",xlim = c(120,290),ylim = c(-45,40))
   contour(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,add = T,levels = seq(0,26,1),col = "dark blue")
-  maps::map("world",add = T, fill = TRUE) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-}
+  map_EPO()}
 savePlot("mean_HBF_10yr.png",type = "png")
 
 #write.csv(table(dat$ncrew,dat$reg),file = "crew by region.csv")
@@ -199,42 +219,48 @@ text(simplemod)
 ########################
 #Clustering
 
+projdir <- "~/IATTC/2019_CPUE/"
+
+krdir <- paste0(projdir, "KR/")
+datadir <- paste0(krdir, "data/")
+kralysis_dir <- paste0(krdir, "analyses/")
+krfigs <- paste0(krdir, "figures/")
+Rdir <- paste0(projdir, "Rfiles/")
+dir.create(kralysis_dir)
+dir.create(krfigs)
+setwd(kralysis_dir)
+
 #library(R4MFCL)
-#install.packages('randomForest')
 library(randomForest)
 library(influ)
-#install.packages("nFactors")
-#install.packages("Rcpp")
 library("nFactors")
 library(data.table)
 library(plyr)
-#install.packages('dplyr')
 library(dplyr)
 library(cluster)
 library(splines)
 library(boot)
 library(beanplot)
 library(maps)
-#install.packages("date")
 library(date)
-#library(sdhpkg)
 library(mapdata)
 library(maptools)
 library(mgcv)
-#install.packages("NbClust")
 library(NbClust)
+library("cpue.rfmo")
+
 
 clustdir <- paste0(krdir,"clustering/")
 dir.create(clustdir)
 setwd(clustdir)
 
 load(file = paste0(kralysis_dir, "../data/KRdat.RData"))
+str(dat)
 
 flag <- "KR"
-kr_splist <- c("alb","bet","blm","bum","mls","osh","oth","sfa","skj","swo","yft")
+kr_splist <- c("alb","bet","blm","bum","mls","sha","oth","sfa","skj","swo","yft")
 
-allabs <- c("op_yr","op_mon","hooks",kr_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regB","regB1")
-dat <- data.frame(dat)
+allabs <- c("op_yr","op_mon","hooks",kr_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regBepo","regBall")
 
 for (r in c(1:4)) {
   windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
@@ -246,11 +272,13 @@ for (r in c(1:4)) {
 
 use_splist <- c("alb","bet","bum","mls","sfa","swo","yft")
 
-nclB <- c(4,4,4)
+#nclB <- c(6,4,4,3)
+nclB <- c(4,3,4,4)
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
-regtype <- "regB"
-for (r in 2:3) {
+
+regtype <- "regBepo"
+for (r in 1:4) {
   fnh <- paste(flag,regtype,r,sep = "_")
   dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))

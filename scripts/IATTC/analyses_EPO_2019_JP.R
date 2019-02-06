@@ -1,5 +1,6 @@
 projdir <- "~/IATTC/2019_CPUE/"
 jpdir <- paste0(projdir, "JP/")
+datadir_orig <- paste0(jpdir, "Japan/Operational Level Data/20190126/CE/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
 jpfigs <- paste0(jpdir, "figures/")
@@ -11,6 +12,8 @@ dir.create(jalysis_dir)
 dir.create(jpfigs)
 
 setwd(jalysis_dir)
+
+options(max.print = 10000)
 
 library(stringi)
 library(htmlwidgets)
@@ -40,54 +43,128 @@ library("cpue.rfmo")
 #source(paste0(Rdir,"support_functions.r"))
 #xsd # stop!
 
+
+
 # ===================================================================================
 # Please keep the data format consistent between years and for the IATTC + IOTC analyses.
-nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
-      "hbf","hooks","bft","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid")
-wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
-cc <- "iiiiiiiciiiiiiiiiiiiiicci"
-posses <- cumsum(c(1,wdths))
-cc <- "iiiiiiiciiiiiiiiiiiiiicci"
-cbind(nms,wdths,unlist(strsplit(cc,"")))
+# wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
+# cc <- "iiiiiiiciiiiiiiiiiiiiicci"
+# posses <- cumsum(c(1,wdths))
+# cc <- "iiiiiiiciiiiiiiiiiiiiicci"
+# cbind(nms,wdths,unlist(strsplit(cc,"")))
 
 # the following two lines can be used to check the data format.
 # chk <- readLines(paste0(datadir1,"/JPNLL_20170524.dat"))
 # chk[10240:10242]
 
 # Check the first 20 rows
-a <- data.frame(read_fwf(file = paste0(datadir1,"/JPNLL_AO_20180417.dat"),fwf_widths(wdths),col_types = cc,n_max = 20));gc()
-cbind(names(a), nms)
-names(a) <- nms
-a
+# a <- data.frame(read_fwf(file = paste0(datadir1,"/JPNLL_AO_20180417.dat"),fwf_widths(wdths),col_types = cc,n_max = 20));gc()
+# cbind(names(a), nms)
+# names(a) <- nms
+# a
 
-# If good, load the whole file
-dat1 <- data.frame(read_fwf(file = paste0(datadir1,"/JPNLL_AO_20180417.dat"),fwf_widths(wdths),col_types = cc))
-problems(dat1) # Check any problems. Some of those reported are not important.
-names(dat1) <- nms
-table(dat1$trip_st == 0,dat1$op_yr) # Check for the timing of missign trip_start variables
-table(is.na(dat1$trip_st), dat1$op_yr) # Check for the timing of missign trip_start variables
-table(dat1$op_yr)
+a <- read_csv(paste0(datadir_orig,"CE_PTS_20190122_Pac.csv"))
+prepdat <- as.data.frame(a)
+names(prepdat)
+nms <- c("ocean","op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign","vesstyp","target","mainline","branchline",
+         "hbf","lbranch","lfloat","hooks","setnum","logbookid","alb","bet","yft","swo","mls","bum","blm","sas","sha","sai","spf",
+         "PTS95","PTS85","PTS75","PTS65","PTS50","Fune","Log_CE","CAL_CE","tonnage",
+rbind(names(prepdat), nms)
+
+# January 25-29, 2019, adapted from Cleridy's notes
+load(paste0(datadir_orig,"CE_20190126.RData"))
+rm(a,aa,b,bb,c,cc,d,dd,e,ee,f,ff,g,gg,h,hh,i,ii,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)
+
+windows(width = 15,height = 9)
+hist(comp.d$YY,breaks = 1950:2020, main = "Sets per year", xlab = "Year")
+savePlot(filename = "sets_per_year.png",type = "png")
+
+# # Data cleaning for JPN C&E LL data
+# # coerce "." to NA in numeric fields
+# comp.d$latitude<-as.numeric(as.character(comp.d$latitude))
+# comp.d$vessel_type<-as.numeric(as.character(comp.d$vessel_type))
+# comp.d$gear<-as.numeric(as.character(comp.d$gear))
+# comp.d$MAIN<-as.numeric(as.character(comp.d$MAIN))
+# comp.d$Branch<-as.numeric(as.character(comp.d$Branch))
+# comp.d$NHBF<-as.numeric(as.character(comp.d$NHBF))
+# comp.d$LBranch<-as.numeric(as.character(comp.d$LBranch))
+# comp.d$Lfloat<-as.numeric(as.character(comp.d$Lfloat))
+# comp.d$HOOK<-as.numeric(as.character(comp.d$HOOK))
+# comp.d$PTS95<-as.numeric(as.character(comp.d$PTS95))
+# comp.d$PTS85<-as.numeric(as.character(comp.d$PTS85))
+# comp.d$PTS75<-as.numeric(as.character(comp.d$PTS75))
+# comp.d$PTS65<-as.numeric(as.character(comp.d$PTS65))
+# comp.d$PTS50<-as.numeric(as.character(comp.d$PTS50))
+
+# remove records with missing data for latitude, longitude and hooks
+#comp.d<-comp.d[!is.na(comp.d$latitude) & !is.na(comp.d$HOOK) & !is.na(comp.d$longitude),]
+
+# Trim outliers in HOOK, following what Simon Hoyle does (SC7-SA-IP-01, Appendix 1)
+#comp.d<-comp.d[comp.d$HOOK>200 & comp.d$HOOK<10000,]
+
+# Trim outliers for NHBF, following what Simon Hoyle does (SC7-SA-IP-01, Appendix 1)
+#comp.d<-comp.d[(comp.d$NHBF<26 & !is.na(comp.d$NHBF)) | is.na(comp.d$NHBF & comp.d$YY < 1976),]
+
+# remove data for training vessels
+#table(comp.d$vessel_type, comp.d$YY, useNA="always")
+#comp.d<-comp.d[comp.d$vessel_type==1 | comp.d$vessel_type==4 |(is.na(comp.d$vessel_type)) | (comp.d$vessel_type==2 & comp.d$YY < 1971) ,]
+#table(comp.d$vessel_type, comp.d$YY, useNA="always")
+
+
+# remove some target that were for shark or SWO (per SC7-SA-IP-01 Appendix 1)
+# comp.d<-comp.d[(comp.d$gear==3 & !is.na(comp.d$gear)) | is.na(comp.d$gear),]
+
+# # remove callsigns that are not valid; skip this part if you want to keep data prior to late 1970s
+# comp.d$CAL<-as.character(comp.d$CAL)
+# tmp.flg<-rep(T,length(comp.d$CAL))
+# tmp.flg[comp.d$CAL=="XXX   " | comp.d$CAL=="--    " | comp.d$CAL=="      "]<-F
+# comp.d<-comp.d[tmp.flg,]
+# rm(tmp.flg)
+
+# reformat latitude and longitude ( I think longc=2 is east and longc=1 is west)
+# Satoh-san says longitudes of 180 are not correct, so deleting any
+
+rawdat <- comp.d
+
+a <- head(rawdat)
+dataprep_JP_EPO2(a)
 
 # Prepare the data
-rawdat <- dat1
-pd1 <- dataprep_JP(rawdat, region = "AO") # No changes between IO and AO functions
-pd2 <- setup_AO_regions(pd1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
-str(pd1)
-str(pd2)
+#pd0 <- dataprep_JP_EPO(rawdat)
+pd1 <- dataprep_JP_EPO2(rawdat)
+pd2 <- setup_EPO_regions(pd1, regBall = TRUE, regBepo = TRUE, regBwcpo = TRUE)
 
-# Clean the data
-str(rawdat)
-clndat <- dataclean_JPIO(rawdat)
-prepdat1 <- dataprep_JP(clndat, region = "AO")
-prepdat <- setup_AO_regions(prepdat1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
-str(prepdat)
-save(pd1, pd2, prepdat, file = "prepdat.RData")
+# str(pd1)
+# str(pd2)
+
+# # Clean the data
+# str(rawdat)
+# clndat <- dataclean_JPIO(rawdat)
+# prepdat1 <- dataprep_JP(clndat, region = "AO")
+# prepdat <- setup_AO_regions(prepdat1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
+# str(prepdat)
+# save(pd1, pd2, prepdat, file = "prepdat.RData")
+save(pd1, pd2, file = "prepdat.RData")
 
 #dat <- make_clid(prepdat)
-dat <- make_lbidmon(prepdat)
-save(dat,file = "JPdat.RData")
-load(file = "JPdat.RData")
+#dat <- make_lbidmon(prepdat)
+dat_all <- pd2
+clndat <- dataclean_JP_EPO(dat_all, checktg = FALSE)
 
+dat_pac <- clndat
+dat_epo <- dat_pac[dat_pac$ocean == 4,]
+dat_wcpo <- dat_pac[dat_pac$ocean == 1,]
+dat <- dat_epo
+
+save(dat_all, file = "../data/JPdat_all.RData")
+save(dat_pac, file = "../data/JPdat_pac.RData")
+save(dat_wcpo, file = "../data/JPdat_wcpo.RData")
+save(dat_epo, file = "../data/JPdat_epo.RData")
+load(file = "../data/JPdat_epo.RData")
+dat <- dat_epo
+
+setwd(jpfigs)
+rm(prepdat, dat_wcpo, rawdat, comp.d, dat_epo, pd1, pd2, llv)
 
 # ===================================================================================
 # Plot and explore the data
@@ -96,40 +173,38 @@ load(file = "JPdat.RData")
 table(pd1$op_yr)
 table(pd2$op_yr)
 table(dat$op_yr)
-table(clndat$op_yr)
-table(prepdat1$op_yr)
 table(prepdat$op_yr)
-table(is.na(dat$clid))
+table(is.na(pd2$lbid))
 
 xfun <- function(x) sum(x > 0)
 a <- table(dat$vessid,dat$op_yr)
 apply(a,2,xfun)
 
-vnm <- (dat$vesselname)
-library("tm")
-tm_map(vnm, function(x) content_transformer(iconv(enc2utf8, sub = "byte")))
+# vnm <- (dat$vesselname)
+# library("tm")
+# tm_map(vnm, function(x) content_transformer(iconv(enc2utf8, sub = "byte")))
 
-a <- table(dat$vesselname,dat$op_yr)
-apply(a,2,xfun)
+# a <- table(dat$vesselname,dat$op_yr)
+# apply(a,2,xfun)
 
 
 # Plot grid squares with sets by region, for each regional structure
-a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
-windows(width = 10,height = 10)
-for (fld in c("regB","regB1")) {
+a <- unique(paste(dat_all$lat,dat_all$lon))
+a0 <- dat_all[match(a,paste(dat_all$lat,dat_all$lon)),c("lat","lon","regBepo","regBall")]
+windows(width = 20,height = 14)
+for (fld in c("regBepo","regBall")) {
   reg <- with(a0,get(fld))
-  plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld, xlim = c(-100, 50))
+  plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld, xlim = c(120, 290))
   text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
-  map(add = T, fill = TRUE)
+  maps::map("world2",add = T, fill = TRUE)
   savePlot(paste0("mapf_",fld),type = "png")
 }
 
 # Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
-regBord <- c(1,2,3)
-windows(height = 12,width = 12); par(mfrow = c(2,2),mar = c(3,2,2,1))
-for (r in regBord) {
-  llv <- pd2[pd2$regB==r,]
+regBPac <- c(1:9,11:15)
+windows(height = 12,width = 12); par(mfrow = c(4,4),mar = c(3,2,2,1))
+for (r in regBPac) {
+  llv <- pd2[pd2$regBall==r,]
   yq <- seq(1958.125,2017.875,0.25)
   llv$yrqtr <- factor(llv$yrqtr,levels = yq)
   a <- aggregate(hooks ~ lat5 + lon5 + yrqtr,sum,data = llv)
@@ -146,17 +221,20 @@ savePlot(filename = "Clean strata hooks",type = "png")
 
 # Sets per day and per month
 windows(width = 15,height = 9)
-hist(prepdat$dmy,breaks = "days",freq = T,xlab = "Date",main = "Sets per day")
+hist(dat_all$dmy,breaks = "days",freq = T,xlab = "Date",main = "Sets per day")
 savePlot(filename = "sets_per_day.png",type = "png")
-hist(prepdat$dmy,breaks = "months",freq = T,xlab = "Date",main = "Sets per month")
+hist(dat_all$dmy,breaks = "months",freq = T,xlab = "Date",main = "Sets per month")
 savePlot(filename = "sets_per_month.png",type = "png")
-table(prepdat$dmy)
+
+windows(width = 15,height = 9)
+hist(comp.d$YY,breaks = 1950:2020, main = "Sets per year", xlab = "Year")
+savePlot(filename = "sets_per_year.png",type = "png")
 
 # Map of hook distribution, all time
-a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm = T)
-windows(width = 11,height = 11)
-symbols(x = a[,2],y = a[,1],circles = .0002*sqrt(a[,3]),inches = F,bg = 2,fg = 2,xlab = "Longitude",ylab = "Latitude",ylim = c(-50,60), xlim = c(-95, 20))
-map(add = T,interior = F,fill = T)
+a <- aggregate(dat_all$hooks,list(dat_all$lat5,dat_all$lon5),sum,na.rm = T)
+windows(width = 20,height = 15)
+symbols(x = a[,2],y = a[,1],circles = .0002*sqrt(a[,3]),inches = F,bg = 2,fg = 2,xlab = "Longitude",ylab = "Latitude",ylim = c(-50, 50), xlim = c(120, 290))
+maps::map("world2",add = T,interior = F,fill = T)
 savePlot(filename = "map_hooks.png",type = "png")
 
 # Histogram of hooks per set
@@ -166,23 +244,24 @@ savePlot("Hook histogram.png",type = "png")
 # Check catch distribtions for outliers. Probably no need to remove.
 str(dat)
 str(dat1)
-table(prepdat$alb)
-table(prepdat$bet)
-table(prepdat$yft)
-table(prepdat$sbt)
-table(prepdat$bft)
-#table(prepdat$ott)
-table(prepdat$swo)
-table(prepdat$mls)
-table(prepdat$bum)
-table(prepdat$blm)
-#table(prepdat$otb)
-#table(prepdat$skj)
-#table(prepdat$sha)   # ask majority of sets (=719211) with 0 sha. Also one set with 663
-#table(prepdat$oth)   # ask sets with 3059! But most (=636641) have 0.
-table(prepdat$hbf,useNA = "always")  # 6408 with NA! All in 1973-75
+table(dat_all$alb)
+table(dat_all$bet)
+table(dat_all$yft)
+#table(dat_all$ott)
+table(dat_all$swo)
+table(dat_all$mls)
+table(dat_all$bum)
+table(dat_all$blm)
+#table(dat_all$otb)
+#table(dat_all$skj)
+#table(dat_all$sha)   # ask majority of sets (=719211) with 0 sha. Also one set with 663
+#table(dat_all$oth)   # ask sets with 3059! But most (=636641) have 0.
+table(dat_all$hbf,useNA = "always")  # 6408 with NA! All in 1973-75
 
-table(dat$hbf,dat$op_yr,useNA = "always")  #
+table(comp.d$NHBF,comp.d$YY,useNA = "always")
+table(dat_all$hbf,dat_all$op_yr,useNA = "always")
+table(cut(dat$hbf,c(0,1,2,3,4,5,6,8,10,15,20,25,30)),dat$op_yr,useNA = "always")  #
+table(cut(comp.d$NHBF,c(0,1,2,3,4,5,6,8,10,15,20,25,30)),comp.d$YY,useNA = "always")  #
 table(dat$op_yr,is.na(dat$hbf))  #
 
 # Store some results (aggregated to avoid data concerns) for later reporting.
@@ -343,7 +422,7 @@ str(dat)
 rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
 
 gc()
-jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","shk")
+jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
 use_splist <- c("alb","bet","yft","swo","mls","bum","bft","sbt","sas")
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1")
 dat <- data.frame(dat)
@@ -378,7 +457,7 @@ setwd(clusdir)
 load(file = paste0(jalysis_dir,"JPdat.RData"))
 
 gc()
-jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","shk")
+jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
 use_splist <- c("alb","yft","swo","mls","bum","bft","sbt","sas")
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1","bet")
 dat <- data.frame(dat)

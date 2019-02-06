@@ -125,7 +125,7 @@ dataprep_JPIO <- function(dat, alldat = T) {
 #' @param splist List of species codes
 #' @return Modified dataset.
 #'
-dataprep_JP <- function(dat, alldat = T, region = "IO", splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")) {
+dataprep_JP <- function(dat, alldat = T, region = "IO", splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","sha")) {
   dat <- dat[order(dat$op_yr, dat$op_mon, dat$op_day), ]
   dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
   dat$moon <- lunar.illumination(dat$dmy)
@@ -168,7 +168,207 @@ dataprep_JP <- function(dat, alldat = T, region = "IO", splist = c("bft","sbt","
 
   dat <- make_lbidmon(dat) # This sets up the clustering variable.
 
-    dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  return(dat)
+}
+
+#' Prepare Japanese longline data for the eastern and western Pacific, IATTC 2019.
+#'
+#' The function prepares Japanese longline data for EPO (mainly) but also some WCPO analyses. Data are already partly preprared.
+#' @param dat Input dataset
+#' @param alldat If FALSE, removes vessels without vessel ID.
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataprep_JP_EPO <- function(dat, alldat = T, splist = c("alb","bet","yft","swo","mls","bum","blm","sas","sha","sai","spf")) {
+  dat <- dat[order(dat$op_yr, dat$op_mon, dat$op_day), ]
+  dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+  dat <- dat[!is.na(dat$dmy),]
+  dat$moon <- lunar.illumination(dat$dmy)
+
+  lat.1dgc <- dat$lat_raw
+  lon.1dgc <- dat$lon_raw
+  lat.1dgc[dat$latc==1] <-   lat.1dgc[dat$latc==1] + 0.5
+  lat.1dgc[dat$latc==2] <- ((lat.1dgc[dat$latc==2] + 1) * (-1)) + 0.5
+  lon.1dgc[dat$lonc==2] <- (lon.1dgc[dat$lonc==2] * (-1)) - 0.5
+  lon.1dgc[dat$lonc==1] <-  lon.1dgc[dat$lonc==1] - 360 + 0.5
+  dat$lat <-  lat.1dgc
+  dat$lonx <- lon.1dgc
+  dat$lon <- dat$lonx + 360
+
+  dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
+  dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
+
+  dat$lonx5 <- dat$lon5 - 360
+
+  dat$vessid <- as.numeric(as.factor(paste(dat$callsign)))
+  if (alldat == F) { dat <- dat[dat$vessid != 1, ] }
+  dat$vessid <- as.numeric(as.factor(dat$vessid))
+  dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
+  dat$tripidwk <- as.factor(paste(dat$vessid, dat$op_yr, week(dat$dmy)))
+
+  splist_short <- splist[!splist %in% c("sai","spf")]
+  dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+  dat$Total <- apply(dat[, splist_short], 1, sum)
+  dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
+
+  # dat$trip_yr <- as.numeric(substr(as.character(dat$trip_st), 1, 4))
+  # dat <- dat[dat$trip_yr > 1945 | is.na(dat$trip_yr), ]
+
+  # dat$tripid <- paste(dat$vessid, dat$trip_st, sep = "_")
+  # dat$tripid[dat$vessid == 1] <- NA
+  # dat$tripid[dat$trip_st == 0] <- NA
+
+  dat <- make_lbidmon(dat) # This sets up the clustering variable.
+
+  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  return(dat)
+}
+
+#' Prepare Japanese longline data for the eastern and western Pacific, IATTC 2019.
+#'
+#' The function prepares Japanese longline data for EPO (mainly) but also some WCPO analyses. Data are already partly preprared.
+#' @param dat Input dataset
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataprep_JP_EPO2 <- function(dat, splist=c("alb","bet","yft","swo","mls","bum", "blm","sas","sha","sfa","ssp")) {
+
+  #modified from:
+  #cpue.rfmo from Simon Hoyle
+  # and "R commands_raw data processing.rtf" from Cleridy Lennert-Cody
+
+  #Original Names
+  # [1] "ocean"       "YY"          "MM"          "DD"          "latitude"    "latc"        "longitude"
+  # [8] "longc"       "CAL"         "vessel_type" "gear"        "vessel_size" "MAIN"        "Branch"
+  # [15] "NHBF"        "LBranch"     "Lfloat"      "HOOK"        "number"      "LOG"         "alb"
+  # [22] "bet"         "yft"         "swo"         "whm"         "bum"         "blm"         "saispear"
+  # [29] "sharks"      "sai"         "spf"         "PTS95"       "PTS85"       "PTS75"       "PTS65"
+  # [36] "PTS50"
+
+  #clean characters of numeric data by specifying as integers
+  #dat<-type.convert(dat)
+
+  # Set up standard names, the same as for other fleets (based on cpue.rfmo but not the equal)
+  MyNames<-c("ocean","op_yr","op_mon","op_day","lat_raw","latc","lon_raw","lonc","VESSEL_CD","vessel_type","set_target","vessel_size",
+             "main","branch","hbf","lbranch","lfloat","hooks","number","logbookID","alb","bet","yft",
+             "swo","mls","bum", "blm", "sas", "sha","sfa","ssp","PTS95","PTS85","PTS75","PTS65","PTS50")
+
+  #mls is stripped marlin (Kajikia audax), it was as "whm" in the original data
+  #bum; blue marline (Makaira mazara)
+  #blm; black marlin (Istiompax indica)
+  #sas was  saispear; mix of sailfish (Istiophorus platypterus) and shortbill spearfish (Tetrapturus angustirostris)
+  #sha is sharks, it was "sharks"; mix of shark species, in the original data
+  #sfa was "sai"; sailfish (Istiophorus platypterus) in the original data
+  #ssp was spf; shortbill spearfish (Tetrapturus angustirostris)
+  names(dat) <- MyNames
+  defactor <- function(x) as.numeric(as.character(x))
+  dat$vessel_type<-defactor(dat$vessel_type)
+  dat$set_target<-defactor(dat$set_target)
+  dat$main<-defactor(dat$main)
+  dat$branch<-defactor(dat$branch)
+  dat$lbranch<-defactor(dat$lbranch)
+  dat$lfloat<-defactor(dat$lfloat)
+  dat$PTS95<-defactor(dat$PTS95)
+  dat$PTS85<-defactor(dat$PTS85)
+  dat$PTS75<-defactor(dat$PTS75)
+  dat$PTS65<-defactor(dat$PTS65)
+  dat$PTS50<-defactor(dat$PTS50)
+
+  dat$hooks <- defactor(dat$hooks)
+  dat$hbf <- defactor(dat$hbf)
+  dat$lat_raw <- defactor(dat$lat_raw)
+  dat$lon_raw <- defactor(dat$lon_raw)
+  dat$latc <- defactor(dat$latc)
+  dat$lonc <- defactor(dat$lonc)
+
+  dat <- mutate(dat,dmy=parse_date(str_c(parse_character(op_yr),"/",
+                                         parse_character(op_mon),"/",parse_character(op_day)), "%Y/%m/%d")) %>%
+      mutate(hbf=parse_integer(hbf)) %>% mutate(floats=hooks*hbf)
+  #Warning: 753 parsing failures. e.g. invalid date 1952/2/31
+  # reformat latitude and longitude ( I think longc=2 is east and longc=1 is west)
+  # Satoh-san says longitudes of 180 are not correct, so deleting any
+  dat<-dat[dat$lon_raw!=180,]
+  #table(comp.d$longitude!=180)
+  #FALSE    TRUE
+  #13 7009247
+
+  ########SIMON THIS PART IS WEIRD>>>>
+  # lonx are western longitudes (from -360 to 0)
+  # lon are eastern longitudes (from 0 to 360)
+  # dat$lat<-dat$latitude
+  # dat$lon<-dat$longitude
+  # dat$lat[dat$latc==1]<-dat$lat[dat$latc==1]+0.5
+  # dat$lat[dat$latc==2]<-((dat$lat[dat$latc==2]+1)*(-1))+0.5
+  # dat$lon[dat$longc==2]<-(dat$lon[dat$longc==2]*(-1))-0.5
+  # dat$lon[dat$longc==1]<- dat$lon[dat$longc==1]-360+0.5
+  #
+  # dat$lonx<-lon.1dgc      # probably won't work because field lon.1dgc hasn't been made yet
+  # dat$lon<- lon.1dgc - 360
+  #
+  # dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
+  # dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
+  # dat$lonx5 <- 5 * floor(dat$lonx/5) + 2.5
+
+  # ----------------- inserted from earlier Hoyle version
+  dat$lat_raw <- as.numeric(as.character(dat$lat_raw))
+  dat$lon_raw <- as.numeric(as.character(dat$lon_raw))
+  dat$latc <- as.numeric(as.character(dat$latc))
+  dat$lonc <- as.numeric(as.character(dat$lonc))
+  lat.1dgc <- dat$lat_raw
+  lon.1dgc <- dat$lon_raw
+  lat.1dgc[dat$latc==1] <-   lat.1dgc[dat$latc==1] + 0.5
+  lat.1dgc[dat$latc==2] <- ((lat.1dgc[dat$latc==2] + 1) * (-1)) + 0.5
+  lon.1dgc[dat$lonc==2] <- (lon.1dgc[dat$lonc==2] * (-1)) - 0.5
+  lon.1dgc[dat$lonc==1] <-  lon.1dgc[dat$lonc==1] - 360 + 0.5
+  dat$lat <-  lat.1dgc
+  dat$lonx <- lon.1dgc
+  dat$lon <- dat$lonx + 360
+
+  dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
+  dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
+
+  dat$lonx5 <- dat$lon5 - 360
+
+  # if (alldat == F) dat <- dat[dat$vessid != 1, ] do this later in data cleaning
+  # dat$vessid <- as.numeric(as.factor(dat$vessid))
+  # dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
+  # dat$tripidwk <- as.factor(paste(dat$vessid, dat$op_yr, week(dat$dmy)))
+
+
+  # dat$trip_yr <- as.numeric(substr(as.character(dat$trip_st), 1, 4))
+  # dat <- dat[dat$trip_yr > 1945 | is.na(dat$trip_yr), ]
+
+  # dat$tripid <- paste(dat$vessid, dat$trip_st, sep = "_")
+  # dat$tripid[dat$vessid == 1] <- NA
+  # dat$tripid[dat$trip_st == 0] <- NA
+
+  dat <- make_lbidmon(dat) # This sets up the clustering variable, needed before 1979 when there are no vessel ids.
+
+  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+
+  ###############>>>>>>>>>>>>>
+  dat$moon <- lunar.illumination(dat$dmy)
+  dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+  dat$latlongx <- paste(dat$lat5, dat$lon5x, sep = "_")
+
+  dat$vessid <- as.factor(as.numeric(dat$VESSEL_CD)) # VESSEL_CD is a factor so this is anonymizing it
+  #dat$tonnage <- as.factor(substring(dat$VESSEL_CD, 1, 1))
+  dat$tripidmon <- paste(dat$vessid, dat$op_yr, dat$op_mon)
+  dat$tripidwk <- as.factor(paste(dat$vessid, dat$op_yr, week(dat$dmy)))
+  splist_short <- splist[!splist %in% c("sfa","ssp")]
+  dat$Total <- apply(dat[, splist_short], 1, sum)
+  dat$Totalx <- apply(dat[,splist], 1, sum, na.rm = TRUE)
+  dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum, na.rm = TRUE)
+  #number of species
+  dat$nsp<- apply((dat[,splist]>0), 1, sum, na.rm = TRUE)
+
+  #return only some variables
+  #noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripidmon", "tripidwk", "moon", splist, "Total", "Total2", splist_w, "dmy", "lat", "lon", "lat5", "lon5", "lonx", "lonx5", "lonraw5")
+
+  #dat <- dat[, noms]
   return(dat)
 }
 

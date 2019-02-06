@@ -7,7 +7,7 @@
 #' @param splist List of species codes
 #' @return Modified dataset.
 #'
-dataclean_CNIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")) {
+dataclean_CNIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","sha")) {
   dat$op_yr <- as.numeric(dat$op_yr)
   dat$op_mon <- as.numeric(dat$op_mon)
   dmy <- as.Date(dat$date)
@@ -38,7 +38,7 @@ dataclean_CNIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt",
 #' @param splist List of species codes
 #' @return Modified dataset.
 #'
-dataclean_JPIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")) {
+dataclean_JPIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt","alb","bet","yft","swo","mls","bum","blm","sas","sha")) {
   dat$op_yr <- as.numeric(dat$op_yr)
   dat$op_mon <- as.numeric(dat$op_mon)
   dat$op_day <- as.numeric(dat$op_day)
@@ -71,6 +71,32 @@ dataclean_JPIO <- function(dat, checktg = F, allHBF = F, splist = c("bft","sbt",
   # dat$ncrew <- as.numeric(dat$ncrew)
   if (checktg)
     dat <- dat[dat$target == 3 | is.na(dat$target), ]  # tuna target  (remove to avoid a change in 1994 - but recent trend is more important)
+  return(dat)
+}
+
+#' Clean data.
+#'
+#' The function sets up variables and removes bad data. Originally developed for Japanese data in the IO.
+#' @param dat Input dataset
+#' @param checktg If TRUE, remove effort identified as not targetng tuna. Not generally used.
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataclean_JP_EPO <- function(dat, checktg = F, splist = c("alb","bet","yft","swo","mls","bum","blm","sas","sha","sfa","ssp")) {
+  dat$hooks <- as.numeric(dat$hooks)
+  dat <- dat[!is.na(dat$hooks) & !is.na(dat$dmy) & !is.na(dat$lat) & !is.na(dat$lon), ]
+  for (sp in splist) {
+    dat[,sp] <- as.numeric(dat[,sp])
+    if (sum(is.na(dat[,sp])) > 0) dat[is.na(dat[,sp]), sp] <- 0
+  }
+  dat <- dat[dat$hooks < 10000, ]  # clean up outliers
+  dat <- dat[dat$hooks > 200, ]
+  dat <- dat[(!is.na(dat$hbf) & dat$hbf < 26) | (dat$op_yr < 1976 & is.na(dat$hbf)), ]
+
+  if (checktg)
+    dat <- dat[dat$target == 3 | is.na(dat$target), ]  # tuna target  (remove to avoid a change in 1994 - but recent trend is more important)
+
+  dat <- dat[dat$vessel_type==1 | dat$vessel_type==4 |(is.na(dat$vessel_type)) | (dat$vessel_type==2 & dat$op_yr < 1971) ,]   # remove data fotr training vessels
   return(dat)
 }
 

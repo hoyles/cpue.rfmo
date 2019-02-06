@@ -6,7 +6,7 @@
 \usage{
 plot_catchmap(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20,
   130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "",
-  bgc = "grey")
+  bgc = "grey", maptype = "world2")
 }
 \arguments{
 \item{indat}{Input dataset to plot.}

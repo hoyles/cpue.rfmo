@@ -202,22 +202,20 @@ for (fld in c("regBepo","regBall")) {
 
 # Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
 regBPac <- c(1:9,11:15)
-windows(height = 12,width = 12); par(mfrow = c(4,4),mar = c(3,2,2,1))
+windows(height = 12,width = 14); par(mfrow = c(4,4),mar = c(3,2,2,1))
 for (r in regBPac) {
-  llv <- pd2[pd2$regBall==r,]
-  yq <- seq(1958.125,2017.875,0.25)
-  llv$yrqtr <- factor(llv$yrqtr,levels = yq)
-  a <- aggregate(hooks ~ lat5 + lon5 + yrqtr,sum,data = llv)
-  b <- a[a$hooks > 5000,]
-  b <- tapply(b$hooks,b$yrqtr,sum)
-  a <- tapply(a$hooks,a$yrqtr,sum)
-  yqa <- a[match(yq,names(a))]
-  yqb <- b[match(yq,names(b))]
-  yqb[is.na(yqb)] <- 0
-  ab <- yqb/yqa
+  xall <- dat_all[dat_all$regBall==r,]
+  xpac <- dat_pac[dat_pac$regBall==r,]
+  yq <- seq(1952.125,2017.875,0.25)
+  aa <- tapply(xall$hooks,xall$yrqtr,sum)
+  ap <- tapply(xpac$hooks,xpac$yrqtr,sum)
+  yqa <- aa[match(yq,names(aa))]
+  yqp <- ap[match(yq,names(ap))]
+  yqp[is.na(yqp)] <- 0
+  ab <- yqp/yqa
   plot(names(ab),ab,ylim = c(0,1),main = paste("Region",r))
 }
-savePlot(filename = "Clean strata hooks",type = "png")
+savePlot(filename = "Cleaning",type = "png")
 
 # Sets per day and per month
 windows(width = 15,height = 9)
@@ -227,7 +225,7 @@ hist(dat_all$dmy,breaks = "months",freq = T,xlab = "Date",main = "Sets per month
 savePlot(filename = "sets_per_month.png",type = "png")
 
 windows(width = 15,height = 9)
-hist(comp.d$YY,breaks = 1950:2020, main = "Sets per year", xlab = "Year")
+hist(dat_pac$op_yr,breaks = 1950:2020, main = "Sets per year", xlab = "Year")
 savePlot(filename = "sets_per_year.png",type = "png")
 
 # Map of hook distribution, all time
@@ -240,6 +238,7 @@ savePlot(filename = "map_hooks.png",type = "png")
 # Histogram of hooks per set
 hist(dat$hooks, nclass = 60,xlab = "Hooks per set")   # ask if very large # hooks is okay
 savePlot("Hook histogram.png",type = "png")
+table(dat$hooks[dat$hooks > 5000])
 
 # Check catch distribtions for outliers. Probably no need to remove.
 str(dat)
@@ -265,29 +264,27 @@ table(cut(comp.d$NHBF,c(0,1,2,3,4,5,6,8,10,15,20,25,30)),comp.d$YY,useNA = "alwa
 table(dat$op_yr,is.na(dat$hbf))  #
 
 # Store some results (aggregated to avoid data concerns) for later reporting.
-dat <- dat[is.na(dat$hbf) == FALSE | dat$op_yr < 1976,]
+#dat <- dat[is.na(dat$hbf) == FALSE | dat$op_yr < 1976,]
 a <- table(dat$op_yr,round(dat$hbf,0),useNA = "always")
 write.csv(a,"table hbf by year.csv")
 
+table(clndat$lonc) # all good
+
 # Set density map by 5 degree cell
-table(clndat$loncode) # all good
-a <- log(table(dat$lon5,dat$lat5))
+a <- log(table(dat_pac$lon5,dat_pac$lat5))
 windows(width = 13,height = 10)
-image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,xlab = "Longitude",ylab = "Latitude")
-map("worldHires",add = T, interior = F,fill = F)
+image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,xlab = "Longitude",ylab = "Latitude",ylim = c(-60,60),xlim = c(100,300))
+maps::map("world2",add = T, interior = F,fill = F)
 savePlot("Setmap_logscale.png",type = "png")
 
 # Set density map by 1 degree cell
-a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],log(table(lon,lat)))
-windows(width = 10,height = 10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab = "Longitude",ylab = "Latitude",ylim = c(-55,70),xlim = c(-100,30))
-map("world",add = T, interior = F,fill = T)
+a <- with(dat_pac,log(table(lon,lat)))
+windows(width = 13,height = 10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab = "Longitude",ylab = "Latitude",ylim = c(-60,60),xlim = c(100,300))
+maps::map("world2",add = T, interior = F,fill = T)
 savePlot("Setmap_logscale_1deg.png",type = "png")
 
-a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],tapply(regB,list(lon,lat),mean))
-windows(width = 10,height = 10)
-image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col = 2:6,xlab = "Longitude",ylab = "Latitude")
-map("worldHires",add = T, interior = F,fill = T)
+map_epo()
 savePlot("regbet.png",type = "png")
 
 # Mean fishing location  by yearqtr

@@ -348,7 +348,6 @@ dataprep_JP_EPO2 <- function(dat, splist=c("alb","bet","yft","swo","mls","bum", 
 
   dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
 
-  ###############>>>>>>>>>>>>>
   dat$moon <- lunar.illumination(dat$dmy)
   dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
   dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")

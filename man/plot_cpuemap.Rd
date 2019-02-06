@@ -5,7 +5,8 @@
 \title{Plot map of cpue or the ratio of two other spatial variables.}
 \usage{
 plot_cpuemap(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120,
-  210), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "")
+  210), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "",
+  bgc = "grey", maptype = "world2")
 }
 \arguments{
 \item{indat}{Input dataset to plot.}

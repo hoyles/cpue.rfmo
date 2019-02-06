@@ -5,7 +5,7 @@
 \title{Plot map of catches or other spatial variable.}
 \usage{
 plot_catchmap2(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20,
-  130), ti = "", delta = 1)
+  130), ti = "", delta = 1, bgc = "grey", maptype = "world2")
 }
 \arguments{
 \item{indat}{Input dataset to plot.}

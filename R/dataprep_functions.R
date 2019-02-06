@@ -168,7 +168,61 @@ dataprep_JP <- function(dat, alldat = T, region = "IO", splist = c("bft","sbt","
 
   dat <- make_lbidmon(dat) # This sets up the clustering variable.
 
-    dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
+  return(dat)
+}
+
+#' Prepare Japanese longline data for the eastern and western Pacific, IATTC 2019.
+#'
+#' The function prepares Japanese longline data for EPO (mainly) but also some WCPO analyses. Data are already partly preprared.
+#' @param dat Input dataset
+#' @param alldat If FALSE, removes vessels without vessel ID.
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataprep_JP_EPO <- function(dat, alldat = T, splist = c("alb","bet","yft","swo","mls","bum","blm","sas","sha","sai","spf")) {
+  dat <- dat[order(dat$op_yr, dat$op_mon, dat$op_day), ]
+  dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
+  dat <- dat[!is.na(dat$dmy),]
+  dat$moon <- lunar.illumination(dat$dmy)
+
+  lat.1dgc <- dat$lat_raw
+  lon.1dgc <- dat$lon_raw
+  lat.1dgc[dat$latc==1] <-   lat.1dgc[dat$latc==1] + 0.5
+  lat.1dgc[dat$latc==2] <- ((lat.1dgc[dat$latc==2] + 1) * (-1)) + 0.5
+  lon.1dgc[dat$lonc==2] <- (lon.1dgc[dat$lonc==2] * (-1)) - 0.5
+  lon.1dgc[dat$lonc==1] <-  lon.1dgc[dat$lonc==1] - 360 + 0.5
+  dat$lat <-  lat.1dgc
+  dat$lonx <- lon.1dgc
+  dat$lon <- dat$lonx + 360
+
+  dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
+  dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
+
+  dat$lonx5 <- dat$lon5 - 360
+
+  dat$vessid <- as.numeric(as.factor(paste(dat$callsign)))
+  if (alldat == F) { dat <- dat[dat$vessid != 1, ] }
+  dat$vessid <- as.numeric(as.factor(dat$vessid))
+  dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))
+  dat$tripidwk <- as.factor(paste(dat$vessid, dat$op_yr, week(dat$dmy)))
+
+  splist_short <- splist[!splist %in% c("sai","spf")]
+  dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+  dat$Total <- apply(dat[, splist_short], 1, sum)
+  dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
+
+  # dat$trip_yr <- as.numeric(substr(as.character(dat$trip_st), 1, 4))
+  # dat <- dat[dat$trip_yr > 1945 | is.na(dat$trip_yr), ]
+
+  # dat$tripid <- paste(dat$vessid, dat$trip_st, sep = "_")
+  # dat$tripid[dat$vessid == 1] <- NA
+  # dat$tripid[dat$trip_st == 0] <- NA
+
+  dat <- make_lbidmon(dat) # This sets up the clustering variable.
+
+  dat$hbf[dat$op_yr < 1976 & is.na(dat$hbf)] <- 5
   return(dat)
 }
 

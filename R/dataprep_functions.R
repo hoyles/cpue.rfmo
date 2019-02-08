@@ -252,7 +252,7 @@ dataprep_JP_EPO2 <- function(dat, splist=c("alb","bet","yft","swo","mls","bum", 
 
   # Set up standard names, the same as for other fleets (based on cpue.rfmo but not the equal)
   MyNames<-c("ocean","op_yr","op_mon","op_day","lat_raw","latc","lon_raw","lonc","VESSEL_CD","vessel_type","set_target","vessel_size",
-             "main","branch","hbf","lbranch","lfloat","hooks","number","logbookID","alb","bet","yft",
+             "main","branch","hbf","lbranch","lfloat","hooks","number","logbookid","alb","bet","yft",
              "swo","mls","bum", "blm", "sas", "sha","sfa","ssp","PTS95","PTS85","PTS75","PTS65","PTS50")
 
   #mls is stripped marlin (Kajikia audax), it was as "whm" in the original data
@@ -655,8 +655,9 @@ dataprep_SY <- function(dat, region, splist) {
 #' @return Modified dataset.
 #'
 make_lbidmon <- function(dat) {
- dat$lbid_mon <- paste(dat$logbookid, dat$op_mon)
- return(dat)
+  dat$lbid_mon <- paste(dat$logbookid, dat$op_mon)
+  dat$lbid_wk <- paste(dat$logbookid, week(dat$dmy))
+  return(dat)
 }
 
 #' Set up Indian Ocean regions

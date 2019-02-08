@@ -275,6 +275,9 @@ plot_pacific <- function(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "
 #' Map of the Pacific Ocean with EPO boundaries.
 #'
 #' Function to make a map of the Pacific Ocean, with regional boundaries.
+#' @param new Make a new plot
+#' @param latlim Latitudes for the edges of the map.
+#' @param lonlim Longitudes for the edges of the map.
 #'
 map_EPO <- function(new=FALSE, latlim = c(-40, 40), lonlim = c(140, 290)) {
   if(new) {

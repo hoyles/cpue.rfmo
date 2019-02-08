@@ -263,6 +263,7 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
   if("addpca" %in% names(runpars))  addpca <- runpars$addpca else addpca <- NA
   if("samp" %in% names(runpars))    samp <- runpars$samp else samp <- NA
   if("llstrat" %in% names(runpars)) llstrat <- runpars$llstrat else llstrat <- 5
+  if("rm_hbfna" %in% names(runpars)) rm_hbfna <- runpars$rm_hbfna else rm_hbfna <- FALSE
 
   gdat <- indat[indat$reg == runreg, ]
   if (!is.na(yrlims[1]))
@@ -286,10 +287,17 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
     vars <- c(vars, "clust")
   }
   if (dim(gdat)[1] > 0) {
-    if (sum(is.na(gdat$hbf)) > 0)
-      gdat[is.na(gdat$hbf), ]$hbf <- 5
-    if (sum(gdat$hbf == 0) > 0)
-      gdat[gdat$hbf == 0, ]$hbf <- 5
+    if(rm_hbfna) {
+      if (sum(is.na(gdat$hbf)) > 0)
+        gdat <- gdat[!is.na(gdat$hbf), ]
+      if (sum(gdat$hbf == 0) > 0)
+        gdat <- gdat[gdat$hbf > 0, ]
+    } else {
+      if (sum(is.na(gdat$hbf)) > 0)
+        gdat[is.na(gdat$hbf), ]$hbf <- 5
+      if (sum(gdat$hbf == 0) > 0)
+        gdat[gdat$hbf == 0, ]$hbf <- 5
+    }
     gdat <- gdat[gdat$hbf >= minhbf, ]
     if (llstrat != 5)
       gdat$latlong <- paste(llstrat * floor(gdat$lat/llstrat), llstrat * floor(gdat$lon/llstrat), sep = "_")

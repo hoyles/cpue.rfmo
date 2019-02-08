@@ -10,8 +10,8 @@
 doplot_cpue <- function(a,vartype, mdti, regstr, runreg) {
   plot(a$yq,a$pr/mean(a$pr,na.rm=T),xlab="Year-quarter",ylab="Relative CPUE",main=paste(vartype,mdti),type="l",ylim=c(0,3))
   points(a$yq,a$pr/mean(a$pr,na.rm=T), cex=0.7)
-  points(a$yq,a$ul/mean(a$pr,na.rm=T),pch="-",col=3)
-  points(a$yq,a$ll/mean(a$pr,na.rm=T),pch="-",col=2)
+  points(a$yq,a$ul/mean(a$pr,na.rm=T),pch=3, cex = 0.5 ,col=3)
+  points(a$yq,a$ll/mean(a$pr,na.rm=T),pch=3, cex = 0.5, col=2)
   mtext(paste0(regstr," R",runreg),side=3,outer=T,line=-2)
 }
 
@@ -77,13 +77,13 @@ prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"),
                 if(vartype=="lognC") {
                   xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
                   xx$cv <- nd$predterms$se.fit[,1]
-                  xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-                  xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
+                  xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant") - 1.96*nd$predterms$se.fit[,1])
+                  xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant") + 1.96*nd$predterms$se.fit[,1])
                 } else {
                   xx$pr <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant"))
                   xx$cv <- nd$predterms$se.fit[,1]
-                  xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")-1.96*nd$predterms$se.fit[,1])
-                  xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant")+1.96*nd$predterms$se.fit[,1])
+                  xx$ll <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant") - 1.96*nd$predterms$se.fit[,1])
+                  xx$ul <- exp(apply(nd$predterms$fit,1,sum)+attr(nd$predterms$fit,"constant") + 1.96*nd$predterms$se.fit[,1])
                 }
                 a <- data.frame(yq=seq(min(xx$yq),max(xx$yq),0.25))
                 a <- cbind(yq=a$yq,xx[match(a$yq,xx$yq),3:6])

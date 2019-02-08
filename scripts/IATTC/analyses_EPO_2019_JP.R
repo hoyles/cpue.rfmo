@@ -13,7 +13,7 @@ dir.create(jpfigs)
 
 setwd(jalysis_dir)
 
-options(max.print = 10000)
+options(max.print = 5000)
 
 library(stringi)
 library(htmlwidgets)
@@ -63,13 +63,13 @@ library("cpue.rfmo")
 # names(a) <- nms
 # a
 
-a <- read_csv(paste0(datadir_orig,"CE_PTS_20190122_Pac.csv"))
-prepdat <- as.data.frame(a)
-names(prepdat)
-nms <- c("ocean","op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign","vesstyp","target","mainline","branchline",
-         "hbf","lbranch","lfloat","hooks","setnum","logbookid","alb","bet","yft","swo","mls","bum","blm","sas","sha","sai","spf",
-         "PTS95","PTS85","PTS75","PTS65","PTS50","Fune","Log_CE","CAL_CE","tonnage",
-rbind(names(prepdat), nms)
+# a <- read_csv(paste0(datadir_orig,"CE_PTS_20190122_Pac.csv"))
+# prepdat <- as.data.frame(a)
+# names(prepdat)
+# nms <- c("ocean","op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign","vesstyp","target","mainline","branchline",
+#          "hbf","lbranch","lfloat","hooks","setnum","logbookid","alb","bet","yft","swo","mls","bum","blm","sas","sha","sai","spf",
+#          "PTS95","PTS85","PTS75","PTS65","PTS50","Fune","Log_CE","CAL_CE","tonnage",
+# rbind(names(prepdat), nms)
 
 # January 25-29, 2019, adapted from Cleridy's notes
 load(paste0(datadir_orig,"CE_20190126.RData"))
@@ -141,7 +141,7 @@ pd2 <- setup_EPO_regions(pd1, regBall = TRUE, regBepo = TRUE, regBwcpo = TRUE)
 # str(rawdat)
 # clndat <- dataclean_JPIO(rawdat)
 # prepdat1 <- dataprep_JP(clndat, region = "AO")
-# prepdat <- setup_AO_regions(prepdat1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
+# prepdat <- setup_AO_regions(prepdat1, regBpac = T, regBEpac = T) # Later will also need YFT regions, and possibly alternative BET regions
 # str(prepdat)
 # save(pd1, pd2, prepdat, file = "prepdat.RData")
 save(pd1, pd2, file = "prepdat.RData")
@@ -164,7 +164,7 @@ load(file = "../data/JPdat_epo.RData")
 dat <- dat_epo
 
 setwd(jpfigs)
-rm(prepdat, dat_wcpo, rawdat, comp.d, dat_epo, pd1, pd2, llv)
+rm(prepdat, dat_wcpo, rawdat, comp.d, dat_epo, pd1, pd2, llv, clndat, dat_all)
 
 # ===================================================================================
 # Plot and explore the data
@@ -200,10 +200,11 @@ for (fld in c("regBepo","regBall")) {
   savePlot(paste0("mapf_",fld),type = "png")
 }
 
-# Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
-regBPac <- c(1:9,11:15)
+# Plot effort proportions by yr & region, indicating how much was removed by cleaning
+load(paste0(datadir1,"dat_all.RData"))
+regBord <- c(1:9,11:15)
 windows(height = 12,width = 14); par(mfrow = c(4,4),mar = c(3,2,2,1))
-for (r in regBPac) {
+for (r in regBord) {
   xall <- dat_all[dat_all$regBall==r,]
   xpac <- dat_pac[dat_pac$regBall==r,]
   yq <- seq(1952.125,2017.875,0.25)
@@ -274,21 +275,23 @@ table(clndat$lonc) # all good
 a <- log(table(dat_pac$lon5,dat_pac$lat5))
 windows(width = 13,height = 10)
 image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,xlab = "Longitude",ylab = "Latitude",ylim = c(-60,60),xlim = c(100,300))
-maps::map("world2",add = T, interior = F,fill = F)
+maps::map("world2",add = T, interior = F,fill = TRUE)
 savePlot("Setmap_logscale.png",type = "png")
 
 # Set density map by 1 degree cell
 a <- with(dat_pac,log(table(lon,lat)))
 windows(width = 13,height = 10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab = "Longitude",ylab = "Latitude",ylim = c(-60,60),xlim = c(100,300))
-maps::map("world2",add = T, interior = F,fill = T)
+maps::map("world2",add = T, interior = F,fill = TRUE)
 savePlot("Setmap_logscale_1deg.png",type = "png")
 
-map_epo()
+windows(width = 13,height = 10)
+image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab = "Longitude",ylab = "Latitude",ylim = c(-60,60),xlim = c(100,300),xaxt="n")
+map_EPO()
 savePlot("regbet.png",type = "png")
 
 # Mean fishing location  by yearqtr
-windows(width = 15,height = 10);par(mfrow = c(1,2))
+windows(width = 15,height = 10);par(mfrow = c(1,2), oma = c(0,0,2,0))
 ax <- tapply(dat$yrqtr,dat$yrqtr,mean); ay = tapply(dat$lat5,dat$yrqtr,mean)
 plot(ax,ay,xlab = "yr",ylab = "Mean latitude",type = "n")
 a <- 4*(.125+dat$yrqtr-floor(dat$yrqtr))
@@ -297,16 +300,23 @@ text(ax,ay,a,cex = 0.7)
 ax = tapply(dat$lon5,dat$yrqtr,mean);ay = tapply(dat$yrqtr,dat$yrqtr,mean)
 plot(ax,ay,ylab = "yr",xlab = "Mean longitude",type = "n")
 text(ax,ay,a,cex = 0.7)
-savePlot("mean_fishing_location1.png",type = "png")
+mtext("EPO", outer = TRUE, font = 2)
+savePlot("mean_fishing_location1 epo.png",type = "png")
 
-# Mean fishing location by year
-windows(width = 15,height = 10);par(mfrow = c(1,2))
-plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat5,dat$op_yr,mean),xlab = "yr",ylab = "Mean latitude")
-plot(tapply(dat$lon5,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab = "yr",xlab = "Mean longitude")
-savePlot("mean_fishing_location2.png",type = "png")
+windows(width = 15,height = 10);par(mfrow = c(1,2), oma = c(0,0,2,0))
+ax <- tapply(dat_pac$yrqtr,dat_pac$yrqtr,mean); ay = tapply(dat_pac$lat5,dat_pac$yrqtr,mean)
+plot(ax,ay,xlab = "yr",ylab = "Mean latitude",type = "n")
+a <- 4*(.125+dat_pac$yrqtr-floor(dat_pac$yrqtr))
+a <- tapply(a,dat_pac$yrqtr,mean)
+text(ax,ay,a,cex = 0.7)
+ax = tapply(dat_pac$lon5,dat_pac$yrqtr,mean);ay = tapply(dat_pac$yrqtr,dat_pac$yrqtr,mean)
+plot(ax,ay,ylab = "yr",xlab = "Mean longitude",type = "n")
+text(ax,ay,a,cex = 0.7)
+mtext("Pacific", outer = TRUE, font = 2)
+savePlot("mean_fishing_location1 pacific.png",type = "png")
 
-write.csv(table(round(dat$hbf,0),dat$regB,useNA = "always"),file = "hbf by region.csv")
-write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA = "always"),file = "hbf by region by 5 years.csv")
+write.csv(table(round(dat$hbf,0),dat$regBall,useNA = "always"),file = "hbf by region.csv")
+write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regBall,useNA = "always"),file = "hbf by region by 5 years.csv")
 
 # Plot hbf. Change spatial selection criteria for AO.
 windows(20,14);par(mfrow = c(3,3),mar = c(2,2,2,2))
@@ -341,7 +351,7 @@ write.csv(table(dat$lat5,dat$lon5,5*floor(dat$yrqtr/5)),file = "ops by lat-long-
 # data exploration
 #install.packages("rpart")
 library("rpart")
-a <- dat[dat$regB %in% c(2),]
+a <- dat[dat$regBall %in% c(2),]
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
@@ -379,6 +389,11 @@ text(varImpPlot,main = NULL)
 savePlot("Rforest yft cpue",type = "png")
 
 
+a <- with(dat[dat$regBepo==1,],table(set_target, op_yr, exclude=NULL))
+b <- apply(a,2,sum)
+a
+b
+t(a)/b
 
 # ===================================================================================
 # Start the analysis proper
@@ -398,10 +413,10 @@ library("nFactors")
 library("plyr")
 library("dplyr")
 library("data.table")
-library("cluster")
 library("boot")
 library("beanplot")
 library("cpue.rfmo")
+library("fastcluster")
 
 projdir <- "~/IATTC/2019_CPUE/"
 jpdir <- paste0(projdir, "JP/")
@@ -409,40 +424,88 @@ datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 clusdir <- paste0(jpdir, "clustering/")
-clusdir_xsoi <- paste0(jpdir, "clustering_xsoi/")
+#clusdir_xsoi <- paste0(jpdir, "clustering_xsoi/")
 dir.create(clusdir)
 setwd(clusdir)
-load(file = paste0(jalysis_dir,"JPdat.RData"))
-str(dat)
+
+load(file = "../data/JPdat_epo.RData")
+dat <- dat_epo
+
+
+table(dat$mls > 0, dat$op_yr)
+
+load(paste0(datadir1,"JPdat_wcpo.RData"))
+table(dat_wcpo$mls > 0, dat_wcpo$op_yr)
+rm(dat_wcpo)
+
+a <- aggregate(hooks ~ tripidmon + op_yr, data = dat, length)
+table(a$op_yr)
+tapply(a$hooks, a$op_yr, mean)
+b <- tapply(a$hooks, a$op_yr, mean)
+plot(as.numeric(names(b)), b, ylim = c(0, 25), xlab = "Year", ylab = "Sets per month per vessel")
+
+a <- aggregate(hooks ~ tripidwk + op_yr, data = dat, length)
+table(a$op_yr)
+tapply(a$hooks, a$op_yr, mean)
+
+a <- aggregate(hooks ~ lbid_mon + op_yr, data = dat, length)
+table(a$op_yr)
+tapply(a$hooks, a$op_yr, mean)
+b <- tapply(a$hooks, a$op_yr, mean)
+windows()
+plot(as.numeric(names(b)), b, ylim = c(0, 25), xlab = "Year", ylab = "Sets per vessel per month")
+savePlot("Sets per vessel per month", type = "png")
+
+a <- aggregate(hooks ~ lbid_wk + op_yr, data = dat, length)
+table(a$op_yr)
+tapply(a$hooks, a$op_yr, mean)
+
 
 # Remove redundant datasets, if present. Don't worry if not.
-rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
+rm(prepdat,prepdat1,pd1,pd2,clndat,rawdat,dataset,llv)
 
 gc()
-jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
-use_splist <- c("alb","bet","yft","swo","mls","bum","bft","sbt","sas")
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1")
+jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","sas","sha","sfa","ssp")
 dat <- data.frame(dat)
-str(dat[,allabs])
 flag = "JP"
 
-for (r in c(1:3)) {
+tdat <- dat[dat$op_day==1,]
+str(tdat)
+a <- table(dat$vessid, dat$regBepo)
+
+for (r in c(1:4)) {
   windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB == r,]
+  a <- dat[dat$regBepo == r,]
   for (sp in jp_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
 }
 
-nclB = c(4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1")
+a <- as.data.frame(group_by(dat, lbid_mon, regBepo) %>% summarise(length = length(vessid)))
+head(a)
+a <- a[a$regBepo==1,]
+a <- a[a$length > 3,]
+tdat <- dat[dat$lbid_mon %in% a$lbid_mon | dat$regBepo != 1,]
+dim(dat); dim(tdat)
+
+hist(a[a > 0], nclass=60)
+
+use_splist <- c("alb","bet","yft","swo","mls","bum","sas")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripidmon","tripidwk","lbid_mon","lbid_wk", "moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regBepo")
+str(dat[,allabs])
+allabs[!allabs %in% names(dat)]
+tdat <- tdat[tdat$op_yr > 1975,]
+str(dat)
+
+nclB = c(3,4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regBepo")
 r = 4
 
 
-regtype = "regB"
+regtype = "regBepo"
 for (r in 1:length(nclB)) {
   fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "lbid_mon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  dataset <- clust_PCA_run(r = r,ddd = tdat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "lbid_mon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 
@@ -456,17 +519,17 @@ load(file = paste0(jalysis_dir,"JPdat.RData"))
 gc()
 jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
 use_splist <- c("alb","yft","swo","mls","bum","bft","sbt","sas")
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1","bet")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regBepo","regBall","bet")
 dat <- data.frame(dat)
 str(dat[,allabs])
 flag = "JP"
 
 nclB = c(4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1","bet")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regBepo","regBall","bet")
 r = 3
 
 
-regtype = "regB"
+regtype = "regBepo"
 for (r in 1:length(nclB)) {
   fnh <- paste(flag,regtype,r,sep = "_")
   dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "lbid_mon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
@@ -519,7 +582,7 @@ clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
 flag <- "JP"
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regBEpac", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
@@ -621,7 +684,7 @@ setwd(resdir)
 
 flag <- "JP"
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regBpac", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
@@ -720,7 +783,7 @@ setwd(resdir)
 
 flag <- "JP"
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["bet"]] <- list(regtype = "regBpac", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 

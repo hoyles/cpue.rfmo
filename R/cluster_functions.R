@@ -218,7 +218,7 @@ make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid 
     # NbClust(atrp[, spp], method = 'ward.D');flush.console()
     atrp <- scale(atrp[, spp])
     dtrp <- dist(atrp, method = "euclidean")
-    fittrp <- hclust(dtrp, method = "ward.D")
+    fittrp <- fastcluster::hclust(dtrp, method = "ward.D")
     plot(fittrp, labels = FALSE, hang = -1, main = paste(titx, "trip"))  # display dendogram  #looks like 3 (or 4)
     grptrp <- cutree(fittrp, k = ncl)  # cut tree into ncl clusters
     print(table(grptrp))

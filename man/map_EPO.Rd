@@ -6,6 +6,13 @@
 \usage{
 map_EPO(new = FALSE, latlim = c(-40, 40), lonlim = c(140, 290))
 }
+\arguments{
+\item{new}{Make a new plot}
+
+\item{latlim}{Latitudes for the edges of the map.}
+
+\item{lonlim}{Longitudes for the edges of the map.}
+}
 \description{
 Function to make a map of the Pacific Ocean, with regional boundaries.
 }

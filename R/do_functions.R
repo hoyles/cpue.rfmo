@@ -134,7 +134,7 @@ do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, ru
 #'
 #' The function runs delta lognormal models.
 #' @param runpars The 'runpars' object with all variables.
-#' @param doflags Include HBF in the models.
+#' @param doflags The flags to include in the model runs.
 #' @param regstr The name of the regional structure to be run.
 #' @param maxyr Include no times after the start of this year.
 #' @param do_early If TRUE, run the additional pre-1979 and post-1979 standardizations.
@@ -148,6 +148,8 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdla
   runsp <- rp$runsp
   addcl <- rp$addcl
   dohbf <- rp$dohbf
+  ylall <- rp$ylall
+  if(length(doflags)==1) onefl <- doflags else onefl <- NA
   jdat <- data.frame()
   if("strsmp" %in% names(rp))  strsmp <- rp$strsmp else strsmp <- NA
 
@@ -169,19 +171,19 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdla
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for (runreg in rp$doregs) {
     jdat2 <- jdat[jdat$yrqtr < jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
-    glmdat <- select_data_IO2(jdat2,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars)
+    glmdat <- select_data_IO2(jdat2,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars, yrlims = ylall, oneflag = onefl)
     if (!is.na(strsmp) & nrow(glmdat) > 60000)
       glmdat <- samp_strat_data(glmdat, strsmp)
 
     glmdat$.wtt   <- mk_wts(glmdat,wttype = "area")
 
     if (do_early) {
-      glmdat5279 <- select_data_IO2(jdat2,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1952,1980))
+      glmdat5279 <- select_data_IO2(jdat2,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1952,1980), oneflag = onefl)
       if (!is.na(strsmp) & nrow(glmdat5279) > 60000)
         glmdat5279 <- samp_strat_data(glmdat5279, strsmp)
 
       a <- jdat2[jdat2$vessid != "JP1",]
-      glmdat79nd <- select_data_IO2(a,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1979,maxyr))
+      glmdat79nd <- select_data_IO2(a,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1979,maxyr), oneflag = onefl)
       if (!is.na(strsmp) & nrow(glmdat79nd) > 60000)
         glmdat79nd <- samp_strat_data(glmdat79nd, strsmp)
       glmdat5279$.wtt   <- mk_wts(glmdat5279,wttype="area")

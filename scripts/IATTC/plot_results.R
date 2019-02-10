@@ -9,7 +9,22 @@ JPdir <- paste0(projdir, "JP/")
 KRdir <- paste0(projdir, "KR/")
 TWdir <- paste0(projdir, "TW/")
 
-alldirs <- c(paste0(jointdir,"analyses/cl1_hb0_hk1/"))
+alldirs <- c(paste0(jointdir,"analyses/cl0_hb0_hk1/"),
+             paste0(jointdir,"analyses/cl1_hb0_hk1/"),
+             paste0(jointdir,"analyses/cl0_hb1_hk1/"),
+             paste0(jointdir,"analyses/cl1_hb1_hk1/"),
+             paste0(JPdir,"analyses/cl0_hb0_hk1/"),
+             paste0(JPdir,"analyses/cl1_hb0_hk1/"),
+             paste0(JPdir,"analyses/cl0_hb1_hk1/"),
+             paste0(JPdir,"analyses/cl1_hb1_hk1/"),
+             paste0(KRdir,"analyses/cl0_hb0_hk1/"),
+             paste0(KRdir,"analyses/cl1_hb0_hk1/"),
+             paste0(KRdir,"analyses/cl0_hb1_hk1/"),
+             paste0(KRdir,"analyses/cl1_hb1_hk1/"),
+             paste0(TWdir,"analyses/cl0_hb0_hk1/"),
+             paste0(TWdir,"analyses/cl1_hb0_hk1/"),
+             paste0(TWdir,"analyses/cl0_hb1_hk1/"),
+             paste0(TWdir,"analyses/cl1_hb1_hk1/"))
 
 
 
@@ -33,6 +48,7 @@ library("cpue.rfmo")
 library("maps")
 library("maptools")
 library("mapdata")
+library("plotrix")
 
 library("cpue.rfmo")
 
@@ -41,7 +57,7 @@ mdtv <- "boat_allyrs"
 md5279 <- "novess_5279"
 md79nd <- "vessid_79nd"
 keepd <- TRUE
-yr1 = 1975
+yr1 = 1979
 
 mdt_all <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")
 mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")
@@ -52,7 +68,7 @@ reg_strs <- c("regBepo")
 
 #resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
-prep_indices(resdirs=alldirs[1], reg_strs=c("regBepo"), reglist, vartypes = c("lognC","dellog"), yr1=1975)
+prep_indices(resdirs=alldirs[1], reg_strs=c("regBepo"), reglist, vartypes = c("lognC","dellog"), yr1=1979, nplots = 2)
 
 #prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 

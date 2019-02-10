@@ -8,11 +8,30 @@
 #' @param runreg Region number, to use in file name.
 #'
 doplot_cpue <- function(a,vartype, mdti, regstr, runreg) {
-  plot(a$yq,a$pr/mean(a$pr,na.rm=T),xlab="Year-quarter",ylab="Relative CPUE",main=paste(vartype,mdti),type="l",ylim=c(0,3))
-  points(a$yq,a$pr/mean(a$pr,na.rm=T), cex=0.7)
-  points(a$yq,a$ul/mean(a$pr,na.rm=T),pch=3, cex = 0.5 ,col=3)
-  points(a$yq,a$ll/mean(a$pr,na.rm=T),pch=3, cex = 0.5, col=2)
+  est <- a$pr/mean(a$pr,na.rm=T)
+  upr <- a$ul/mean(a$pr,na.rm=T)
+  lwr <- a$ll/mean(a$pr,na.rm=T)
+  plot(a$yq,est,xlab="Year-quarter",ylab="Relative CPUE",main=paste(vartype,mdti),type="l",ylim=c(0,3))
+  # points(a$yq,a$pr/mean(a$pr,na.rm=T), cex=0.7)
+  # points(a$yq,upr,pch=3, cex = 0.5 ,col=3)
+  # points(a$yq,lwr,pch=3, cex = 0.5, col=2)
+  # plotCI(a$yq,a$pr/mean(a$pr,na.rm=T), ui=a$ul/mean(a$pr,na.rm=T),
+  #        li=a$ll/mean(a$pr,na.rm=T),pch = NA, add = TRUE, slty = 1, gap = 0.005, sfrac = .005)
+  # points(a$yq,a$pr/mean(a$pr,na.rm=T),type="l")
+  findna <- complete.cases(a)
+  for(i in 1:(length(findna) - 1)) {
+    if(findna[i] & findna[i+1]) {
+      j <- i + 1
+      with(a,polygon(c(yq[i:j],yq[j:i]),c(lwr[i:j],upr[j:i]),col = "grey75", border = FALSE))
+    }
+  }
+
+  matlines(a[,1],cbind(est,lwr,upr),
+           lwd=c(2,1,1),
+           lty=1,
+           col=c("black","red","red"))
   mtext(paste0(regstr," R",runreg),side=3,outer=T,line=-2)
+  points(a$yq,est,type = "both")
 }
 
 #' Plot annual indices.
@@ -34,6 +53,17 @@ doplot_yr_cpue <- function(a,vartype, mdti, regstr, runreg) {
   mtext(paste0(regstr," R",runreg),side=3,outer=T,line=-2)
 }
 
+#' Set up output window for index plots
+#'
+#' @param wh Window height
+#' @param ww Window width
+#' @param wmf Window mfrow parameter
+#'
+make_index_windows <- function(wh=12,ww=12,wmf=c(2,2)) {
+  windows(height=wh,width=ww)
+  par(mfrow=wmf,mar=c(4,4,3,1))
+  }
+
 #' Prepare indices, save files and plots.
 #'
 #' The function takes a list of directories with output file.
@@ -49,17 +79,20 @@ doplot_yr_cpue <- function(a,vartype, mdti, regstr, runreg) {
 #'
 prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"), yr1=1952, outdirname = "outputs/",
                          mdt_all = c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd"),
-                         mdti_all = c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")) {
+                         mdti_all = c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),
+                                      paste0(yr1,"-1979 no vessid"),"1979-present vessid"), nplots=4) {
   for (resdir in resdirs) {
     outdir <- paste0(resdir,outdirname)
     dir.create(outdir)
     setwd(resdir)
+    if (nplots==2) { wh <- 7; ww <- 12; wmf <- c(1,2) }
+    if (nplots==4) { wh <- 12; ww <- 12; wmf <- c(2,2) }
     for(regstr in reg_strs) {
       for(runreg in rgl[[regstr]]) {
         for(vartype in vartypes) {
-          windows(height=12,width=12);par(mfrow=c(2,2),mar=c(4,4,3,1))
+          make_index_windows(wh = wh, ww = ww, wmf = wmf)
           qtrdev <- dev.cur()
-          windows(height=12,width=12);par(mfrow=c(2,2),mar=c(4,4,3,1))
+          make_index_windows(wh = wh, ww = ww, wmf = wmf)
           yrdev <- dev.cur()
           saveit <- FALSE
           for(mdn in 1:4) {

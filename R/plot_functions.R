@@ -374,7 +374,8 @@ plot_effects <- function(model, indat, addmain = F, addbranch = F, addalb = F, a
     coefs2 <- tapply(coefs, list(alon, alat), mean)
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0.5, 2.5), ylab = "Lat", xlab = "Long")
     contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    maps::map(add = TRUE)
+    if(max(alon, na.rm = TRUE) > 180) odb <- "world2" else odb <- "world"
+    maps::map(database = odb, add = TRUE, fill = TRUE)
 
     index <- sort(unique(indat$vessid))
     b <- match(index, indat$vessid)
@@ -745,7 +746,8 @@ plot_effects_IO <- function(model, indat, dovess = T, addcl = F, addpca = F, ti 
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0, 4), ylab = "Lat", xlab = "Long")
     if (length(coefs2) > 5)
         contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    maps::map(add = TRUE, fill = TRUE)
+    if(max(alon, na.rm = TRUE) > 180) odb <- "world2" else odb <- "world"
+    maps::map(database = odb, add = TRUE, fill =TRUE)
 
 
     if (dovess) {
@@ -883,7 +885,8 @@ plot_effects_IO_old <- function(model, indat, dovess = T, addcl = F, addpca = F,
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0, 4), ylab = "Lat", xlab = "Long")
     if (length(coefs2) > 5)
         contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    maps::map(add = TRUE, fill = TRUE)
+    if(max(alon, na.rm = TRUE) > 180) odb <- "world2" else odb <- "world"
+    maps::map(database = odb, add = TRUE, fill =TRUE)
 
     if (dovess) {
         index <- sort(unique(indat$vessid))
@@ -1029,7 +1032,8 @@ plot_effects_IOx <- function(model, indat, dovess = T, addcl = F, addpca = F, ti
     image(sort(as.numeric(unique(alon))), sort(unique(alat)), coefs2, zlim = c(0.5, 2.5), ylab = "Lat", xlab = "Long")
     if (length(coefs2) > 5)
         contour(sort(unique(alon)), sort(unique(alat)), coefs2, levels = c(0, 1, 2, 2.5), add = TRUE, col = 4)
-    maps::map(add = TRUE)
+    if(max(alon, na.rm = TRUE) > 180) odb <- "world2" else odb <- "world"
+    maps::map(database = odb, add = TRUE, fill =TRUE)
 
     if (dovess) {
         index <- sort(unique(indat$vessid))

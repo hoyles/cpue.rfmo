@@ -68,7 +68,7 @@ reg_strs <- c("regBepo")
 
 #resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
-prep_indices(resdirs=alldirs[1], reg_strs=c("regBepo"), reglist, vartypes = c("lognC","dellog"), yr1=1979, nplots = 2)
+prep_indices(resdirs=alldirs, reg_strs=c("regBepo"), reglist, vartypes = c("lognC","dellog"), yr1=1979, nplots = 2)
 
 #prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
@@ -124,9 +124,13 @@ prep_indices(resdirs=alldirs[1], reg_strs=c("regBepo"), reglist, vartypes = c("l
   ## -----------------------------------
 
 
-fl = c("jnt","jnt","jnt")
-for(dirnum in 1) {
-  setwd(alldirs[dirnum])
+
+fl = rep(c("jnt", "JP", "KR", "TW"), each = 4)
+for(dirnum in 1:16) {
+  resdir <- alldirs[dirnum]
+  outdir <- paste0(resdir,"/influ/")
+  dir.create(outdir)
+  setwd(outdir)
   for(regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
       for (mdi in 1:4) {
@@ -137,30 +141,30 @@ for(dirnum in 1) {
         rm(infve)
         fn <- paste0(alldirs[dirnum],"Joint_", regstr,"_R",r,"_lognC_",md,"_model.RData")
         if (file.exists(fn)) {
-        load(fn)
-        runsp <- splist[[regstr]]
-        assign(nm_dat, mod$data)
-        assign(nm_wt, mk_wts(mod$data,wttype="area"))
-        mn <- with(mod$data,0.1 * mean(get(runsp)/hooks))
-        # check variables
-        doltln <- isTRUE(grep("latlong", mod$formula)[1] > 0)
-        dohbf  <- isTRUE(grep("hbf", mod$formula)[1] > 0)
-        dohook <- isTRUE(grep("hooks", mod$formula)[1] > 0)
-        dovess <- isTRUE(grep("vessid", mod$formula)[1] > 0)
-        doclust <- isTRUE(grep("clust", mod$formula)[1] > 0)
-        infve=Influence$new(mod)
-        infve$calc()
-        windows()
-        fname <- paste0(regstr,"_R",r,"_",fl[dirnum],"_",runsp,"_",md,".png")
-        infve$stanPlot();savePlot(paste0("Stanplot", fname),type="png")
-        infve$stepPlot();savePlot(paste0("stepPlot", fname), type = "png")
-        infve$influPlot();savePlot(paste0("influPlot", fname), type = "png")
-        if (doltln) { infve$cdiPlot('latlong');savePlot(paste0("influPlot_latlong", fname),type="png") }
-        if (dovess) { infve$cdiPlot('vessid'); savePlot(paste0("influPlot_vessid", fname),type="png") }
-        if (dohook) { infve$cdiPlot('ns(hooks, 10)');savePlot(paste0("influPlot_hooks", fname),type="png") }
-        if (dohbf)  { infve$cdiPlot('ns(hbf, 3)');savePlot(paste0("influPlot_hbf", fname),type="png") }
-        if (doclust) { infve$cdiPlot('clust');savePlot(paste0("influPlot_cl", fname),type="png") }
-        graphics.off()
+          load(fn)
+          runsp <- splist[[regstr]]
+          assign(nm_dat, mod$data)
+          assign(nm_wt, mk_wts(mod$data,wttype="area"))
+          mn <- with(mod$data,0.1 * mean(get(runsp)/hooks))
+          # check variables
+          doltln <- isTRUE(grep("latlong", mod$formula)[1] > 0)
+          dohbf  <- isTRUE(grep("hbf", mod$formula)[1] > 0)
+          dohook <- isTRUE(grep("hooks", mod$formula)[1] > 0)
+          dovess <- isTRUE(grep("vessid", mod$formula)[1] > 0)
+          doclust <- isTRUE(grep("clust", mod$formula)[1] > 0)
+          infve=Influence$new(mod)
+          infve$calc()
+          windows()
+          fname <- paste0(regstr,"_R",r,"_",fl[dirnum],"_",runsp,"_",md,".png")
+          infve$stanPlot();savePlot(paste0("Stanplot", fname),type="png")
+          infve$stepPlot();savePlot(paste0("stepPlot", fname), type = "png")
+          infve$influPlot();savePlot(paste0("influPlot", fname), type = "png")
+          if (doltln) { infve$cdiPlot('latlong');savePlot(paste0("influPlot_latlong", fname),type="png") }
+          if (dovess) { infve$cdiPlot('vessid'); savePlot(paste0("influPlot_vessid", fname),type="png") }
+          if (dohook) { infve$cdiPlot('ns(hooks, 10)');savePlot(paste0("influPlot_hooks", fname),type="png") }
+          if (dohbf)  { infve$cdiPlot('ns(hbf, 3)');savePlot(paste0("influPlot_hbf", fname),type="png") }
+          if (doclust) { infve$cdiPlot('clust');savePlot(paste0("influPlot_cl", fname),type="png") }
+          graphics.off()
         }
       }
     }
@@ -195,11 +199,11 @@ getwd()
 mdt="boat_allyrs"; mdt="vessid_79nd"; mdt="novess_5279"; mdt="novess_allyrs";
 vartype="lognC"
 
-reg_strs <- c("regA4")
+reg_strs <- c("regBepo")
 
 
-for (resdir in alldirs) {
-  outdir <- paste0(resdir,"/test/")
+for (resdir in alldirs[5:16]) {
+  outdir <- paste0(resdir,"/resids/")
   dir.create(outdir)
   for(regstr in reg_strs) {
     sp <- splist[[regstr]]
@@ -212,19 +216,21 @@ for (resdir in alldirs) {
           fname <- paste0("Joint_",regstr,"_R",runreg)
           if(file.exists(paste0(resdir,fname,"_",modtype,"_model.RData"))){
             load(paste0(resdir,fname,"_",modtype,"_model.RData"))
-            if(resdir %in% alldirs[5:6]) mod <- mod1
+ #           if(resdir %in% alldirs[5:6]) mod <- mod1
             a <- mod$data
             b <- mod$residuals
             ncl <- length(unique(a$clust))
-            mf <- c(5,5)
-            if (ncl <= 20) mf <- c(5,4)
-            if (ncl <= 16) mf <- c(4,4)
-            if (ncl <= 9) mf <- c(3,3)
-            if (ncl <= 4) mf <- c(2,2)
-            if (ncl == 1) mf <- c(1,1)
-            resplot_med_by_yq_cl(a,b,mf,outdir,fname,modtype)
-            resplot_all_by_yq_cl(a,b,mf,outdir,fname,modtype)
-            resplot_med_by_map_cl(a,b,mf,outdir,fname,modtype)
+            if(ncl > 0) {
+              mf <- c(5,5)
+              if (ncl <= 20) mf <- c(5,4)
+              if (ncl <= 16) mf <- c(4,4)
+              if (ncl <= 9) mf <- c(3,3)
+              if (ncl <= 4) mf <- c(2,2)
+              if (ncl == 1) mf <- c(1,1)
+              resplot_med_by_yq_cl(a,b,mf,outdir,fname,modtype)
+              resplot_all_by_yq_cl(a,b,mf,outdir,fname,modtype)
+              resplot_med_by_map_cl(a,b,mf,outdir,fname,modtype)
+            }
             a$flag <- substring(as.character(a$vessid),1,1)
             nfl <- length(unique(a$flag))
             mf <- c(2,2)
@@ -245,7 +251,7 @@ for (resdir in alldirs) {
 for (resdir in alldirs) {
   for (regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
-      outdir <- paste0(resdir,"diags/")
+      outdir <- paste0(resdir,"spatial/")
       dir.create(outdir)
       runreg <- r
       mdn <- 2
@@ -294,7 +300,9 @@ for (resdir in alldirs) {
       windows(18,14);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
       for (lon in (lons)) {
         i <- match(lon, as.numeric(dimnames(bb)[[1]]))
-        plot(yq, bb[i,], main = lon)
+        lonnm <- lon # for EPO
+        lonnm[lonnm < 0] <- lonnm[lonnm < 0] + 360 # for EPO
+        plot(yq, bb[i,], main = lonnm) # for EPO
         mtext(paste(fname,modtype),side=3,outer=T,line=0)
       }
       savePlot(paste0(outdir,fname,"_lons.png"),type="png")
@@ -312,11 +320,12 @@ for (resdir in alldirs) {
       ll <- as.numeric(unlist(strsplit(as.character(res$ll),"_")))
       res$lat <- ll[seq(1,length(ll),2)]
       res$lon <- ll[seq(2,length(ll),2)]
+      res$lon[res$lon < 0] <- res$lon[res$lon < 0] + 360 # for EPO
       bb3 <- tapply(res$est,list(res$lon,res$lat),mean)
       windows(width = 18, height = 14)
       image(sort(unique(res$lon)),sort(unique(res$lat)),bb3,xlab="Lon",ylab="Lat",main=paste0(fname," Residual trends by cell"),breaks = seq(-0.07, 0.075, length.out = 31), col=heat.colors(30))
       contour(sort(unique(res$lon)),sort(unique(res$lat)),100*bb3,add=T,levels=seq(-10,10,length.out=41))
-      map(add=TRUE,fill=TRUE)
+      map(database = "world2", add=TRUE,fill=TRUE) # world2 for EPO
       savePlot(paste0(outdir,fname,"_Res trends.png"), type = "png")
       # Table of strata sample sizes
 
@@ -592,6 +601,69 @@ for (resdir in alldirs) {
 ############ End of residual plots ##################
 
 ############ Start of comparison plots ##############
+
+jntests <- paste0(jointdir, "analyses/cl0_hb1_hk1/outputs/" )
+TWests <- paste0(TWdir, "analyses/cl0_hb1_hk1/outputs/" )
+JPests <- paste0(JPdir, "analyses/cl0_hb1_hk1/outputs/" )
+KRests <- paste0(KRdir, "analyses/cl0_hb1_hk1/outputs/" )
+
+jntR1 <- read.csv(paste0(jntests, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+TWR1 <- read.csv(paste0(TWests, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+JPR1 <- read.csv(paste0(JPests, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+KRR1 <- read.csv(paste0(KRests, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+
+windows(10,10)
+plot(TWR1$yq, TWR1$pr, type = "l", col = 2, xlab = "Year-quarter", ylab = "ests",ylim = c(0, 3), xlim = c(1979, 2018))
+lines(JPR1$yq, JPR1$pr, type = "l", col = 1)
+lines(KRR1$yq, KRR1$pr, type = "l", col = 3)
+lines(jntR1$yq, jntR1$pr, type = "l", col = 4, lwd=2)
+legend("topright", legend = c("JP", "TW","KR", "joint"), col = 1:4, lty = 1, lwd = c(1,1,1,2))
+savePlot("compare_indices all R1", type = "png")
+
+matchyq <- function(a,b) {
+  a$pr/b$pr[match(a$yq, b$yq)]
+}
+
+windows(10,10)
+plot(TWR1$yq, matchyq(TWR1, jntR1), type = "l", col = 2, xlab = "Year-quarter", ylab = "ests",ylim = c(0, 2), xlim = c(1979, 2018))
+lines(JPR1$yq, matchyq(JPR1, jntR1), type = "l", col = 1)
+lines(KRR1$yq, matchyq(KRR1, jntR1), type = "l", col = 3)
+lines(jntR1$yq, matchyq(jntR1, jntR1), type = "l", col = 4, lwd=2)
+legend("topright", legend = c("JP", "TW","KR", "joint"), col = 1:4, lty = 1, lwd = c(1,1,1,2))
+savePlot("compare_indices ratios all R1", type = "png")
+
+jntests011 <- paste0(jointdir, "analyses/cl0_hb1_hk1/outputs/" )
+jntests001 <- paste0(jointdir, "analyses/cl0_hb0_hk1/outputs/" )
+jntests101 <- paste0(jointdir, "analyses/cl1_hb0_hk1/outputs/" )
+jntests111 <- paste0(jointdir, "analyses/cl1_hb1_hk1/outputs/" )
+jt1_011 <- read.csv(paste0(jntests011, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+jt1_001 <- read.csv(paste0(jntests001, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+jt1_101 <- read.csv(paste0(jntests101, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+jt1_111 <- read.csv(paste0(jntests111, "Joint_regBepo_R1_dellog_boat_allyrs_yq.csv"))
+
+windows(10,10)
+plot(jt1_011$yq, jt1_011$pr, type = "l", col = 1, lwd=2, xlab = "Year-quarter", ylab = "ests",ylim = c(0, 3), xlim = c(1979, 2018))
+lines(jt1_001$yq, jt1_001$pr, type = "l", col = 2)
+lines(jt1_101$yq, jt1_101$pr, type = "l", col = 3, lwd=1)
+lines(jt1_111$yq, jt1_111$pr, type = "l", col = 4, lwd=1)
+legend("topright", legend = c("cl0_hb1_hk1", "cl0_hb0_hk1","cl1_hb0_hk1", "cl1_hb1_hk1"), col = 1:4, lty = 1, lwd = c(2,1,1,1))
+savePlot("compare_indices jnt R1", type = "png")
+
+matchyq <- function(a,b) {
+  a$pr/b$pr[match(a$yq, b$yq)]
+}
+
+windows(10,10)
+plot(jt1_011$yq, matchyq(jt1_011,jt1_011), type = "l", col = 1, lwd=2, xlab = "Year-quarter", ylab = "ests",ylim = c(0.5, 1.5), xlim = c(1979, 2018))
+lines(jt1_011$yq, matchyq(jt1_001,jt1_011), type = "l", col = 2)
+lines(jt1_011$yq, matchyq(jt1_101,jt1_011), type = "l", col = 3)
+lines(jt1_011$yq, matchyq(jt1_111,jt1_011), type = "l", col = 4)
+legend("topright", legend = c("cl0_hb1_hk1", "cl0_hb0_hk1","cl1_hb0_hk1", "cl1_hb1_hk1"), col = 1:4, lty = 1, lwd = c(2,1,1,1))
+savePlot("compare_ratios jnt R1", type = "png")
+
+
+
+#########################################################################
 
 library(readxl)
 a <- excel_sheets("~/../Google Drive/My papers/IOTC/WPTT/2015-17/IOTC-2015-WPTT17-DATA03 - std_cpue_JP_LL_yft_2015.xlsx")

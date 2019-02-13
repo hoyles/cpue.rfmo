@@ -11,7 +11,7 @@ run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
 \arguments{
 \item{runpars}{The 'runpars' object with all variables.}
 
-\item{doflags}{Include HBF in the models.}
+\item{doflags}{The flags to include in the model runs.}
 
 \item{regstr}{The name of the regional structure to be run.}
 

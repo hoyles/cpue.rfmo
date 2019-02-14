@@ -143,7 +143,7 @@ do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, ru
 #' @param twlimit The earliest time limit for including Taiwanese data in the model.
 #' @param keepd Keep data in the model object if TRUE.
 #'
-run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdlabs, projdir, twlimit = 2005, jplimit = list(reg=4, yr=0), keepd = TRUE) {
+run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdlabs, projdir, twlimit = 2005, jplimit = list(reg=4, yr=0), keepd = TRUE, krlimit=NA) {
   rp <- runpars[[regstr]]
   runsp <- rp$runsp
   addcl <- rp$addcl
@@ -171,7 +171,11 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdla
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
   for (runreg in rp$doregs) {
     jdat2 <- jdat[jdat$yrqtr < jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
-    glmdat <- select_data_IO2(jdat2,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars, yrlims = ylall, oneflag = onefl)
+    if(!is.na(krlimit)) {
+      jdat3 <- jdat2[(jdat2$yrqtr > krlimit$yr[1] & jdat2$yrqtr < krlimit$yr[2]) |
+                     !jdat2$reg %in% krlimit$reg | jdat2$flag != "KR",]
+    }
+    glmdat <- select_data_IO2(jdat3,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars, yrlims = ylall, oneflag = onefl)
     if (!is.na(strsmp) & nrow(glmdat) > 60000)
       glmdat <- samp_strat_data(glmdat, strsmp)
 

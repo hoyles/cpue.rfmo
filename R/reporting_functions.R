@@ -238,7 +238,7 @@ resplot_med_by_map_cl <- function(a,b,mf,outdir,fname,modtype) {
     if(min(dim(bb3)) > 1) {
       image(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,xlab="Lon",ylab="Lat",main=cl,breaks=seq(-1.5,1.5,length.out=31),col=heat.colors(30))
       contour(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,add=T,breaks=seq(-5,5,length.out=101))
-      map(add=TRUE,fill=TRUE)
+      maps::map(add=TRUE,fill=TRUE)
       mtext(paste(fname,modtype),side=3,outer=T,line=0)
     }
   }
@@ -311,7 +311,7 @@ resplot_med_by_map_flg <- function(a,b,mf,outdir,fname,modtype) {
     if(min(dim(bb3)) > 1) {
       image(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,xlab="Lon",ylab="Lat",main=switch(fl,J="JP",K="KR",T="TW",S="SY"),breaks=seq(-1.5,1.5,length.out=31),col=heat.colors(30))
       contour(sort(unique(bb2$lon)),sort(unique(bb2$lat)),bb3,add=T,breaks=seq(-5,5,length.out=101))
-      map(add=TRUE,fill=TRUE)
+      maps::map(add=TRUE,fill=TRUE)
       mtext(paste(fname,modtype),side=3,outer=T,line=0)
     }
   }

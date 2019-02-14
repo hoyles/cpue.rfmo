@@ -560,14 +560,14 @@ tabfun(a=sz[sz$species == 4 & sz$unit %in% c(3,4),], ppp = "resolution")
 tabfun(a=sz[sz$species == 5 & sz$unit %in% c(6,7,8),], ppp = "resolution")
 tabfun(a=sz[sz$species == 5 & sz$unit %in% c(3,4),], ppp = "resolution")
 
-bet1 <- sz[sz$species==4 & sz$resolution== 4 & sz$vessel_type==1,] # resolution 4 is 1x1
+bet1 <- sz[sz$species==4 & sz$resolution== 4 & sz$vessel_type==1 & sz$unit %in% c(6,7,8),] # resolution 4 is 1x1
 bet1$num <- bet1$number
-yft1 <- sz[sz$species==5 & sz$resolution== 4 & sz$vessel_type==1,] # resolution 4 is 1x1
+yft1 <- sz[sz$species==5 & sz$resolution== 4 & sz$vessel_type==1 & sz$unit %in% c(6,7,8),] # resolution 4 is 1x1
 yft1$num <- yft1$number
 
-plot_resp_image_resp(dat=bet1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=20),ti="",fn="BET1_model",rng=c(50,200),respvar="cls2",sz_name="BET1_yq_sz_plot",mapname="BET1_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET")
+plot_resp_image_resp(dat=bet1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="BET1_model",rng=c(80,180),respvar="cls2",sz_name="BET1_yq_sz_plot",mapname="BET1_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET")
 
-plot_resp_image_resp(dat=yft1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=20),ti="",fn="YFT1_model",rng=c(30,180),respvar="cls2",sz_name="YFT1_yq_comm_sz_plot",mapname="YFT1_map_comm_sz_plot",yq_mode=F,llmode=F,lenplot=T,newwindow=T, sp = "YFT")
+plot_resp_image_resp(dat=yft1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="YFT1_model",rng=c(70,180),respvar="cls2",sz_name="YFT1_yq_comm_sz_plot",mapname="YFT1_map_comm_sz_plot",yq_mode=F,llmode=F,lenplot=T,newwindow=T, sp = "YFT")
 
 bet1len <- sz[sz$species==4 & sz$resolution== 4 & sz$unit %in% c(6,7,8),] # resolution 4 is 1x1
 yft1len <- sz[sz$species==5 & sz$resolution== 4 & sz$unit %in% c(6,7,8),] # resolution 4 is 1x1

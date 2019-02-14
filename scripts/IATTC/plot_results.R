@@ -26,10 +26,18 @@ alldirs <- c(paste0(jointdir,"analyses/cl0_hb0_hk1/"),
              paste0(TWdir,"analyses/cl0_hb1_hk1/"),
              paste0(TWdir,"analyses/cl1_hb1_hk1/"))
 
+alldirs <- c(paste0(jointdir,"analyses/y_cl1_hb0_hk1/"),
+             paste0(jointdir,"analyses/y_cl0_hb1_hk1/"),
+             paste0(JPdir,"analyses/y_cl1_hb0_hk1/"),
+             paste0(JPdir,"analyses/y_cl0_hb1_hk1/"),
+             paste0(KRdir,"analyses/y_cl1_hb0_hk1/"),
+             paste0(KRdir,"analyses/y_cl0_hb1_hk1/"),
+             paste0(TWdir,"analyses/y_cl1_hb0_hk1/"),
+             paste0(TWdir,"analyses/y_cl0_hb1_hk1/"))
 
 
 reglist <- list("regBepo" = c(1:4))
-splist <- list("regBepo" = "bet")
+splist <- list("regBepo" = "yft")
 
 library("beanplot")
 library("cluster")

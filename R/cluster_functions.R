@@ -226,7 +226,7 @@ make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid 
     savePlot(paste0(fname, "_hclusters_trip.png"), type = "png")
     if (setclust) {
         dset <- dist(aset, method = "euclidean")  # distance matrix
-        fitset <- hclust(dset, method = "ward.D")
+        fitset <- fastcluster::hclust(dset, method = "ward.D")
         windows()
         plot(fitset, labels = FALSE, hang = -1, main = paste(titx, "set"))  # display dendogram  #looks like 3 (or 4)
         grpset <- cutree(fitset, k = ncl)  # cut tree into ncl clusters

@@ -8,20 +8,26 @@ Imports:
     beanplot,
     boot,
     cluster,
-    date,
     data.table,
+    date,
     dplyr,
+    fastcluster,
     graphics,
     grDevices,
     lubridate,
     lunar,
-    mapdata,
+    magrittr,
     maps,
-    maptools,
     mgcv,
     nFactors,
+    readr,
     splines,
-    stats
+    stats,
+    stringr,
+    utils
+Suggests:
+    mapdata,
+    maptools
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

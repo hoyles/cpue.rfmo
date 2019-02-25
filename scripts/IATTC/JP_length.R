@@ -50,8 +50,9 @@ cc <- c("iiiiiiiiiiiiiiiii")
 posses <- cumsum(c(1,wdths))
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
-load(paste0(lendat_dir, ".RData"))
-sz <- prep_len_data(comp.d)
+load(paste0(lendat_dir, "comp.RData"))
+sz <- prep_len_data(size)
+summary(sz)
 
 # Code
 # species: 1: bluefin tuna, 2: southern bluefin tuna, 3: albacore, 4: bigeye tuna, 5: yellowfin tuna, 6: swordfish
@@ -63,7 +64,7 @@ sz <- prep_len_data(comp.d)
 # vessel_type (type of vessel): 1: commercial vessel, >2: training and research vessel
 # unit:  1: kg, 2:  1 cm, 3: 1 kg, 4: 2 kg, 5: 5 kg, 6: 1 cm, 7: 2 cm, 8: 5 cm
 # place: 1: On board (by fisherman), 2-8 and 10-12: port sampling (2: Kagoshima, 3: Katsuura, 4: Yaizu, 5: Shimizu, 6:Tokyo, 7: Shiogama, 8:Kesennuma, 10: Sakai-minato, 11: Kamaishi, 12: Misakai), 9: SBT monitor ship, 13: On board (by Observer)
-# sex: 1: female, 2: male, 3: unknown (or 0 is unknown?)
+# sex: 1: female, 2: male, 0: unknown
 # size_class: size class
 # number: Number of specimen
 
@@ -111,7 +112,7 @@ tabplot(a=a, pp1 = "dd", key=list(leg2=c("day","month")), legloc = "right")
 # Report on the data structures
 #kplace=data.frame(k=c(sort(unique(sz$place)),99),
 #                  legs=c("Vessel fisher", "PS Yaizu", "PS Shimizu", "PS Tokyo", "SBT monitor ship", "Vessel Observer","Not recorded"))
-ksex=data.frame(k=c(sort(unique(sz$sex))), legs=c("Unknown","Female", "Male", "Not recorded"))
+ksex=data.frame(k=c(sort(unique(sz$sex))), legs=c("Not recorded","Unknown","Female", "Male"))
 kunit=data.frame(k=c(sort(unique(sz$unit))), legs=c("NA","1 kg", "1 cm", "2 cm", "5 cm"))
 kvesselc=data.frame(k=c(sort(unique(sz$vessel_type))), legs=c("Commercial","Trn + Rsrch"))
 kresolution=data.frame(k=c(sort(unique(sz$resolution))), legs=c("10  x 20", "5 x 10", "5 x 5", "1 x 1"))
@@ -129,19 +130,18 @@ b_only <- sz[sz$species == 4,]
 tabfun(a=sz, ppp = "sex")
 tabfun(a=sz[sz$species == 5,], ppp = "sex")
 tabfun(a=sz, ppp = "vessel_type")
-tabfun(a=sz, ppp = "fleet")
+#tabfun(a=sz, ppp = "fleet")
 tabfun(a=sz, ppp = "resolution")
 tabfun(a=sz, ppp = "unit")
 tabfun(a=sz, ppp = "species")
-tabfun(a=b_only, ppp = "place")
+#tabfun(a=b_only, ppp = "place")
 
 
 a=sz[sz$species %in% c(4,5) & sz$year %in% 1970:2005 & sz$size_class %in% 100:120 & sz$unit == 7,]
 tapply(a$number,list(a$year,a$size_class), sum)
 
 
-tabfun2(a=sz, pp1 = "place", pp2="vessel_type")
-tabfun2(a=sz, pp1 = "sex", pp2="vessel_type")
+#tabfun2(a=sz, pp1 = "place", pp2="vessel_type")
 tabfun2(a=sz, pp1 = "sex", pp2="vessel_type")
 tabfun2(a=sz, pp1 = "unit", pp2="vessel_type")
 tabfun2(a=sz, pp1 = "unit", pp2="resolution")
@@ -155,40 +155,38 @@ savePlot("Size units by year.png", type = "png")
 #tabplot(a=sz, pp1 = "place", key=list(leg2=c("On board fisherman", "PS Yaizu", "PS Shimizu"#, "PS Tokyo", "SBT monitor ship", "On board Observer","Not recorded")),
 #        legloc = "bottomleft")
 #savePlot("Size sampling location by year.png", type = "png")
-tabplot(a=sz, pp1 = "sex", key=list(leg2=c("Unknown","Female", "Male", "Not recorded")),legloc = "bottomleft")
+tabplot(a=sz, pp1 = "sex", key=list(leg2=c("Not recorded","Unknown","Female", "Male")),legloc = "bottomleft")
 savePlot("Size sex by year.png", type = "png")
 tabplot(a=sz, pp1 = "vessel_type", key=list(leg2=c("Commercial","Training and research")),legloc = "bottomleft")
 savePlot("Size vessel class by year.png", type = "png")
-tabplot(a=sz, pp1 = "resolution", key=list(leg2=c("10  x 20", "5 x 10", "5 x 5", "1 x 1")),legloc = "bottomright")
-savePlot("Size spatial resolution by year.png", type = "png")
-tabplot(a=sz, pp1 = "resolution", key=list(leg2=c("10  x 20", "5 x 10", "5 x 5", "1 x 1")),legloc = "bottomright")
+tabplot(a=sz, pp1 = "resolution", key=list(leg2=c("10  x 20", "5 x 10", "5 x 5", "1 x 1")),legloc = "bottomleft")
 savePlot("Size spatial resolution by year.png", type = "png")
 
 a <- sz[! sz$species %in% c(1,2,6,7,8, 9, 10, 11, 12),]
 tabplot(a=a, pp1 = "species", key=list(leg2=c("bigeye tuna","yellowfin tuna")),legloc = "top")
 savePlot("Size species by year.png", type = "png")
-tabplot_nums(a=a, pp1 = "species", key=list(leg2=c("albacore tuna","bigeye tuna","yellowfin tuna")),legloc = "top")
+tabplot_nums(a=a, pp1 = "species", key=list(leg2=c("bigeye tuna","yellowfin tuna")),legloc = "top")
 savePlot("Size species nums by year.png", type = "png")
 
 
 spname <- c("All","","Albacore","Bigeye","Yellowfin")
-windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1)+.1)
-for(sp in c(1, 5, 4, 3)) {
+windows(height=12, width=8); par(mfrow = c(2,1), mar = c(4, 4, 3, 1)+.1)
+for(sp in c(5, 4)) {
   if(sp==1) a <- sz else a <- sz[sz$species == sp,]
   tabplot(a, pp1 = "unit", key=list(leg2=c("1 kg", "1 cm", "2 cm", "5 cm")), legloc="right", main = spname[sp],neww=F, doleg=(sp==1))
 }
 savePlot("Size units grid by year.png", type = "png")
 
-windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1) + .1)
-for(sp in c(1, 5, 4, 3)) {
+windows(height=12, width=8); par(mfrow = c(2,1), mar = c(4, 4, 3, 1)+.1)
+for(sp in c(5, 4)) {
   kkx = keys[["unit"]]
   if(sp==1) a <- sz else a <- sz[sz$species == sp,]
   tabplot2(a, pp1 = "unit", legloc="right", main = spname[sp],neww=F, doleg=(sp==1), kk=kkx)
 }
 savePlot("Size units grid by year.png", type = "png")
 
-windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1) + .1)
-for(sp in c(5,4)) {
+windows(height=12, width=8); par(mfrow = c(2,1), mar = c(4, 4, 3, 1)+.1)
+for(sp in c(5, 4)) {
   kkx = keys[["unit"]]
   if(sp==1) a <- sz else a <- sz[sz$species == sp,]
   tabplot2(a, pp1 = "dd", legloc="right", main = spname[sp],neww=F, doleg=(sp==1), kk=kkx)
@@ -197,33 +195,33 @@ savePlot("Size units grid by year.png", type = "png")
 
 tabplot(a=a, pp1 = "dd", key=list(leg2=c("day","month")), legloc = "right")
 
+#
+# windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1)+.1)
+# for(sp in c( 5, 4)) {
+#   kkx = keys[["place"]]
+#   if(sp==1) a <- sz else a <- sz[sz$species == sp,]
+#   tabplot2(a, pp1 = "place", legloc="left", main = spname[sp],neww=F, doleg=(sp==5), kk=kkx)
+# }
+# savePlot("Size samploc grid by year.png", type = "png")
 
-windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1)+.1)
-for(sp in c(1, 5, 4, 3)) {
-  kkx = keys[["place"]]
-  if(sp==1) a <- sz else a <- sz[sz$species == sp,]
-  tabplot2(a, pp1 = "place", legloc="left", main = spname[sp],neww=F, doleg=(sp==5), kk=kkx)
-}
-savePlot("Size samploc grid by year.png", type = "png")
-
-windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1)+.1)
-for(sp in c(1, 5, 4, 3)) {
+windows(height=12, width=8); par(mfrow = c(2,1), mar = c(4, 4, 3, 1)+.1)
+for(sp in c(5, 4)) {
   kkx = keys[["sex"]]
   if(sp==1) a <- sz else a <- sz[sz$species == sp,]
   tabplot2(a, pp1 = "sex", legloc="left", main = spname[sp],neww=F, doleg=(sp==5), kk=kkx)
 }
 savePlot("Size sex grid by year.png", type = "png")
 
-windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1)+.1)
-for(sp in c(1, 5, 4, 3)) {
+windows(height=12, width=8); par(mfrow = c(2,1), mar = c(4, 4, 3, 1)+.1)
+for(sp in c(5, 4)) {
   kkx = keys[["resolution"]]
   if(sp==1) a <- sz else a <- sz[sz$species == sp,]
-  tabplot2(a, pp1 = "resolution", legloc="right", main = spname[sp],neww=F, doleg=(sp==3), kk=kkx)
+  tabplot2(a, pp1 = "resolution", legloc="right", main = spname[sp],neww=F, doleg=(sp==5), kk=kkx)
 }
 savePlot("Size resolution grid by year.png", type = "png")
 
-windows(); par(mfrow = c(2,2), mar = c(4, 4, 3, 1)+.1)
-for(sp in c(1, 5, 4, 3)) {
+windows(height=12, width=8); par(mfrow = c(2,1), mar = c(4, 4, 3, 1)+.1)
+for(sp in c(5, 4)) {
   kkx = keys[["vessel_type"]]
   if(sp==1) a <- sz else a <- sz[sz$species == sp,]
   tabplot2(a, pp1 = "vessel_type", legloc="right", main = spname[sp],neww=F, doleg=(sp==3), kk=kkx)
@@ -622,153 +620,63 @@ plot_resp_image_resp(dat=yft2cm,alat="lat510", alon="lon510", minlat=-41,maxlat=
                      lenplot=T,newwindow=T, sp = "YFT", ylab = "Length (cm)")
 
 
-wb <- read.csv("~/../Google Drive/My papers/WCPFC_SC_papers/13th Regular Session/2017UpdatedIndices.csv")
-wy <- read.csv("~/../Google Drive/My papers/WCPFC_SC_papers/13th Regular Session/YFT_DLN-ind_NOVESHES_LONG_MFCL-frmtd_2017-regions.csv")
-wbo <- read.csv("~/../OneDrive/Consulting/IOTC/2017_CPUE/JP/lengths/bet.csv")
-wyo <- read.csv("~/../OneDrive/Consulting/IOTC/2017_CPUE/JP/lengths/yft.csv")
-a <- wyo$R5
-wyo$R5 <- wyo$R6
-wyo$R6 <- a
 
-str(wb)
-str(wy)
-par()
-windows(height = 14, width = 14); par(mfrow = c(3,3), mar = c(4,4,3,.5)+.1)
-sp = "BET"
-for (i in 1:9) {
-  reg <- paste0("R",i)
-  pts <- with(wb, get(reg))
-  plot(wb$yrqtr, pts, main = paste(sp, reg), xlab = "Year-quarter", ylab = "Index", xlim = c(1962, 1995))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("WCPO bet", type = "png")
-windows(height = 14, width = 14); par(mfrow = c(3,3), mar = c(4,4,3,.5)+.1)
-sp = "YFT"
-for (i in 1:9) {
-  reg <- paste0("R",i)
-  pts <- with(wy, get(reg))
-  plot(wy$yrqtr, pts, main = paste(sp, reg), xlab = "Year-quarter", ylab = "Index", xlim = c(1962, 1995))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("WCPO yft", type = "png")
+# ----------------------------
+#load(paste0(lendat_dir, ".RData"))
+load(paste0(lendat_dir, "comp.RData"))
+library(mgcv)
+sz <- prep_len_data(size)
+sz$num <- sz$number
 
-windows(height = 14, width = 14); par(mfrow = c(3,2), mar = c(4,4,3,.5)+.1)
-sp = "BET"
-for (i in 1:6) {
-  reg <- paste0("R",i)
-  pts <- with(wbo, get(reg))
-  plot(wbo$Yrqtr, pts, main = paste(sp, reg), xlab = "Year-quarter", ylab = "Index", xlim = c(1952, 2011))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("WCPO 2011 bet", type = "png")
-windows(height = 14, width = 14); par(mfrow = c(3,2), mar = c(4,4,3,.5)+.1)
-sp = "YFT"
-for (i in 1:6) {
-  reg <- paste0("R",i)
-  pts <- with(wyo, get(reg))
-  plot(wyo$Yrqtr, pts, main = paste(sp, reg), xlab = "Year-quarter", ylab = "Index", xlim = c(1952, 2011))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("WCPO 2011 yft", type = "png")
+defactor <- function(x) as.numeric(as.character(x))
+bet1 <- sz[sz$species==4 & sz$resolution== 4 & sz$vessel_type==1 & sz$unit %in% c(6,7,8) & sz$lat < 11 & sz$year >= 2011,] # resolution 4 is 1x1
+yft1 <- sz[sz$species==5 & sz$resolution== 4 & sz$vessel_type==1 & sz$unit %in% c(6,7,8) & sz$lat < 11 & sz$year >= 2011,] # resolution 4 is 1x1
+tun1 <- sz[sz$species %in% c(4,5) & sz$resolution== 4 & sz$vessel_type==1 & sz$unit %in% c(6,7,8) & sz$lat < 11 & sz$year >= 2011,] # resolution 4 is 1x1
 
 
+bet1.1 <- bet1[defactor(bet1$month) %in% c(1,2,3),]
+bet1.2 <- bet1[defactor(bet1$month) %in% c(4,5,6),]
+bet1.3 <- bet1[defactor(bet1$month) %in% c(7,8,9),]
+bet1.4 <- bet1[defactor(bet1$month) %in% c(10,11,12),]
+yft1.1 <- yft1[defactor(yft1$month) %in% c(1,2,3),]
+yft1.2 <- yft1[defactor(yft1$month) %in% c(4,5,6),]
+yft1.3 <- yft1[defactor(yft1$month) %in% c(7,8,9),]
+yft1.4 <- yft1[defactor(yft1$month) %in% c(10,11,12),]
 
-iob1 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regB2_R1_dellog_boat_allyrs.csv")
-iob2 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regB2_R2_dellog_boat_allyrs.csv")
-iob3 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regB2_R3_dellog_boat_allyrs.csv")
-iob4 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regB2_R4_dellog_boat_allyrs.csv")
-iob1nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regB2_R1_dellog_boat_allyrs.csv")
-iob2nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regB2_R2_dellog_boat_allyrs.csv")
-iob3nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regB2_R3_dellog_boat_allyrs.csv")
-iob4nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regB2_R4_dellog_boat_allyrs.csv")
-ioy2 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regY_R2_dellog_boat_allyrs.csv")
-ioy3 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regY_R3_dellog_boat_allyrs.csv")
-ioy4 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regY_R4_dellog_boat_allyrs.csv")
-ioy5 <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_xTW/outputs/Joint_regY_R5_dellog_boat_allyrs.csv")
-ioy2nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regY_R2_dellog_boat_allyrs.csv")
-ioy3nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regY_R3_dellog_boat_allyrs.csv")
-ioy4nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regY_R4_dellog_boat_allyrs.csv")
-ioy5nc <- read.csv("~/../OneDrive/Consulting_done/IOTC/CPUE_LL_2016/2016_secondmeet/joint/std_nocl_xTW_nohbf/outputs/Joint_regY_R5_dellog_boat_allyrs.csv")
+tun1.1 <- tun1[defactor(tun1$month) %in% c(1,2,3),]
+tun1.2 <- tun1[defactor(tun1$month) %in% c(4,5,6),]
+tun1.3 <- tun1[defactor(tun1$month) %in% c(7,8,9),]
+tun1.4 <- tun1[defactor(tun1$month) %in% c(10,11,12),]
 
-windows(height = 14, width = 14); par(mfrow = c(2,2), mar = c(4,4,3,.5)+.1)
-sp = "BET"
-for (i in 1:4) {
-  reg <- paste0("R",i)
-  pts <- get(paste0("iob",i))
-  pts <- pts[pts$yq > 1962 & pts$yq < 1995,]
-  plot(pts$yq, pts$pr, main = paste(sp, reg, "clust"), xlab = "Year-quarter", ylab = "Index", xlim = c(1962, 1995))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("IO BET CPUE clust", type = "png")
-windows(height = 14, width = 14); par(mfrow = c(2,2), mar = c(4,4,3,.5)+.1)
-sp = "BET"
-for (i in 1:4) {
-  reg <- paste0("R",i)
-  pts <- get(paste0("iob",i,"nc"))
-  pts <- pts[pts$yq > 1962 & pts$yq < 1995,]
-  plot(pts$yq, pts$pr, main = paste(sp, reg, "nocl"), xlab = "Year-quarter", ylab = "Index", xlim = c(1962, 1995))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("IO BET CPUE nocl", type = "png")
-windows(height = 14, width = 14); par(mfrow = c(2,2), mar = c(4,4,3,.5)+.1)
-sp = "YFT"
-for (i in c(2,5,3,4)) {
-  reg <- paste0("R",i)
-  pts <- get(paste0("ioy",i))
-  pts <- pts[pts$yq > 1962 & pts$yq < 1995,]
-  plot(pts$yq, pts$pr, main = paste(sp, reg, "clust"), xlab = "Year-quarter", ylab = "Index", xlim = c(1962, 1995))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("IO YFT CPUE clust", type = "png")
-windows(height = 14, width = 14); par(mfrow = c(2,2), mar = c(4,4,3,.5)+.1)
-sp = "YFT"
-for (i in c(2,5,3,4)) {
-  reg <- paste0("R",i)
-  pts <- get(paste0("ioy",i,"nc"))
-  pts <- pts[pts$yq > 1962 & pts$yq < 1995,]
-  plot(pts$yq, pts$pr, main = paste(sp, reg, "nocl"), xlab = "Year-quarter", ylab = "Index", xlim = c(1962, 1995))
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-savePlot("IO YFT CPUE nocl", type = "png")
+# Run glms.
+BET1s1_model <- plot_resp_image_resp_gam(dat=bet1.1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="BET1s1_model",rng=c(80,180),respvar="cls2",sz_name="BET1s1_yq_sz_plot",mapname="BET1s1_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET",initk=4)
+BET1s2_model <- plot_resp_image_resp_gam(dat=bet1.2,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="BET1s2_model",rng=c(80,180),respvar="cls2",sz_name="BET1s2_yq_sz_plot",mapname="BET1s2_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET",initk=4)
+BET1s3_model <- plot_resp_image_resp_gam(dat=bet1.3,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="BET1s3_model",rng=c(80,180),respvar="cls2",sz_name="BET1s3_yq_sz_plot",mapname="BET1s3_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET",initk=5)
+BET1s4_model <- plot_resp_image_resp_gam(dat=bet1.4,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="BET1s4_model",rng=c(80,180),respvar="cls2",sz_name="BET1s4_yq_sz_plot",mapname="BET1s4_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET",initk=4)
 
-windows(height = 14, width = 14); par(mfrow = c(2,2), mar = c(4,4,3,.5)+.1)
-sp = "BET"
-for (i in 1:4) {
-  reg <- paste0("R",i)
-  pts <- get(paste0("iob",i))
-  pts <- pts[pts$yq > 1962 & pts$yq < 1995,]
-  pts2 <- get(paste0("iob",i,"nc"))
-  pts2 <- pts2[pts2$yq > 1962 & pts2$yq < 1995,]
-  plot(pts$yq, pts$pr, main = paste(sp, reg), xlab = "Year-quarter", ylab = "Index",
-       xlim = c(1962, 1995), ylim = c(0, max(c(pts$pr, pts2$pr), na.rm = TRUE)))
-  points(pts2$yq, pts2$pr, col = 4, pch = 3, cex = .9)
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-legend("topright", legend = c("clusters","no clusters"), pch = c(1,3), col = c(1,4))
-savePlot("IO BET CPUE both", type = "png")
-windows(height = 14, width = 14); par(mfrow = c(2,2), mar = c(4,4,3,.5)+.1)
-sp = "YFT"
-for (i in c(2,5,3,4)) {
-  reg <- paste0("R",i)
-  pts <- get(paste0("ioy",i))
-  pts <- pts[pts$yq > 1962 & pts$yq < 1995,]
-  pts2 <- get(paste0("ioy",i,"nc"))
-  pts2 <- pts2[pts2$yq > 1962 & pts2$yq < 1995,]
-  plot(pts$yq, pts$pr, main = paste(sp, reg), xlab = "Year-quarter", ylab = "Index",
-       xlim = c(1962, 1995), ylim = c(0, max(c(pts$pr, pts2$pr), na.rm = TRUE)))
-  points(pts2$yq, pts2$pr, col = 4, pch = 3, cex = .9)
-  abline(v=1976.875, col = 2, lty = 3)
-  abline(v=1977.875, col = 2, lty = 3)
-}
-legend("topright", legend = c("clusters","no clusters"), pch = c(1,3), col = c(1,4))
-savePlot("IO YFT CPUE both", type = "png")
+BET1_model <- plot_resp_image_resp_gam(dat=bet1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="BET1_model",rng=c(80,180),respvar="cls2",sz_name="BET1_yq_sz_plot",mapname="BET1_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET",initk=8)
+
+summary(BET1s1_model)
+#summary(BET1s2_model)
+summary(BET1s3_model)
+summary(BET1s4_model)
+summary(BET1_model)
+table(sz$source,sz$year)
+
+TUN1s1_model <- plot_resp_image_resp_gam(dat=tun1.1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="TUN1s1_model",rng=c(80,180),respvar="cls2",sz_name="TUN1s1_yq_sz_plot",mapname="TUN1s1_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "TUN",initk=4,spmod=TRUE)
+TUN1s2_model <- plot_resp_image_resp_gam(dat=tun1.2,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="TUN1s2_model",rng=c(80,180),respvar="cls2",sz_name="TUN1s2_yq_sz_plot",mapname="TUN1s2_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "TUN",initk=4,spmod=TRUE)
+TUN1s3_model <- plot_resp_image_resp_gam(dat=tun1.3,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="TUN1s3_model",rng=c(80,180),respvar="cls2",sz_name="TUN1s3_yq_sz_plot",mapname="TUN1s3_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "TUN",initk=5,spmod=TRUE)
+TUN1s4_model <- plot_resp_image_resp_gam(dat=tun1.4,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="TUN1s4_model",rng=c(80,180),respvar="cls2",sz_name="TUN1s4_yq_sz_plot",mapname="TUN1s4_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "TUN",initk=4,spmod=TRUE)
+
+TUN1_model <- plot_resp_image_resp_gam(dat=tun1,alat="lat1", alon="lon1", minlat=-10,maxlat=10,minlong=210,maxlong=250,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="TUN1_model",rng=c(80,180),respvar="cls2",sz_name="TUN1_yq_sz_plot",mapname="TUN1_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "TUN",initk=8,spmod=TRUE)
+
+summary(TUN1s1_model)
+summary(TUN1s2_model)
+summary(TUN1s3_model)
+summary(TUN1s4_model)
+summary(TUN1_model)
+
+bet_all <- sz[sz$species==4 & sz$unit %in% c(6,7,8),]
+
+BET_all_model <- plot_resp_image_resp_gam(dat=bet_all,alat="lat1", alon="lon1", minlat=-50,maxlat=50,minlong=170,maxlong=290,minfrq=100,zl2=seq(40,800,by=5),ti="",fn="BET1_model",rng=c(80,180),respvar="cls2",sz_name="BETall_yq_sz_plot",mapname="BETall_map_comm_sz_plot",yq_mode=F,llmode=F, lenplot=T,newwindow=T, sp = "BET",initk=20)
 

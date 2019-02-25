@@ -26,18 +26,27 @@ alldirs <- c(paste0(jointdir,"analyses/cl0_hb0_hk1/"),
              paste0(TWdir,"analyses/cl0_hb1_hk1/"),
              paste0(TWdir,"analyses/cl1_hb1_hk1/"))
 
-alldirs <- c(paste0(jointdir,"analyses/y_cl1_hb0_hk1/"),
-             paste0(jointdir,"analyses/y_cl0_hb1_hk1/"),
-             paste0(JPdir,"analyses/y_cl1_hb0_hk1/"),
-             paste0(JPdir,"analyses/y_cl0_hb1_hk1/"),
-             paste0(KRdir,"analyses/y_cl1_hb0_hk1/"),
-             paste0(KRdir,"analyses/y_cl0_hb1_hk1/"),
-             paste0(TWdir,"analyses/y_cl1_hb0_hk1/"),
-             paste0(TWdir,"analyses/y_cl0_hb1_hk1/"))
+alldirs_y <- c(paste0(jointdir,"analyses/y_cl1_hb0_hk1/"),
+               paste0(jointdir,"analyses/y_cl0_hb1_hk1/"),
+               paste0(JPdir,"analyses/y_cl1_hb0_hk1/"),
+               paste0(JPdir,"analyses/y_cl0_hb1_hk1/"),
+               paste0(KRdir,"analyses/y_cl1_hb0_hk1/"),
+               paste0(KRdir,"analyses/y_cl0_hb1_hk1/"),
+               paste0(TWdir,"analyses/y_cl1_hb0_hk1/"),
+               paste0(TWdir,"analyses/y_cl0_hb1_hk1/"))
+
+alldirs_kr <- c(paste0(jointdir,"analyses/cl1_hb1_hk1_kr/"),
+               paste0(jointdir,"analyses/cl0_hb1_hk1_kr/"))
+
+
+alldirs_fn <- c(paste0(jointdir,"analyses/cl0_hb0_hk1_fn/"),
+             paste0(jointdir,"analyses/cl1_hb0_hk1_fn/"),
+             paste0(jointdir,"analyses/cl0_hb1_hk1_fn/"),
+             paste0(jointdir,"analyses/cl1_hb1_hk1_fn/"))
 
 
 reglist <- list("regBepo" = c(1:4))
-splist <- list("regBepo" = "yft")
+splist <- list("regBepo" = "bet")
 
 library("beanplot")
 library("cluster")
@@ -76,7 +85,7 @@ reg_strs <- c("regBepo")
 
 #resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
-prep_indices(resdirs=alldirs, reg_strs=c("regBepo"), reglist, vartypes = c("lognC","dellog"), yr1=1979, nplots = 2)
+prep_indices(resdirs=alldirs_fn, reg_strs=c("regBepo"), reglist, vartypes = c("lognC","dellog"), yr1=1979, nplots = 2)
 
 #prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
@@ -134,8 +143,10 @@ prep_indices(resdirs=alldirs, reg_strs=c("regBepo"), reglist, vartypes = c("logn
 
 
 fl = rep(c("jnt", "JP", "KR", "TW"), each = 4)
-for(dirnum in 1:16) {
-  resdir <- alldirs[dirnum]
+fl = c("jnt","jnt","jnt","jnt")
+inum <- 0
+for(resdir in alldirs_fn) {
+  inum <- inum + 1
   outdir <- paste0(resdir,"/influ/")
   dir.create(outdir)
   setwd(outdir)
@@ -147,7 +158,7 @@ for(dirnum in 1:16) {
         nm_wt <- c("wtt.all", "wtt.all", "wtt.5279", "wtt.79nd")[mdi]
         rm(mod)
         rm(infve)
-        fn <- paste0(alldirs[dirnum],"Joint_", regstr,"_R",r,"_lognC_",md,"_model.RData")
+        fn <- paste0(resdir,"Joint_", regstr,"_R",r,"_lognC_",md,"_model.RData")
         if (file.exists(fn)) {
           load(fn)
           runsp <- splist[[regstr]]
@@ -163,7 +174,7 @@ for(dirnum in 1:16) {
           infve=Influence$new(mod)
           infve$calc()
           windows()
-          fname <- paste0(regstr,"_R",r,"_",fl[dirnum],"_",runsp,"_",md,".png")
+          fname <- paste0(regstr,"_R",r,"_",fl[inum],"_",runsp,"_",md,".png")
           infve$stanPlot();savePlot(paste0("Stanplot", fname),type="png")
           infve$stepPlot();savePlot(paste0("stepPlot", fname), type = "png")
           infve$influPlot();savePlot(paste0("influPlot", fname), type = "png")
@@ -210,7 +221,7 @@ vartype="lognC"
 reg_strs <- c("regBepo")
 
 
-for (resdir in alldirs[5:16]) {
+for (resdir in alldirs_fn) {
   outdir <- paste0(resdir,"/resids/")
   dir.create(outdir)
   for(regstr in reg_strs) {
@@ -256,7 +267,7 @@ for (resdir in alldirs[5:16]) {
 
 
 # Spatial temporal residual plots
-for (resdir in alldirs) {
+for (resdir in alldirs_fn) {
   for (regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
       outdir <- paste0(resdir,"spatial/")

@@ -1,7 +1,7 @@
 ########################################
 # Plots
 ########################################
-# Joint standardization
+# Joint standardization outputs
 projdir <- "~/IATTC/2019_CPUE/"
 
 jointdir <- paste0(projdir, "joint/")

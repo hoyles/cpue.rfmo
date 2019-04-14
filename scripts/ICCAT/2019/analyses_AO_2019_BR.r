@@ -1,13 +1,13 @@
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_Bigeye/"
 
-krdir <- paste0(projdir, "KR/")
-datadir <- paste0(krdir, "data/")
-kralysis_dir <- paste0(krdir, "analyses/")
-krfigs <- paste0(krdir, "figures/")
+brdir <- paste0(projdir, "BR/")
+datadir <- paste0(brdir, "data/")
+bralysis_dir <- paste0(brdir, "analyses/")
+brfigs <- paste0(brdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-dir.create(kralysis_dir)
-dir.create(krfigs)
-setwd(kralysis_dir)
+dir.create(bralysis_dir)
+dir.create(brfigs)
+setwd(bralysis_dir)
 
 library("date")
 library("splines")
@@ -45,8 +45,8 @@ str(rawdat)
 
 # check the data
 str(rawdat)
-kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","whm","yft")
-a <- c("VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks","floats",kr_splist,"Total")
+br_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","whm","yft")
+a <- c("VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks","floats",br_splist,"Total")
 cbind(names(rawdat),a)
 names(rawdat) <- a
 head(rawdat)
@@ -57,21 +57,21 @@ str(rawdat)
 # Prepare and clean the data
 rawdat$op_yr <- year(rawdat$DATE)
 rawdat$op_mon <- month(rawdat$DATE)
-prepdat <- dataprep_KR(rawdat, splist = kr_splist)
+prepdat <- dataprep_BR(rawdat, splist = br_splist)
 head(prepdat)
 
 prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE)
 head(prepdat2)
 prepdat2 <- as.data.frame(prepdat2)
-dat <- dataclean_KR(prepdat2, yearlim = 2018, splist = kr_splist)
-save(prepdat,dat,file = "KRdat.RData")
+dat <- dataclean_BR(prepdat2, yearlim = 2018, splist = br_splist)
+save(prepdat,dat,file = "BRdat.RData")
 
 
 # ===================================================================================
 # Plot and explore the data
 # ===================================================================================
 # These plots are for checking the data. Not especially important.
-load(file = "KRdat.RData")
+load(file = "BRdat.RData")
 str(dat)
 summary(dat)
 table(dat$vessid,dat$op_yr)
@@ -250,14 +250,14 @@ library(mgcv)
 #install.packages("NbClust")
 library(NbClust)
 
-clustdir <- paste0(krdir,"clustering/")
+clustdir <- paste0(brdir,"clustering/")
 dir.create(clustdir)
 setwd(clustdir)
 
-load(file = paste0(kralysis_dir, "KRdat.RData"))
+load(file = paste0(bralysis_dir, "BRdat.RData"))
 
-flag <- "KR"
-kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","yft")
+flag <- "BR"
+br_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","yft")
 
 use_splist <- c("alb","bet","bum","mls","sfa","swo","yft")
 allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regB","regB1")
@@ -266,7 +266,7 @@ dat <- data.frame(dat)
 for (r in c(2:3)) {
   windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
   a <- dat[dat$regB == r,]
-  for (sp in kr_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+  for (sp in br_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
 }
@@ -295,16 +295,16 @@ for (r in 2:3) {
 
 projdir <- "~/ICCAT/2018_Bigeye/"
 
-krdir <- paste0(projdir, "KR/")
-datadir <- paste0(krdir, "data/")
-kralysis_dir <- paste0(krdir, "analyses/")
-krfigs <- paste0(krdir, "figures/")
+brdir <- paste0(projdir, "BR/")
+datadir <- paste0(brdir, "data/")
+bralysis_dir <- paste0(brdir, "analyses/")
+brfigs <- paste0(brdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-dir.create(kralysis_dir)
-dir.create(krfigs)
-setwd(kralysis_dir)
+dir.create(bralysis_dir)
+dir.create(brfigs)
+setwd(bralysis_dir)
 
-resdir <- paste0(kralysis_dir,"std_cl_KRonly_hbf/")
+resdir <- paste0(bralysis_dir,"std_cl_BRonly_hbf/")
 dir.create(resdir)
 setwd(resdir)
 
@@ -333,9 +333,10 @@ stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks", splist, 
 #clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
 clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
+clkeepBR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
 clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
 clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,BR = clkeepBR_B,TW = clkeepTW_B,US = clkeepUS_B)
 
 runpars <- list()
 runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
@@ -350,7 +351,7 @@ for (runsp in c("bet")) {
   dohbf <- runpars[[runsp]]$dohbf
   cltype <- runpars[[runsp]]$cltype
   jdat <- data.frame()
-  for (flag in c("KR")) {
+  for (flag in c("BR")) {
     for (r in runpars[[runsp]]$doregs) {
       load(paste0(projdir,flag,"/clustering/",paste(flag,regtype,r,sep = "_"),".RData"))
       dataset$flag <- flag
@@ -369,7 +370,7 @@ for (runsp in c("bet")) {
     minqtrs <- minqtrs_byreg[runreg]
     glmdat <- select_data_JointIO(jdat,runreg = runreg,clk = clk,minqtrs = minqtrs,runsp = runsp,mt = "deltabin",vars = vars,maxqtrs = maxqtrs,minvess = 50,minll = 50,minyrqtr = 50,addcl = addcl,cltype = cltype,addpca = NA,samp = NA,strsmp = NA)
     if (nrow(glmdat)>60000) glmdat <- samp_strat_data(glmdat,60)
-    a <- jdat[jdat$vessid != "KR1",]
+    a <- jdat[jdat$vessid != "BR1",]
 
     wtt.all   <- mk_wts(glmdat,wttype = "area")
     fmla.oplogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = T,nhbf = 3)

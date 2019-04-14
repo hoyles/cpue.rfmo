@@ -31,7 +31,7 @@ doplot_cpue <- function(a,vartype, mdti, regstr, runreg) {
            lty=1,
            col=c("black","red","red"))
   mtext(paste0(regstr," R",runreg),side=3,outer=T,line=-2)
-  points(a$yq,est,type = "both")
+  points(a$yq,est,type = "b")
 }
 
 #' Plot annual indices.

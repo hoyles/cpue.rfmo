@@ -1,4 +1,4 @@
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -22,8 +22,8 @@ library("lubridate")
 library("readr")
 library("plyr")
 library("dplyr")
-library("dtplyr")
-library("tm")
+#library("dtplyr")
+#library("tm")
 
 #install.packages("devtools")
 library(devtools)
@@ -38,7 +38,7 @@ library("cpue.rfmo")
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
-      "hbf","hooks","bft","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid")
+      "hbf","hooks","bft","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","sha","prefecture","vesselname","logbookid")
 wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
 cc <- "iiiiiiiciiiiiiiiiiiiiicci"
 posses <- cumsum(c(1,wdths))
@@ -50,13 +50,13 @@ cbind(nms,wdths,unlist(strsplit(cc,"")))
 # chk[10240:10242]
 
 # Check the first 20 rows
-a <- data.frame(read_fwf(file = paste0(datadir1,"/JPNLL_AO_20180417.dat"),fwf_widths(wdths),col_types = cc,n_max = 20));gc()
+a <- data.frame(read_fwf(file = paste0(datadir1,"/JPNLL_AO_20190402.dat"),fwf_widths(wdths),col_types = cc,n_max = 20));gc()
 cbind(names(a), nms)
 names(a) <- nms
 a
 
 # If good, load the whole file
-dat1 <- data.frame(read_fwf(file = paste0(datadir1,"/JPNLL_AO_20180417.dat"),fwf_widths(wdths),col_types = cc))
+dat1 <- data.frame(read_fwf(file = paste0(datadir1,"/JPNLL_AO_20190402.dat"),fwf_widths(wdths),col_types = cc))
 problems(dat1) # Check any problems. Some of those reported are not important.
 names(dat1) <- nms
 table(dat1$trip_st == 0,dat1$op_yr) # Check for the timing of missign trip_start variables
@@ -66,7 +66,7 @@ table(dat1$op_yr)
 # Prepare the data
 rawdat <- dat1
 pd1 <- dataprep_JP(rawdat, region = "AO") # No changes between IO and AO functions
-pd2 <- setup_AO_regions(pd1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
+pd2 <- setup_AO_regions(pd1, regY = T, regY1 = T) # Later will also need YFT regions, and possibly alternative BET regions
 str(pd1)
 str(pd2)
 
@@ -74,7 +74,7 @@ str(pd2)
 str(rawdat)
 clndat <- dataclean_JPIO(rawdat)
 prepdat1 <- dataprep_JP(clndat, region = "AO")
-prepdat <- setup_AO_regions(prepdat1, regB = T, regB1 = T) # Later will also need YFT regions, and possibly alternative BET regions
+prepdat <- setup_AO_regions(prepdat1, regY = T, regY1 = T) # Later will also need YFT regions, and possibly alternative BET regions
 str(prepdat)
 save(pd1, pd2, prepdat, file = "prepdat.RData")
 
@@ -110,9 +110,9 @@ apply(a,2,xfun)
 
 # Plot grid squares with sets by region, for each regional structure
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
-windows(width = 10,height = 10)
-for (fld in c("regB","regB1")) {
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regY1")]
+for (fld in c("regY","regY1")) {
+  windows(width = 10,height = 10)
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld, xlim = c(-100, 50))
   text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
@@ -155,6 +155,7 @@ map(add = T,interior = F,fill = T)
 savePlot(filename = "map_hooks.png",type = "png")
 
 # Histogram of hooks per set
+windows(width = 11,height = 11)
 hist(dat$hooks, nclass = 60,xlab = "Hooks per set")   # ask if very large # hooks is okay
 savePlot("Hook histogram.png",type = "png")
 
@@ -322,7 +323,7 @@ library("boot")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -338,7 +339,7 @@ str(dat)
 rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
 
 gc()
-jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","shk")
+jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
 use_splist <- c("alb","bet","yft","swo","mls","bum","bft","sbt","sas")
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1")
 dat <- data.frame(dat)
@@ -373,7 +374,7 @@ setwd(clusdir)
 load(file = paste0(jalysis_dir,"JPdat.RData"))
 
 gc()
-jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","shk")
+jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
 use_splist <- c("alb","yft","swo","mls","bum","bft","sbt","sas")
 allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1","bet")
 dat <- data.frame(dat)

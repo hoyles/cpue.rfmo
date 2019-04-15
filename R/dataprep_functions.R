@@ -845,7 +845,7 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
 #' @param regB1 If TRUE, set up regB1
 #' @return Modified dataset.
 #'
-setup_AO_regions <- function(dat, regB = F, regB1 = F) {
+setup_AO_regions <- function(dat, regB = F, regB1 = F, regY = F, regY1 = F) {
   # north of 25N, between 25N and 15S, and south of 15S
   lat5 <- lon5 <- NULL
   if (regB) {
@@ -859,6 +859,22 @@ setup_AO_regions <- function(dat, regB = F, regB1 = F) {
     dat <- mutate(dat, regB1 = replace(regB1, which(lat5 < 40 & lat5 >= 20 & lon5 < -5 & !is.na(lat5)), 1)) %>%
       mutate(regB1 = replace(regB1, which(lat5 < 20 & lat5 >= -20 & !is.na(lat5)), 2)) %>%
       mutate(regB1 = replace(regB1, which(lat5 < -20 & lat5 >= -35& !is.na(lat5)), 3))
+  }
+  if (regY) {
+    dat$regY <- 0
+    dat <- mutate(dat, regY = replace(regY, which(lat5 < 45 & lat5 >= 25 & lon5 < -5 & !is.na(lat5)), 1)) %>%
+      mutate(regY = replace(regY, which(lat5 < 25 & lat5 >= -15 & !is.na(lat5)), 2)) %>%
+      mutate(regY = replace(regY, which(lat5 < -15 & lat5 >= -35& !is.na(lat5)), 3))
+  }
+  if (regY1) {
+    dat$regY1 <- 0
+    dat <- mutate(dat, regY1 = replace(regY1, which(lat5 < 45 & lat5 >= 25 & lon5 < -5 & !is.na(lat5)), 1)) %>%
+      mutate(regY1 = replace(regY1, which(lat5 <  25 & lat5 >= 15  & lon5 < -35 & !is.na(lat5)), 1)) %>%
+      mutate(regY1 = replace(regY1, which(lat5 <  15 & lat5 >=  0  & lon5 < -60 & !is.na(lat5)), 1)) %>%
+      mutate(regY1 = replace(regY1, which(lat5 <  25 & lat5 >= -15 & lon5 > -35 & lon5 <   5 & !is.na(lat5)), 2)) %>%
+      mutate(regY1 = replace(regY1, which(lat5 <  15 & lat5 >= -15 & lon5 > -60 & lon5 < -35 & !is.na(lat5)), 2)) %>%
+      mutate(regY1 = replace(regY1, which(lat5 <   5 & lat5 >= -40 & lon5 >   5 & lon5 <  25 & !is.na(lat5)), 3)) %>%
+      mutate(regY1 = replace(regY1, which(lat5 < -15 & lat5 >= -40 & lon5 > -70 & lon5 <  25 & !is.na(lat5)), 3))
   }
 
   return(dat)

@@ -147,7 +147,7 @@ PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp, clustid) {
     setpcs <- pcs[match(dat2$TRIP_NUM, tpagg$TRIP_NUM), ]
     eigtp = summary(pca)$sdev^2  # get Eigenvalue
     OCtesttp = nScree(eigtp)  # run Optimal Coordinates test
-   windows()
+   x11()
     plotnScree(OCtesttp)
     par(col = "black")
     savePlot(Screeplotname, type = "png")
@@ -178,7 +178,7 @@ PCA_by_set <- function(datr, Screeplotname = "screeplot set", allsp) {
     pcs <- data.frame(pr_pca[, 1:nspec])
     eig = summary(pca)$sdev^2  # get Eigenvalue
     OCtest = nScree(eig)  # run Optimal Coordinates test
-    windows()
+    x11()
     plotnScree(OCtest)
     par(col = "black")
     savePlot(Screeplotname, type = "png")
@@ -227,7 +227,7 @@ make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid 
     if (setclust) {
         dset <- dist(aset, method = "euclidean")  # distance matrix
         fitset <- fastcluster::hclust(dset, method = "ward.D")
-        windows()
+        x11()
         plot(fitset, labels = FALSE, hang = -1, main = paste(titx, "set"))  # display dendogram  #looks like 3 (or 4)
         grpset <- cutree(fitset, k = ncl)  # cut tree into ncl clusters
         print(table(grpset))

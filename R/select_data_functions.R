@@ -181,6 +181,7 @@ select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtr
       } else {
         a <- rbind(a, gdat[gdat$clust %in% clk$JP[[runsp]][[runreg]] & gdat$flag == "JP", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$KR[[runsp]][[runreg]] & gdat$flag == "KR", ])
+        a <- rbind(a, gdat[gdat$clust %in% clk$BR[[runsp]][[runreg]] & gdat$flag == "BR", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$SY[[runsp]][[runreg]] & gdat$flag == "SY", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$CN[[runsp]][[runreg]] & gdat$flag == "CN", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$US[[runsp]][[runreg]] & gdat$flag == "US", ])
@@ -277,6 +278,7 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
       } else {
         a <- rbind(a, gdat[gdat$clust %in% clk$JP[[runsp]][[runreg]] & gdat$flag == "JP", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$KR[[runsp]][[runreg]] & gdat$flag == "KR", ])
+        a <- rbind(a, gdat[gdat$clust %in% clk$BR[[runsp]][[runreg]] & gdat$flag == "BR", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$SY[[runsp]][[runreg]] & gdat$flag == "SY", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$CN[[runsp]][[runreg]] & gdat$flag == "CN", ])
         a <- rbind(a, gdat[gdat$clust %in% clk$US[[runsp]][[runreg]] & gdat$flag == "US", ])

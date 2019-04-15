@@ -329,7 +329,7 @@ plot_effects <- function(model, indat, addmain = F, addbranch = F, addalb = F, a
     nfigs <- 6 + addmain + addbranch + addalb + addother
     mf <- switch(nfigs - 5, c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    windows(height = hw[1], width = hw[2])
+    x11(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
     pr <- pred$fit
     prse <- pred$se.fit
@@ -431,7 +431,7 @@ plot_effects <- function(model, indat, addmain = F, addbranch = F, addalb = F, a
 #'
 plot_agg_slope_ratio <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2", fname = NULL, addrate = T) {
     # agg goes first, op goes second
-    windows(height = 16, width = 14)
+    x11(height = 16, width = 14)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     myr <- aggyr[match(opyr, aggyr)]
     coefs1 <- coefs1[match(opyr, aggyr)]
@@ -466,7 +466,7 @@ plot_agg_slope_ratio <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coef
 #'
 plot_agg_slope_ratio_2000 <- function(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1", lab2 = "coefs2") {
     # agg goes first, op goes second
-    windows(height = 14, width = 12)
+    x11(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     myr <- aggyr[match(opyr, aggyr)]
     coefs1 <- coefs1[match(opyr, aggyr)]
@@ -501,7 +501,7 @@ plot_res <- function(summ1, summ2, name1, name2) {
     coefs2 <- get.summ.coefs(summ2, nyrs)
     yrs <- rownames(summ1$coefficients)[grep("yrqtr", rownames(summ1$coefficients))]
     yrs <- c(1980.25, as.numeric(substring(yrs, 17)))
-    windows(height = 13, width = 11)
+    x11(height = 13, width = 11)
     par(mfrow = c(2, 1), mar = c(5, 4, 1, 2))
     plot_slope_ratio(coefs1, coefs2, yrs, "")
     plot(yrs, coefs1, type = "l", ylab = "Relative abundance estimate", xlab = "Year", ylim = c(0, 2.5))
@@ -519,7 +519,7 @@ plot_res <- function(summ1, summ2, name1, name2) {
 #'
 plot_slope_ratio <- function(coefs1, coefs2, yr, titl) {
     # base goes first, boat goes second
-    windows(height = 14, width = 12)
+    x11(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     plot(yr, coefs1/coefs2, xlim = c(1976, 2010), ylim = c(0, 2), xlab = "Year", ylab = "Ratio of coefficients")
     title(main = titl, cex.main = 1.2)
@@ -545,7 +545,7 @@ plot_slope_ratio <- function(coefs1, coefs2, yr, titl) {
 #'
 plot_slope_ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
     # base goes first, boat goes second
-    windows(height = 14, width = 12)
+    x11(height = 14, width = 12)
     par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))
     yy <- c(yr1, yr2)
     yr <- seq(min(yy), max(yy), 0.25)
@@ -708,7 +708,7 @@ plot_effects_IO <- function(model, indat, dovess = T, addcl = F, addpca = F, ti 
     nfigs = 3 + 2 * dovess + docl + addpca + dohbf
     mf <- switch(nfigs - 2, c(2, 2), c(2, 2), c(2, 3), c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    windows(height = hw[1], width = hw[2])
+    x11(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
 
     coefs <- glm.coefs(model, indat)
@@ -827,7 +827,7 @@ plot_effects_IO_old <- function(model, indat, dovess = T, addcl = F, addpca = F,
         nfigs <- 5 + addpca
     mf <- switch(nfigs - 4, c(2, 3), c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    windows(height = hw[1], width = hw[2])
+    x11(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
     pr <- pred$fit
     prse <- pred$se.fit
@@ -974,7 +974,7 @@ plot_effects_IOx <- function(model, indat, dovess = T, addcl = F, addpca = F, ti
         nfigs <- 5 + addpca
     mf <- switch(nfigs - 4, c(2, 3), c(2, 3), c(3, 3), c(3, 3), c(3, 3), c(3, 4))
     hw <- c(14, 19)
-    windows(height = hw[1], width = hw[2])
+    x11(height = hw[1], width = hw[2])
     par(mfrow = mf, mar = c(5, 4, 2, 1), oma = c(0, 0, 3, 0))
     pr <- pred$fit
     prse <- pred$se.fit

@@ -121,10 +121,10 @@ for (fld in c("regY","regY1")) {
 }
 
 # Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
-regBord <- c(1,2,3)
+regYord <- c(1,2,3)
 windows(height = 12,width = 12); par(mfrow = c(2,2),mar = c(3,2,2,1))
-for (r in regBord) {
-  llv <- pd2[pd2$regB==r,]
+for (r in regYord) {
+  llv <- pd2[pd2$regY==r,]
   yq <- seq(1958.125,2017.875,0.25)
   llv$yrqtr <- factor(llv$yrqtr,levels = yq)
   a <- aggregate(hooks ~ lat5 + lon5 + yrqtr,sum,data = llv)
@@ -201,11 +201,11 @@ image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab = "
 map("world",add = T, interior = F,fill = T)
 savePlot("Setmap_logscale_1deg.png",type = "png")
 
-a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],tapply(regB,list(lon,lat),mean))
+a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],tapply(regY,list(lon,lat),mean))
 windows(width = 10,height = 10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col = 2:6,xlab = "Longitude",ylab = "Latitude")
 map("worldHires",add = T, interior = F,fill = T)
-savePlot("regbet.png",type = "png")
+savePlot("regyft.png",type = "png")
 
 # Mean fishing location  by yearqtr
 windows(width = 15,height = 10);par(mfrow = c(1,2))
@@ -225,8 +225,8 @@ plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat5,dat$op_yr,mean),xlab = "yr
 plot(tapply(dat$lon5,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab = "yr",xlab = "Mean longitude")
 savePlot("mean_fishing_location2.png",type = "png")
 
-write.csv(table(round(dat$hbf,0),dat$regB,useNA = "always"),file = "hbf by region.csv")
-write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA = "always"),file = "hbf by region by 5 years.csv")
+write.csv(table(round(dat$hbf,0),dat$regY,useNA = "always"),file = "hbf by region.csv")
+write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regY,useNA = "always"),file = "hbf by region by 5 years.csv")
 
 # Plot hbf. Change spatial selection criteria for AO.
 windows(20,14);par(mfrow = c(3,3),mar = c(2,2,2,2))
@@ -261,7 +261,7 @@ write.csv(table(dat$lat5,dat$lon5,5*floor(dat$yrqtr/5)),file = "ops by lat-long-
 # data exploration
 #install.packages("rpart")
 library("rpart")
-a <- dat[dat$regB %in% c(2),]
+a <- dat[dat$regY %in% c(2),]
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
@@ -341,25 +341,25 @@ rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9
 gc()
 jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
 use_splist <- c("alb","bet","yft","swo","mls","bum","bft","sbt","sas")
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1")
 dat <- data.frame(dat)
 str(dat[,allabs])
 flag = "JP"
 
 for (r in c(1:3)) {
   windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB == r,]
+  a <- dat[dat$regY == r,]
   for (sp in jp_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
 }
 
 nclB = c(4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regY","regY1")
 r = 4
 
 
-regtype = "regB"
+regtype = "regY"
 for (r in 1:length(nclB)) {
   fnh <- paste(flag,regtype,r,sep = "_")
   dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "lbid_mon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
@@ -376,17 +376,17 @@ load(file = paste0(jalysis_dir,"JPdat.RData"))
 gc()
 jp_splist <- c("alb","bet","yft","swo","mls","bum","blm","bft","sbt","sas","sha")
 use_splist <- c("alb","yft","swo","mls","bum","bft","sbt","sas")
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regB","regB1","bet")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY1","yft")
 dat <- data.frame(dat)
 str(dat[,allabs])
 flag = "JP"
 
 nclB = c(4,4,4) # Number of bigeye clusters. Will need to be adjusted for each fleet.
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1","bet")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regY","regY1","yft")
 r = 3
 
 
-regtype = "regB"
+regtype = "regY"
 for (r in 1:length(nclB)) {
   fnh <- paste(flag,regtype,r,sep = "_")
   dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "lbid_mon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
@@ -420,7 +420,7 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 jpdir <- paste0(projdir, "JP/")
 datadir1 <- paste0(jpdir, "data/")
 jalysis_dir <- paste0(jpdir, "analyses/")
@@ -430,22 +430,23 @@ resdir <- paste0(jalysis_dir,"std_cl_JPonly_nohbf/")
 dir.create(resdir)
 setwd(resdir)
 
-#clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
-clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
-clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
-clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+#clkeepCN_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
+clkeepBR_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
+clkeepKR_Y <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3)))
+clkeepTW_Y <- list("yft" = list(c(4),c(2,3),c(0)))
+clkeepUS_Y <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clk_Y <- list(JP = clkeepJP_Y,KR = clkeepKR_Y,TW = clkeepTW_Y,US = clkeepUS_Y)
 
 flag <- "JP"
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY", regtype2 = "Y", clk = clk_Y, doregs = 1:3, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
-runreg = 1; runsp = "bet"
+runreg = 1; runsp = "yft"
 keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
-for (runsp in c("bet")) {
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -541,13 +542,13 @@ setwd(resdir)
 
 flag <- "JP"
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY", regtype2 = "Y", clk = clk_Y, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
-runreg = 1; runsp = "bet"
+runreg = 1; runsp = "yft"
 keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
-for (runsp in c("bet")) {
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -640,13 +641,13 @@ setwd(resdir)
 
 flag <- "JP"
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY", regtype2 = "Y", clk = clk_Y, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
 
-runreg = 1; runsp = "bet"
+runreg = 1; runsp = "yft"
 keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
-for (runsp in c("bet")) {
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl

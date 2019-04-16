@@ -945,3 +945,35 @@ dataprep_US <- function(dat, splist) {
   return(dat)
 }
 
+#' Prepare Brazilian longline data.
+#'
+#' The function prepares Brazilian longline data.
+#' Developed for AO analyses by Rodrigo Sant'Ana.
+#' @param dat Input dataset
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataprep_BRA<- function(dat, splist) {
+  dat <- mutate(dat, op_yr = year) %>%
+    mutate(dmy = parse_date(str_c(parse_character(year),"/",
+                                  parse_character(month),"/",
+                                  parse_character(day)),
+                            "%Y/%m/%d")) %>%
+    mutate(op_mon = dat$month) %>%
+    mutate(op_day = dat$day) %>%
+    mutate(hbf = parse_integer(hpb)) %>%
+    mutate(hooks = dat$effort) %>%
+    mutate(floats=hooks*hbf)
+  dat$moon <- dat$IL
+  dat$lon <- dat$lng
+  dat$lon5 <- dat$lng5
+  dat$qtr <- ceiling(as.numeric(dat$op_mon)/3)
+  dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
+  dat$latlong <- paste(dat$lat5, dat$lon5, sep = "_")
+  dat$vessid <- as.factor(as.numeric(dat$boat))
+  dat$tripidmon <- paste(dat$vessid, dat$op_yr, dat$op_mon)
+  dat$Total <- apply(dat[,splist], 1, sum, na.rm = TRUE)
+  dat$Total2 <- apply(dat[, c("bet.t", "yft.t", "alb.t")], 1, sum, na.rm = TRUE)
+  return(dat)
+}
+

@@ -47,7 +47,10 @@ br_splist <- c("yft", "alb","bet", "swo", "sai", "whm", "bum", "bsh",
 
 
 # Prepare and clean the data
-prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE)
+prepdat2 <- setup_AO_regions(dt, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE)
+
+table(prepdat2$regB, prepdat2$regY)
+
 head(prepdat2)
 prepdat2 <- as.data.frame(prepdat2)
 dat <- dataclean_BR(prepdat2, yearlim = 2018, splist = br_splist)

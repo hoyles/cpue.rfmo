@@ -284,3 +284,28 @@ dataclean_USAO <- function(dat, splist = c("bft","alb","bet","yft","swo","mls","
     #     1976 & is.na(dat$hbf)), ]
     return(dat)
   }
+
+#' Clean Brazilian data.
+#'
+#' The function sets up variables and removes bad data.
+#' @param dat Input dataset
+#' @param yearlim Data is included only from before this year.
+#' @param splist List of species codes
+#' @return Modified dataset.
+#'
+dataclean_BR <- function (dat, yearlim = 2018, splist) {
+  for (sp in splist) {
+    dat[, sp] <- as.numeric(dat[, sp])
+    if (sum(is.na(dat[, sp])) > 0)
+      dat[is.na(dat[, sp]), sp] <- 0
+  }
+  data <- dat[dat$type == 1, ]
+  dat <- dat[!is.na(dat$hooks), ]
+  dat <- dat[dat$hooks < 5000, ]
+  dat <- dat[dat$hooks >= 500, ]
+  dat <- dat[is.na(dat$hbf) == FALSE, ]
+  dat <- dat[dat$op_yr > 1976, ]
+  dat <- dat[dat$yrqtr < yearlim, ]
+  dat <- dat[dat$hbf >= 5, ]
+  return(dat)
+}

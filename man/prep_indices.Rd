@@ -21,7 +21,13 @@ prep_indices(resdirs, reg_strs, rgl, vartypes = c("lognC", "dellog"),
 
 \item{yr1}{First year of the early model, for titles.}
 
-\item{outdirname}{The default name of the folder to create for the outputs.}
+\item{outdirname}{Name of output directory.}
+
+\item{mdt_all}{The list of titles.}
+
+\item{mdti_all}{The list of longer titles.}
+
+\item{nplots}{The number of plots to produce, 2 or 4.}
 }
 \description{
 The function takes a list of directories with output file.

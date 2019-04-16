@@ -9,9 +9,11 @@ setup_EPO_regions(dat, regBall = F, regBepo = F, regBwcpo = F)
 \arguments{
 \item{dat}{Input dataset}
 
-\item{regB}{If TRUE, set up regB}
+\item{regBall}{If TRUE, set up regBall}
 
-\item{regB1}{If TRUE, set up regB1}
+\item{regBepo}{If TRUE, set up regBepo}
+
+\item{regBwcpo}{If TRUE, set up regBwcpo}
 }
 \value{
 Modified dataset.

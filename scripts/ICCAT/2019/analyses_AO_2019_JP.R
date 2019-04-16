@@ -112,7 +112,7 @@ apply(a,2,xfun)
 a <- unique(paste(dat$lat,dat$lon))
 a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regY1")]
 for (fld in c("regY","regY1")) {
-  windows(width = 10,height = 10)
+  dev.new(width = 10,height = 10)
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld, xlim = c(-100, 50))
   text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
@@ -122,7 +122,7 @@ for (fld in c("regY","regY1")) {
 
 # Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
 regYord <- c(1,2,3)
-windows(height = 12,width = 12); par(mfrow = c(2,2),mar = c(3,2,2,1))
+dev.new(height = 12,width = 12); par(mfrow = c(2,2),mar = c(3,2,2,1))
 for (r in regYord) {
   llv <- pd2[pd2$regY==r,]
   yq <- seq(1958.125,2017.875,0.25)
@@ -140,7 +140,7 @@ for (r in regYord) {
 savePlot(filename = "Clean strata hooks",type = "png")
 
 # Sets per day and per month
-windows(width = 15,height = 9)
+dev.new(width = 15,height = 9)
 hist(prepdat$dmy,breaks = "days",freq = T,xlab = "Date",main = "Sets per day")
 savePlot(filename = "sets_per_day.png",type = "png")
 hist(prepdat$dmy,breaks = "months",freq = T,xlab = "Date",main = "Sets per month")
@@ -149,13 +149,13 @@ table(prepdat$dmy)
 
 # Map of hook distribution, all time
 a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm = T)
-windows(width = 11,height = 11)
+dev.new(width = 11,height = 11)
 symbols(x = a[,2],y = a[,1],circles = .0002*sqrt(a[,3]),inches = F,bg = 2,fg = 2,xlab = "Longitude",ylab = "Latitude",ylim = c(-50,60), xlim = c(-95, 20))
 map(add = T,interior = F,fill = T)
 savePlot(filename = "map_hooks.png",type = "png")
 
 # Histogram of hooks per set
-windows(width = 11,height = 11)
+dev.new(width = 11,height = 11)
 hist(dat$hooks, nclass = 60,xlab = "Hooks per set")   # ask if very large # hooks is okay
 savePlot("Hook histogram.png",type = "png")
 
@@ -189,26 +189,26 @@ write.csv(a,"table hbf by year.csv")
 # Set density map by 5 degree cell
 table(clndat$loncode) # all good
 a <- log(table(dat$lon5,dat$lat5))
-windows(width = 13,height = 10)
+dev.new(width = 13,height = 10)
 image(as.numeric(dimnames(a)[[1]]),as.numeric(dimnames(a)[[2]]),a,xlab = "Longitude",ylab = "Latitude")
 map("worldHires",add = T, interior = F,fill = F)
 savePlot("Setmap_logscale.png",type = "png")
 
 # Set density map by 1 degree cell
 a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],log(table(lon,lat)))
-windows(width = 10,height = 10)
+dev.new(width = 10,height = 10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,xlab = "Longitude",ylab = "Latitude",ylim = c(-55,70),xlim = c(-100,30))
 map("world",add = T, interior = F,fill = T)
 savePlot("Setmap_logscale_1deg.png",type = "png")
 
 a <- with(dat[!is.na(dat$lat) & dat$yrqtr,],tapply(regY,list(lon,lat),mean))
-windows(width = 10,height = 10)
+dev.new(width = 10,height = 10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a,col = 2:6,xlab = "Longitude",ylab = "Latitude")
 map("worldHires",add = T, interior = F,fill = T)
 savePlot("regyft.png",type = "png")
 
 # Mean fishing location  by yearqtr
-windows(width = 15,height = 10);par(mfrow = c(1,2))
+dev.new(width = 15,height = 10);par(mfrow = c(1,2))
 ax <- tapply(dat$yrqtr,dat$yrqtr,mean); ay = tapply(dat$lat5,dat$yrqtr,mean)
 plot(ax,ay,xlab = "yr",ylab = "Mean latitude",type = "n")
 a <- 4*(.125+dat$yrqtr-floor(dat$yrqtr))
@@ -220,7 +220,7 @@ text(ax,ay,a,cex = 0.7)
 savePlot("mean_fishing_location1.png",type = "png")
 
 # Mean fishing location by year
-windows(width = 15,height = 10);par(mfrow = c(1,2))
+dev.new(width = 15,height = 10);par(mfrow = c(1,2))
 plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat5,dat$op_yr,mean),xlab = "yr",ylab = "Mean latitude")
 plot(tapply(dat$lon5,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab = "yr",xlab = "Mean longitude")
 savePlot("mean_fishing_location2.png",type = "png")
@@ -229,7 +229,7 @@ write.csv(table(round(dat$hbf,0),dat$regY,useNA = "always"),file = "hbf by regio
 write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regY,useNA = "always"),file = "hbf by region by 5 years.csv")
 
 # Plot hbf. Change spatial selection criteria for AO.
-windows(20,14);par(mfrow = c(3,3),mar = c(2,2,2,2))
+dev.new(20,14);par(mfrow = c(3,3),mar = c(2,2,2,2))
 for (y in seq(1975,2015,5)) {
   a <- dat[floor(dat$yrqtr/5)*5==y & dat$lon5 < 125 & dat$lat5 < 55,]
   a <- tapply(a$hbf,list(a$lon5,a$lat5),mean,na.rm = T)
@@ -240,7 +240,7 @@ for (y in seq(1975,2015,5)) {
 savePlot("mean_HBF.png",type = "png")
 qqs <- c(0.125,0.375,0.625,0.875)
 for (qq in 1:4) {
-  windows(20,14);par(mfrow = c(3,3),mar = c(2,2,2,2),oma = c(0,0,1,0))
+  dev.new(20,14);par(mfrow = c(3,3),mar = c(2,2,2,2),oma = c(0,0,1,0))
   for (y in seq(1975,2015,5)) {
     a <- dat[dat$yrqtr %in% (qqs[qq]+y:(y+4)) & dat$lon5 < 125 & dat$lat5 < 55,]
     a <- tapply(a$hbf,list(a$lon5,a$lat5),mean,na.rm = T)
@@ -274,12 +274,12 @@ a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
 #simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
-windows(width = 11,height = 7)
+dev.new(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
 savePlot("Rpart bet cpue",type = "png")
 simplemod <- rpart(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$betcpue + a$mlscpue + a$blmcpue + a$bumcpue)
-windows(width = 11,height = 7)
+dev.new(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
 savePlot("Rpart yft cpue",type = "png")
@@ -287,13 +287,13 @@ savePlot("Rpart yft cpue",type = "png")
 library("randomForest") # These take a long time and use a lot of memory, but are useful.
 simplefor <- randomForest(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$bftcpue + a$albcpue + a$yftcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 print(simplefor)
-windows(width = 11,height = 7)
+dev.new(width = 11,height = 7)
 plot(importance)
 text(varImpPlot,main = NULL)
 savePlot("Rforest bet cpue",type = "png")
 simplefor <- randomForest(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$betcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 print(simplefor)
-windows(width = 11,height = 7)
+dev.new(width = 11,height = 7)
 plot(importance)
 text(varImpPlot,main = NULL)
 savePlot("Rforest yft cpue",type = "png")
@@ -347,7 +347,7 @@ str(dat[,allabs])
 flag = "JP"
 
 for (r in c(1:3)) {
-  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  dev.new(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
   a <- dat[dat$regY == r,]
   for (sp in jp_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)

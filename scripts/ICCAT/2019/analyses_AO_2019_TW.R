@@ -107,7 +107,7 @@ table(dat$lon,useNA = "always")
 a <- unique(paste(dat$lat,dat$lon))
 a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
 for (fld in c("regB","regB1")) {
-windows(width = 15,height = 10)
+dev.new(width = 15,height = 10)
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld)
   text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
@@ -165,7 +165,7 @@ a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
 simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
-windows(width = 11,height = 7)
+dev.new(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
 
@@ -210,7 +210,7 @@ allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks"
 
 flag = "TW"
 for (r in c(1:3)) {
-  windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  dev.new(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
   a <- dat[dat$regB == r,]
   for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
@@ -242,7 +242,7 @@ allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks"
 dat5 <- dat[dat$yrqtr > 2005,]
 
 for (r in c(1:3)) {
-  windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  dev.new(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
   a <- dat5[dat5$regB == r,]
   for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)

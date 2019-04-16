@@ -256,7 +256,7 @@ dataprep_JP_EPO2 <- function(dat, splist=c("alb","bet","yft","swo","mls","bum", 
              "swo","mls","bum", "blm", "sas", "sha","sfa","ssp","PTS95","PTS85","PTS75","PTS65","PTS50")
 
   #mls is stripped marlin (Kajikia audax), it was as "whm" in the original data
-  #bum; blue marline (Makaira mazara)
+  #bum; blue marlin (Makaira mazara)
   #blm; black marlin (Istiompax indica)
   #sas was  saispear; mix of sailfish (Istiophorus platypterus) and shortbill spearfish (Tetrapturus angustirostris)
   #sha is sharks, it was "sharks"; mix of shark species, in the original data
@@ -472,17 +472,6 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
   #   } else a2 <- yy
   #   return(a2)
   # }
-  makedmy <- function(yy, mm, dd) {
-    tmp <- data.frame(yy=yy,mm=mm,dd=dd)
-    loc <- !(is.na(tmp$yy) | is.na(tmp$mm) | is.na(tmp$dd) | (tmp$yy==0) | (tmp$dd==0) )
-    tm2 <- tmp[loc,]
-    tm2$a <- paste(tm2$yy, tm2$mm, tm2$dd, sep = " - ")
-    tm2$a1 <- gsub(" ", "", tm2$a)
-    tm2$a2 <- ymd(tm2$a1)
-    tmp$a2 <- NA
-    tmp[loc,]$a2 <- tm2$a2
-    return(tmp$a2)
-  }
   dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
   dat$debark_dmy <- makedmy(dat$debark_yr, dat$debark_mn, dat$debark_dd)
   dat$op_start_dmy <- makedmy(dat$op_start_yr, dat$op_start_mn, dat$op_start_dd)
@@ -544,15 +533,6 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
   dat <- dat[, noms]
   return(dat)
 }
-
-#' Prepare Seychelles longline data.
-#'
-#' The function prepares Seychelles longline data for IO analyses.
-#' @param dat Input dataset
-#' @param region IO or AO.
-#' @param splist Define the species in the dataset
-#' @return Modified dataset.
-#'
 
 #' Turn YMD data into day month and year.
 #'
@@ -843,6 +823,8 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
 #' @param dat Input dataset
 #' @param regB If TRUE, set up regB
 #' @param regB1 If TRUE, set up regB1
+#' @param regY If TRUE, set up regY
+#' @param regY1 If TRUE, set up regY1
 #' @return Modified dataset.
 #'
 setup_AO_regions <- function(dat, regB = F, regB1 = F, regY = F, regY1 = F) {
@@ -884,8 +866,9 @@ setup_AO_regions <- function(dat, regB = F, regB1 = F, regY = F, regY1 = F) {
 #'
 #' The function sets up the Eastern Pacific Ocean regions for datasets with lat5 and lon5 variables.
 #' @param dat Input dataset
-#' @param regB If TRUE, set up regB
-#' @param regB1 If TRUE, set up regB1
+#' @param regBall If TRUE, set up regBall
+#' @param regBepo If TRUE, set up regBepo
+#' @param regBwcpo If TRUE, set up regBwcpo
 #' @return Modified dataset.
 #'
 setup_EPO_regions <- function(dat, regBall = F, regBepo = F, regBwcpo = F) {

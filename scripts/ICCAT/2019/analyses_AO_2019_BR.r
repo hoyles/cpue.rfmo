@@ -80,7 +80,7 @@ table(dat$op_yr,is.na(dat$vessid))
 table(dat$op_yr,(dat$hooks > 0))
 
 # Sets per day
-windows(width = 15,height = 9)
+dev.new(width = 15,height = 9)
 hist(prepdat$dmy,breaks = "days",freq = T,xlab = "Date",main = "Sets per day")
 savePlot(filename = "sets_per_day.png",type = "png")
 table(prepdat$dmy)
@@ -98,7 +98,7 @@ table(prepdat$dmy)
 # kperday <- 111 * dista/as.numeric(timea)
 # cbind(dista,timea,kperday)
 
-windows()
+dev.new()
 hist(prepdat$hooks, nclass=200)   # ask if very large # hooks is okay
 savePlot("Hook histogram.png",type="png")
 #hist(prepdat$hooks, nclass=200,xlim=c(0,1200),ylim=c(0,500))
@@ -128,14 +128,14 @@ write.csv(a,"table hbf by year.csv")
 # a$lon5[a$lon5 > 180] <- a$lon5[a$lon5 > 180] - 360
 a <- aggregate(dat$hooks,list(dat$lat5,dat$lon5),sum,na.rm=T)
 
-windows(width = 11,height = 9)
+dev.new(width = 11,height = 9)
 symbols(x=a[,2],y=a[,1],circles=.001*sqrt(a[,3]),inches=F,bg=2,fg=2,xlab="Longitude",ylab="Latitude")
 map("world",add=T,interior=F,fill=T)
 savePlot(filename = "map_hooks.png",type = "png")
 
 table(dat$EW) # Some data with 2
 a <- log(table(dat$lon,dat$lat))
-windows(width = 15,height = 10)
+dev.new(width = 15,height = 10)
 image(as.numeric(dimnames(a)[[1]])+.5,as.numeric(dimnames(a)[[2]])+.5,a)
 map("worldHires",add = TRUE, fill = TRUE) # Diagonal stripe?!
 savePlot("Setmap_logscale.png",type = "png")
@@ -157,17 +157,17 @@ table(dat$op_yr)
 a1 <- dat[dat$op_yr >= 2014,]
 table(a1$VESSEL_NAME)
 table(a$VESSEL_NAME)
-windows(12,12);par(mfrow = c(4,4), mar = c(4,2,3,1))
+dev.new(12,12);par(mfrow = c(4,4), mar = c(4,2,3,1))
 for (y in 2001:2016) with(dat[dat$op_yr == y,],plot(lon, lat, main = y))
 
 a <- tapply(dat$regB,list(dat$lon,dat$lat),mean)
-windows(width = 15,height = 10)
+dev.new(width = 15,height = 10)
 image(as.numeric(dimnames(a)[[1]]) + .5,as.numeric(dimnames(a)[[2]]) + .5,a,col = 1:4)
 map("worldHires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
 savePlot("regbet.png",type="png")
 
 # Plot grid squares with sets by region, for each regional structure
-windows(width = 15,height = 10);par(mfrow=c(1,2))
+dev.new(width = 15,height = 10);par(mfrow=c(1,2))
 plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat,dat$op_yr,mean),xlab = "yr",ylab = "Mean latitude")
 plot(tapply(dat$lon,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab = "yr",xlab = "Mean longitude")
 savePlot("mean_fishing_location 2.png",type = "png")
@@ -178,7 +178,7 @@ savePlot("mean_fishing_location 1.png",type = "png")
 write.csv(table(round(dat$hbf,0),dat$regB,useNA = "always"),file = "hbf by region.csv")
 write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA = "always"),file = "hbf by region by 5 years.csv")
 
-windows(20,20);par(mfrow = c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(20,20);par(mfrow = c(3,3), mar = c(4,4,2,1)+.1)
 for (y in seq(1975,2015,5)) {
   a <- dat[floor(dat$yrqtr/5)*5 == y & dat$lon < 125 & dat$lat < 25,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean,na.rm = T)
@@ -187,7 +187,7 @@ for (y in seq(1975,2015,5)) {
   map("world",add = TRUE, fill = TRUE)
 }
 savePlot("mean_HBF.png",type = "png")
-windows(20,20);par(mfrow = c(2,2))
+dev.new(20,20);par(mfrow = c(2,2))
 for (y in c(1978,1988,1998,2008)) {
   a <- dat[dat$yrqtr>y & dat$yrqtr < y+10  & dat$lon < 125,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean)
@@ -217,7 +217,7 @@ a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
 simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$sfacpue + a$mlscpue + a$blmcpue + a$bumcpue)
-windows(width = 11,height = 7)
+dev.new(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
 
@@ -264,7 +264,7 @@ allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat
 dat <- data.frame(dat)
 
 for (r in c(2:3)) {
-  windows(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  dev.new(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
   a <- dat[dat$regB == r,]
   for (sp in br_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)

@@ -12,6 +12,10 @@ setup_AO_regions(dat, regB = F, regB1 = F, regY = F, regY1 = F)
 \item{regB}{If TRUE, set up regB}
 
 \item{regB1}{If TRUE, set up regB1}
+
+\item{regY}{If TRUE, set up regY}
+
+\item{regY1}{If TRUE, set up regY1}
 }
 \value{
 Modified dataset.

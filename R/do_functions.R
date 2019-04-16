@@ -141,7 +141,9 @@ do_deltalog <- function(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3, ru
 #' @param stdlabs The variables from the clustered dataset to make available to the standardization.
 #' @param projdir Base folder for the project. The fleet and joint folders are under this one.
 #' @param twlimit The earliest time limit for including Taiwanese data in the model.
+#' @param jplimit Range of data to include from Japan: region and final year.
 #' @param keepd Keep data in the model object if TRUE.
+#' @param krlimit Range of data to include from Korea: list with first year, last year, and region.
 #'
 run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdlabs, projdir, twlimit = 2005, jplimit = list(reg=4, yr=0), keepd = TRUE, krlimit=NA) {
   rp <- runpars[[regstr]]

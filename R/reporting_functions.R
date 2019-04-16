@@ -60,7 +60,7 @@ doplot_yr_cpue <- function(a,vartype, mdti, regstr, runreg) {
 #' @param wmf Window mfrow parameter
 #'
 make_index_windows <- function(wh=12,ww=12,wmf=c(2,2)) {
-  x11(height=wh,width=ww)
+  dev.new(height=wh,width=ww)
   par(mfrow=wmf,mar=c(4,4,3,1))
   }
 
@@ -75,9 +75,13 @@ make_index_windows <- function(wh=12,ww=12,wmf=c(2,2)) {
 #' @param rgl A list of the regions to plot in each regional structure.
 #' @param vartypes One or both of 'lognC' and 'dellog'.
 #' @param yr1 First year of the early model, for titles.
-#' @param outdirname The default name of the folder to create for the outputs.
+#' @param outdirname Name of output directory.
+#' @param mdt_all The list of titles.
+#' @param mdti_all The list of longer titles.
+#' @param nplots The number of plots to produce, 2 or 4.
 #'
-prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"), yr1=1952, outdirname = "outputs/",
+prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"),
+                         yr1=1952, outdirname = "outputs/",
                          mdt_all = c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd"),
                          mdti_all = c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),
                                       paste0(yr1,"-1979 no vessid"),"1979-present vessid"), nplots=4) {
@@ -185,7 +189,7 @@ prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"),
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
-  x11(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   for (cl in sort(unique(a$clust))) {
     loc <- as.character(a$clust)==cl
     bb <- tapply(b[loc],as.numeric(as.character(a$yrqtr[loc])),median)
@@ -206,7 +210,7 @@ resplot_med_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_all_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
-  x11(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   for (cl in sort(unique(a$clust))) {
     loc <- as.character(a$clust)==cl
     boxplot(b[loc] ~ as.numeric(as.character(a$yrqtr[loc])),xlab="Year-quarter",ylab="Residuals",main=cl)
@@ -226,7 +230,7 @@ resplot_all_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_map_cl <- function(a,b,mf,outdir,fname,modtype) {
-  x11(10,10);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
+  dev.new(10,10);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
   for (cl in sort(unique(a$clust))) {
     loc <- as.character(a$clust)==cl
     bb <- tapply(b[loc],as.character(a$latlong[loc]),median)
@@ -256,7 +260,7 @@ resplot_med_by_map_cl <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
-  x11(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   xrange=range(as.numeric(as.character(a$yrqtr)))
   for (fl in sort(unique(a$flag))) {
     loc <- as.character(a$flag)==fl
@@ -278,7 +282,7 @@ resplot_med_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_all_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
-  x11(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   xrange=range(as.numeric(as.character(a$yrqtr)))
   for (fl in sort(unique(a$flag))) {
     loc <- as.character(a$flag)==fl
@@ -299,7 +303,7 @@ resplot_all_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_map_flg <- function(a,b,mf,outdir,fname,modtype) {
-  x11(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   for (fl in sort(unique(a$flag))) {
     loc <- as.character(a$flag)==fl
     bb <- tapply(b[loc],as.character(a$latlong[loc]),median)

@@ -28,8 +28,8 @@ load(file = paste0(kralysis_dir,"KRdat.RData"))
 
 
 make_reg_windows <- function(type=1) {
-  if(type == 1) windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
-  if(type == 2) windows(height=12,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+  if(type == 1) dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+  if(type == 2) dev.new(height=12,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 }
 regBord <- c(2,3)
 #####################################
@@ -41,76 +41,76 @@ names(a)[3] <- names(a5)[3] <- "decade"
 names(a5)[1:2] <- c("lon","lat")
 
 # Should reconfigure all of these to run as a loop
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015,5)) plot_catchmap(indat=a5,vbl=a5$bet/(a5$bet+a5$yft),dcd=d,latlim=c(-15,25),lonlim=c(-80,20),ti="BET / BET + YFT")
 savePlot("PropBET in YFT_BET5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$bet/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET / Total")
 savePlot("PropBET in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$swo/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SWO / Total",brk2=seq(0,1,.05))
 savePlot("PropSWO in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$alb/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="ALB / Total",brk2=seq(0,1,.1))
 savePlot("PropALB in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$sfa/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SFA / Total",brk2=seq(0,1,.05))
 savePlot("PropSFA in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$sha/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SHA / Total",brk2=seq(0,1,.05))
 savePlot("PropSHA in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$yft/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="YFT / Total")
 savePlot("PropYFT in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$mls/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="MLS / Total",brk2=seq(0,1,.05))
 savePlot("PropMLS in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$bft/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="bft / Total",brk2=seq(0,1,.05))
 savePlot("PropSBF in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$blm/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BLM / Total",brk2=seq(0,1,.05))
 savePlot("PropBLM in Total5",type="png")
-windows(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=20);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$bum/(a5$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BUM / Total",brk2=seq(0,1,.05))
 savePlot("PropBUM in Total5",type="png")
 
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$bet/(a$bet+a$yft),dcd=d,latlim=c(-15,25),lonlim=c(-80,20),ti="BET / BET + YFT")
 savePlot("PropBET in YFT_BET",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$bet/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET / Total")
 savePlot("PropBET in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$swo/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SWO / Total",brk2=seq(0,1,.05))
 savePlot("PropSWO in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$alb/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="ALB / Total",brk2=seq(0,1,.1))
 savePlot("PropALB in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$sfa/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SFA / Total",brk2=seq(0,1,.05))
 savePlot("PropSFA in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$sha/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SHA / Total",brk2=seq(0,1,.05))
 savePlot("PropSHA in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$yft/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="YFT / Total")
 savePlot("PropYFT in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$mls/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="MLS / Total",brk2=seq(0,1,.05))
 savePlot("PropMLS in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$bft/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="bft / Total",brk2=seq(0,1,.05))
 savePlot("PropSBF in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$blm/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BLM / Total",brk2=seq(0,1,.05))
 savePlot("PropBLM in Total",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a,vbl=a$bum/(a$Total),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BUM / Total",brk2=seq(0,1,.05))
 savePlot("PropBUM in Total",type="png")
 
 ########### relative to YBA
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2010,10)) plot_catchmap(indat=a,vbl=a$bet/(a$Total2),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET / YBA Total")
 savePlot("PropBET in altTotal",type="png")
 for(d in seq(1975,2010,10)) plot_catchmap(indat=a,vbl=a$alb/(a$Total2),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="ALB / YBA Total",brk2=seq(0,1,.1))
@@ -118,13 +118,13 @@ savePlot("PropALB in altTotal",type="png")
 for(d in seq(1975,2010,10)) plot_catchmap(indat=a,vbl=a$yft/(a$Total2),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="YFT / YBA Total")
 savePlot("PropYFT in altTotal",type="png")
 
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$bet/(a5$Total2),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET / YBA Total")
 savePlot("PropBET in altTotal5",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$alb/(a5$Total2),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="ALB / YBA Total",brk2=seq(0,1,.1))
 savePlot("PropALB in altTotal5",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap(indat=a5,vbl=a5$yft/(a5$Total2),dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="YFT / YBA Total")
 savePlot("PropYFT in altTotal5",type="png")
 
@@ -134,7 +134,7 @@ a <- aggregate(cbind(alb,bet,bft,blm,bum,mls,oth,sfa,sha,skj,swo,yft,Total,Total
 names(a)[3] <- names(a5)[3] <- "decade"
 names(a5)[1:2] <- c("lon","lat")
 
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a,vbl=a$bet,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET Catch")
 savePlot("Catchmap_BET",type="png")
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a,vbl=a$swo,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SWO Catch")
@@ -160,46 +160,46 @@ savePlot("Catchmap_OTH",type="png")
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a,vbl=a$skj,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SKJ Catch")
 savePlot("Catchmap_SKJ",type="png")
 
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$bet,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET Catch")
 savePlot("Catchmap5_BET",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$swo,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SWO Catch")
 savePlot("Catchmap5_SWO",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$alb,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="ALB Catch")
 savePlot("Catchmap5_ALB",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sfa,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SFA Catch")
 savePlot("Catchmap5_sfa",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sha,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SHA Catch")
 savePlot("Catchmap5_SHA",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$yft,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="YFT Catch")
 savePlot("Catchmap5_YFT",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$mls,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="MLS Catch")
 savePlot("Catchmap5_MLS",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$bft,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="bft Catch")
 savePlot("Catchmap5_bft",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$blm,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BLM Catch")
 savePlot("Catchmap5_BLM",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$bum,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BUM Catch")
 savePlot("Catchmap5_BUM",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$oth,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="OTH Catch")
 savePlot("Catchmap5_OTH",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$skj,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SKJ Catch")
 savePlot("Catchmap5_SKJ",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 
 #CPUE maps
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a,vb1=a$bet,vb2=a$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET CPUE")
 savePlot("Cpuemap_BET",type="png")
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a,vb1=a$swo,vb2=a$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SWO CPUE")
@@ -225,47 +225,47 @@ savePlot("Cpuemap_OTH",type="png")
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a,vb1=a$skj,vb2=a$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SKJ CPUE")
 savePlot("Cpuemap_SKJ",type="png")
 
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$bet,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BET CPUE", delta=5)
 savePlot("CPUEmap5_BET",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$swo,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SWO CPUE", delta=5)
 savePlot("CPUEmap5_SWO",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$alb,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="ALB CPUE", delta=5)
 savePlot("CPUEmap5_ALB",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sfa,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SFA CPUE", delta=5)
 savePlot("CPUEmap5_sfa",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sha,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SHA CPUE", delta=5)
 savePlot("CPUEmap5_SHA",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$yft,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="YFT CPUE", delta=5)
 savePlot("CPUEmap5_YFT",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$mls,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="MLS CPUE", delta=5)
 savePlot("CPUEmap5_MLS",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$bft,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="bft CPUE", delta=5)
 savePlot("CPUEmap5_bft",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$blm,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BLM CPUE", delta=5)
 savePlot("CPUEmap5_BLM",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$bum,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="BUM CPUE", delta=5)
 savePlot("CPUEmap5_BUM",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$oth,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="OTH CPUE", delta=5)
 savePlot("CPUEmap5_OTH",type="png")
-windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+dev.new(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$skj,vb2=a5$hooks,dcd=d,latlim=c(-45,40),lonlim=c(-80,20),ti="SKJ CPUE", delta=5)
 savePlot("CPUEmap5_SKJ",type="png")
 
 #####################################
 #Prepare figures
 # Logsheets per year by region
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1),oma=c(0,0,1,0))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1),oma=c(0,0,1,0))
 xlims <- range(dat$dmy,na.rm=T)
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
@@ -276,7 +276,7 @@ savePlot(filename=paste("Sets per day by region",sep=""),type="png")
 
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
-  windows(height=12,width=14);par(mfrow=c(4,2),oma=c(0,0,1,0))
+  dev.new(height=12,width=14);par(mfrow=c(4,2),oma=c(0,0,1,0))
   for(dec in seq(1975,2010,5)) {
     a <- llv[llv$op_yr >= dec & llv$op_yr < dec+5,]
     hist(a$hooks,breaks=seq(-10,45010,50),xlim=c(0,5000),main=dec)
@@ -285,14 +285,14 @@ for (r in regBord) {
   savePlot(filename=paste0("Histogram hooks by decade R",r),type="png")
 }
 
-windows(height=12,width=14);par(mfrow=c(4,2))
+dev.new(height=12,width=14);par(mfrow=c(4,2))
 for(dec in seq(1975,2010,5)) {
   a <- dat[dat$op_yr >= dec & dat$op_yr < dec+5,]
   hist(a$hooks,breaks=seq(-10,45010,50),xlim=c(0,5000),main=dec)
   }
 savePlot(filename=paste0("Histogram hooks by decade"),type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   a <- table(llv$vessid,llv$op_yr)
@@ -309,7 +309,7 @@ lu <- function(x) {
   }
 
 # Vessels per year by region
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   a <- tapply(llv$vessid,llv$op_yr,lu)
@@ -319,7 +319,7 @@ savePlot(filename=paste("Unique vessels by year",sep=""),type="png")
 
 # Time distribution of vessels
 vy <- list()
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   vess <- as.numeric(unique(llv$vessid))
@@ -342,7 +342,7 @@ for (r in regBord) {
   }
 savePlot(filename=paste("Time distribution of vessels 1",sep=""),type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
 for (r in regBord) {
   vessyrs <- vy[[r]]
   vessyrs <- vessyrs[order(-floor(vessyrs$maxyr)),]
@@ -356,7 +356,7 @@ for (r in regBord) {
 savePlot(filename=paste("Time distribution of vessels 2",sep=""),type="png")
 
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(2,1,2,1))
 for (r in regBord) {
   vessyrs <- vy[[r]]
   llv <- dat[dat$regB==r,]
@@ -374,7 +374,7 @@ for (r in regBord) {
 savePlot(filename=paste("Time distribution of vessels 4",sep=""),type="png")
 
 # Effort by region
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   a <- tapply(llv$hooks,llv$yrqtr,sum)
@@ -383,7 +383,7 @@ for (r in regBord) {
 savePlot(filename="Effort by region by yrqtr",type="png")
 
 # Sets by region
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   a <- tapply(llv$hooks,llv$yrqtr,length)
@@ -392,7 +392,7 @@ for (r in regBord) {
 savePlot(filename="Sets by region by yrqtr",type="png")
 
 ## Sets by region by yrqtr by fishingcat
-#windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+#dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 #for (r in regBord) {
 #  llv <- dat[dat$regB==r,]
 #  a <- tapply(llv$hooks,llv$yrqtr,length)
@@ -416,7 +416,7 @@ dat$latfac <- factor(dat$lat,levels=seq(min(dat$lat),max(dat$lat),1))
 levels(dat$latfac)
 levels(dat$lonfac)
 
-windows(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
+dev.new(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
 ax <- expand.grid(latfac=unique(dat$latfac),lonfac=unique(dat$lonfac),hooks=NA)
 bs <- tapply(ax$hooks,list(ax$lonfac,ax$latfac),length)
 for(dec in seq(1975,2010,5)) {
@@ -431,7 +431,7 @@ for(dec in seq(1975,2010,5)) {
 savePlot(filename=paste0("Map hooks by decade log"),type="png")
 
 
-windows(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
+dev.new(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
 ax <- expand.grid(latfac=unique(dat$latfac),lonfac=unique(dat$lonfac),hooks=NA)
 bs <- tapply(ax$hooks,list(ax$lonfac,ax$latfac),length)
 for(dec in seq(1975,2010,5)) {
@@ -447,7 +447,7 @@ for(dec in seq(1975,2010,5)) {
   }
 savePlot(filename=paste0("Map sets by decade"),type="png")
 
-windows(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
+dev.new(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
 ax <- expand.grid(latfac=unique(dat$latfac),lonfac=unique(dat$lonfac),hooks=NA)
 bs <- tapply(ax$hooks,list(ax$lonfac,ax$latfac),length)
 for(dec in seq(1975,2010,5)) {
@@ -463,7 +463,7 @@ for(dec in seq(1975,2010,5)) {
 savePlot(filename=paste0("Map hooks all by decade log"),type="png")
 
 
-windows(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
+dev.new(height=16,width=14); par(mfrow=c(4,2),mar=c(3,4,2,1))
 ax <- expand.grid(latfac=unique(dat$latfac),lonfac=unique(dat$lonfac),hooks=NA)
 bs <- tapply(ax$hooks,list(ax$lonfac,ax$latfac),length)
 for(dec in seq(1975,2010,5)) {
@@ -478,7 +478,7 @@ for(dec in seq(1975,2010,5)) {
   }
 savePlot(filename=paste0("Map sets all by decade"),type="png")
 
-windows(height=16,width=20); par(mfrow=c(6,6),mar=c(1,1,2,1))
+dev.new(height=16,width=20); par(mfrow=c(6,6),mar=c(1,1,2,1))
 llv <- dat
 ax <- expand.grid(latfac=unique(dat$latfac),lonfac=unique(dat$lonfac),hooks=NA)
 bs <- tapply(ax$hooks,list(ax$lonfac,ax$latfac),length)
@@ -501,7 +501,7 @@ lenzero <- function(x) sum(x > 0)
 dat$ssp <- apply(dat[,c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","yft")],1,lenzero)
 table(dat$ssp)
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(5,4,2,6)+.1)
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(5,4,2,6)+.1)
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   a <- tapply(llv$ssp==1,llv$op_yr,mean)
@@ -521,7 +521,7 @@ for (r in regBord) {
 savePlot(file="proportion_single_species",type="png")
 
 prepdat <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE)
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   cld <- dat[dat$regB==r,]
   rwd <- prepdat[prepdat$regB==r,]
@@ -536,7 +536,7 @@ savePlot(filename="Cleaned effort proportion by region by yrqtr",type="png")
 # Target by region through time
 
 # Catch by region
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   yft <- tapply(llv$yft,llv$yrqtr,sum)
@@ -553,7 +553,7 @@ for (r in regBord) {
   }
 savePlot(filename="Catch by region allsp by yrqtr log1",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   swo <- tapply(llv$swo,llv$yrqtr,sum)
@@ -571,7 +571,7 @@ for (r in regBord) {
   }
 savePlot(filename="Catch by region allsp by yrqtr log2",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   oth <- tapply(llv$oth,llv$yrqtr,sum)
@@ -586,7 +586,7 @@ for (r in regBord) {
 savePlot(filename="Catch by region allsp by yrqtr log3",type="png")
 
 #Catch
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   yft <- tapply(llv$yft,llv$yrqtr,sum)
@@ -603,7 +603,7 @@ for (r in regBord) {
   }
 savePlot(filename="Catch by region allsp by yrqtr 1",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   swo <- tapply(llv$swo,llv$yrqtr,sum)
@@ -621,7 +621,7 @@ for (r in regBord) {
   }
 savePlot(filename="Catch by region allsp by yrqtr 2",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   oth <- tapply(llv$oth,llv$yrqtr,sum)
@@ -636,7 +636,7 @@ for (r in regBord) {
 savePlot(filename="Catch by region allsp by yrqtr 3",type="png")
 
 ### CPUE
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   eff <- tapply(llv$hooks,llv$yrqtr,sum)
@@ -657,7 +657,7 @@ for (r in regBord) {
   }
 savePlot(filename="CPUE by region allsp by yrqtr log1",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   eff <- tapply(llv$hooks,llv$yrqtr,sum)
@@ -681,7 +681,7 @@ for (r in regBord) {
   }
 savePlot(filename="CPUE by region allsp by yrqtr log2",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   eff <- tapply(llv$hooks,llv$yrqtr,sum)
@@ -700,7 +700,7 @@ for (r in regBord) {
 savePlot(filename="CPUE by region allsp by yrqtr log3",type="png")
 
 # CPUE by region
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   yft <- tapply(llv$yft,llv$yrqtr,sum)
@@ -721,7 +721,7 @@ for (r in regBord) {
 }
 savePlot(filename="CPUE nominal allsp by region by yrqtr ",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   eff <- tapply(llv$hooks,llv$yrqtr,sum)
@@ -745,7 +745,7 @@ for (r in regBord) {
 }
 savePlot(filename="CPUE nominal allsp by region by yrqtr 2",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   eff <- tapply(llv$hooks,llv$yrqtr,sum)
@@ -764,7 +764,7 @@ for (r in regBord) {
 savePlot(filename="CPUE nominal by region allsp by yrqtr 3",type="png")
 
 ## CPUE by region by fishingcat
-#windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
+#dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
 #for (fc in 1:2) {
 #  for (r in regBord) {
 #    llv <- dat[dat$regB==r & dat$newfishingcat==fc,]
@@ -790,7 +790,7 @@ savePlot(filename="CPUE nominal by region allsp by yrqtr 3",type="png")
 
 # 5 degree squares fished
 dimu <- function(x) { length(unique(x)) }
-windows(height=14,width=12)
+dev.new(height=14,width=12)
 par (mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB == r,]
@@ -803,7 +803,7 @@ for (r in regBord) {
 savePlot("Number of spatial strata",type="png")
 
 # Proportion sets with zero catches
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   ay <- tapply(llv$yft==0,llv$yrqtr,sum)
@@ -819,7 +819,7 @@ for (r in regBord) {
 savePlot(filename="Proportion zeroes by region by yrqtr",type="png")
 
 # Proportion sets with zero catches allspp
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   ay <- tapply(llv$yft==0,llv$yrqtr,sum)
@@ -840,7 +840,7 @@ for (r in regBord) {
     }
 savePlot(filename="Proportion zeroes by region by yrqtr allspp",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   ay <- tapply(llv$yft==0,llv$yrqtr,sum)
@@ -861,7 +861,7 @@ for (r in regBord) {
     }
 savePlot(filename="Proportion zeroes by region by yrqtr allspp",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   aswo <- tapply(llv$swo==0,llv$yrqtr,sum)
@@ -885,7 +885,7 @@ for (r in regBord) {
     }
 savePlot(filename="Proportion zeroes by region by yrqtr spp2",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1))
 for (r in regBord) {
   llv <- dat[dat$regB==r,]
   a <- tapply(llv$hooks,llv$yrqtr,length)
@@ -907,7 +907,7 @@ for (r in regBord) {
 savePlot(filename="Proportion zeroes by region by yrqtr spp3",type="png")
 
 ## Proportion sets with zero catches allspp by fishingcat
-#windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
+#dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
 #for (fc in 1:2) {
 #  for (r in regBord) {
 #    llv <- dat[dat$regB==r & dat$newfishingcat==fc,]
@@ -935,7 +935,7 @@ savePlot(filename="Proportion zeroes by region by yrqtr spp3",type="png")
 library(maps)
 library(mapproj)
 library(mapdata)
-windows(width=20,height=14); par(mfrow=c(3,3),mar=c(3,4,2,1))
+dev.new(width=20,height=14); par(mfrow=c(3,3),mar=c(3,4,2,1))
 for(yr in seq(1975,2015,by=5)) {
   plot_AO(plot_title=yr,sp="Effort")
   a <- dat[dat$yrqtr > yr & dat$yrqtr < yr+5,]
@@ -949,7 +949,7 @@ for(yr in seq(1975,2015,by=5)) {
 savePlot("Plot map sets", type="png")
 
 #for (fc in 1:2) {
-#  windows(width=14,height=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
+#  dev.new(width=14,height=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
 #  a2 <- dat[dat$newfishingcat==fc,]
 #  for(yr in seq(1950,2009,by=10)) {
 #    plot.pacific(plot_title=yr)
@@ -967,7 +967,7 @@ savePlot("Plot map sets", type="png")
 # #   symbols(pp,rep(i,length(pp)),sqrt(pp2)/40, add = T, inches =FALSE)
 
 # Maps of mean HPB through time
-windows(width=20,height=14); par(mfrow=c(3,3),mar=c(3,4,2,1))
+dev.new(width=20,height=14); par(mfrow=c(3,3),mar=c(3,4,2,1))
 for(yr in seq(1975,2015,by=5)) {
   plot_AO(plot_title=yr,sp="YFT")
   a <- dat[dat$yrqtr > yr & dat$yrqtr < yr+5,]
@@ -982,7 +982,7 @@ savePlot("Plot map mean HBF", type="png")
 
 ## Maps of mean HPB through time by FC
 #for (fc in 1:2) {
-#  windows(width=14,height=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
+#  dev.new(width=14,height=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(0,0,3,0))
 #  a2 <- dat[dat$newfishingcat==fc,]
 #  for(yr in seq(1950,2002,by=10)) {
 #    plot.pacific(plot_title=yr)
@@ -999,7 +999,7 @@ savePlot("Plot map mean HBF", type="png")
 #  }
 
 # Maps of median HPB through time
-windows(width=20,height=14); par(mfrow=c(3,3),mar=c(3,4,2,1))
+dev.new(width=20,height=14); par(mfrow=c(3,3),mar=c(3,4,2,1))
 for(yr in seq(1975,2015,by=5)) {
   plot_AO(plot_title=yr,sp="YFT")
   a <- dat[dat$yrqtr > yr & dat$yrqtr < yr+10,]
@@ -1013,7 +1013,7 @@ for(yr in seq(1975,2015,by=5)) {
 savePlot("Plot map median HBF", type="png")
 
 # Plot hbf by region by year
-  windows(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(1,1,3,1)); r<-3; hh <- 18
+  dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(3,4,2,1),oma=c(1,1,3,1)); r<-3; hh <- 18
   b<- dat
   for (r in regBord) {
     a <- b[b$regB==r,]
@@ -1036,7 +1036,7 @@ countzero <- function(a) {
   pz <- z/tot ; return(pz)
   }
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
 for (r in regBord) {
   a <- dat[dat$regB==r,]
   yrs <- sort(unique(a$op_yr))
@@ -1049,7 +1049,7 @@ for (r in regBord) {
   }
 savePlot("plot pzero bet by hbf by region by yr",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
 for (r in regBord) {
   a <- dat[dat$regB==r,]
   yrs <- sort(unique(a$op_yr))
@@ -1062,7 +1062,7 @@ for (r in regBord) {
   }
 savePlot("plot pzero yft by hbf by region by yr",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
 for (r in regBord) {
   a <- dat[dat$regB==r,]
   yrs <- sort(unique(a$op_yr))
@@ -1075,7 +1075,7 @@ for (r in regBord) {
   }
 savePlot("plot pzero alb by hbf by region by yr",type="png")
 
-windows(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
+dev.new(height=14,width=12); par(mfcol=c(2,1),mar=c(4,4,2,2))
 for (r in regBord) {
   a <- dat[dat$regB==r,]
   yrs <- sort(unique(a$op_yr))
@@ -1107,7 +1107,7 @@ plot_pzero_ll <- function(a,sp,la,lo) {
 for(sp in c("alb","bet","blm","bum","mls","oth","bft","sfa","sha","skj","swo","yft"))
   {
   names(dat)
-  windows(height=14,width=24); par(mfrow=c(5,7),mar=c(2,2,1,0),oma=c(0,0,3,0))
+  dev.new(height=14,width=24); par(mfrow=c(5,7),mar=c(2,2,1,0),oma=c(0,0,3,0))
   for (la in seq(7.5,-12.5,by=-5)) {
     for (lo in seq(-77.5,17.5,by=5)) {
       a <- dat[dat$lat5==la & dat$lon5 %in% c(lo),]
@@ -1121,7 +1121,7 @@ for(sp in c("alb","bet","blm","bum","mls","oth","bft","sfa","sha","skj","swo","y
 for(sp in c("alb","bet","blm","bum","mls","oth","bft","sfa","sha","skj","swo","yft"))
   {
   names(dat)
-  windows(height=14,width=24); par(mfrow=c(5,8),mar=c(2,2,1,0),oma=c(0,0,3,0))
+  dev.new(height=14,width=24); par(mfrow=c(5,8),mar=c(2,2,1,0),oma=c(0,0,3,0))
   for (la in seq(7.5,-12.5,by=-5)) {
     for (lo in seq(77.5,112.5,by=5)) {
       a <- dat[dat$lat5==la & dat$lon5 %in% c(lo),]
@@ -1135,7 +1135,7 @@ for(sp in c("alb","bet","blm","bum","mls","oth","bft","sfa","sha","skj","swo","y
 
 #R 1,2,5,6
 pzero_hbf_sp_yq <- function(sp,laseq,loseq,fname,ti="") {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1170,7 +1170,7 @@ pzero_hbf_sp_yq("alb",laseq=seq(5,-15,-5)+2.5,loseq=seq(40,70,5)+2.5,fname="plot
 #  }
 #}
 #hbf_sp_yq <- function(sp,laseq,loseq,fname,ti="") {
-#  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+#  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
 #  b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
 #  for (la in laseq) {
 #    for (lo in loseq) {
@@ -1200,7 +1200,7 @@ plot_pzero_both <- function(a,la,lo) {
 #  points(yrs,swo,col=4,pch=4,cex=cx)
   }
 pzero_all_sp_yq <- function(laseq,loseq,fname,ti="") {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1235,7 +1235,7 @@ plot_pzero_billf <- function(a,la,lo) {
 #  points(yrs,swo,col=4,pch=4,cex=cx)
   }
 pzero_billf_yq <- function(laseq,loseq,fname,ti="") {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1267,7 +1267,7 @@ plot_pzero_sha <- function(a,la,lo) {
 #  points(yrs,swo,col=4,pch=4,cex=cx)
   }
 pzero_all_sha <- function(laseq,loseq,fname,ti="") {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1288,7 +1288,7 @@ pzero_all_sha(laseq=seq(-20,-40,-5+2.5),loseq=seq(65,120,5)+2.5,fname="plot pzer
 
 # Albacore catch distribution histograms
 write.csv(table(dat$hbf,floor(dat$yrqtr/5)*5,dat$regB),file="hbf by region by 5 years.csv")
-windows();par(mfcol=c(2,1))
+dev.new();par(mfcol=c(2,1))
 for(i in regBord) {
   a <- dat[dat$regB==i,]
   hist(a$alb,nclass=50,xlab="Albacore catch",xlim=c(0,250),main=paste("Region",i))
@@ -1314,7 +1314,7 @@ plot_pcpue <- function(a,la,lo,cpue) {
   points(yrs, alb,col=3,pch=3,cex=cx)
   }
 pcpue_all_sp_yq <- function(cpue,laseq,loseq,fname,ti="") {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1348,7 +1348,7 @@ plot_catch <- function(a,la,lo,ymax) {
   lines(yrs,bft,col=4,lty=4,cex=cx)
   }
 catch_all_sp_yq <- function(laseq,loseq,fname,ti="",ymax) {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1382,7 +1382,7 @@ plot_catch <- function(a,la,lo,ymax) {
   lines(yrs,sfa,col=4,lty=4,cex=cx)
   }
 catch_all_sp_yq <- function(laseq,loseq,fname,ti="",ymax) {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1412,7 +1412,7 @@ plot_catch <- function(a,la,lo,ymax) {
   lines(yrs,skj,col=3,lty=3,cex=cx)
   }
 catch_all_sp_yq <- function(laseq,loseq,fname,ti="",ymax) {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1438,7 +1438,7 @@ plot_effort <- function(a,la,lo,ymax) {
   points(yrs,effort,col=1,cex=cx)
   }
 effort_all_fc_yq <- function(laseq,loseq,fname,ti="",ymax) {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1472,7 +1472,7 @@ plot_median_cpue <- function(a,la,lo) {
   points(yrs, bft,col=4,pch=4,cex=cx)
   }
 median_all_sp_yq_fc <- function(cpue,laseq,loseq,fname,ti="",fc="both") {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {
@@ -1504,7 +1504,7 @@ plot_mean_cpue <- function(a,la,lo) {
   points(yrs, alb,col=3,pch=3,cex=cx)
   }
 mean_all_sp_yq_fc <- function(cpue,laseq,loseq,fname,ti="") {
-  windows(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
+  dev.new(height=14,width=24); par(mfrow=c(length(laseq),length(loseq)),mar=c(2,2,1,0),oma=c(1,1,4,1))
   b <- dat[dat$lat5 %in% laseq & dat$lon5 %in% loseq,]
   for (la in laseq) {
     for (lo in loseq) {

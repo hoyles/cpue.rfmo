@@ -25,7 +25,11 @@ run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
 
 \item{twlimit}{The earliest time limit for including Taiwanese data in the model.}
 
+\item{jplimit}{Range of data to include from Japan: region and final year.}
+
 \item{keepd}{Keep data in the model object if TRUE.}
+
+\item{krlimit}{Range of data to include from Korea: list with first year, last year, and region.}
 }
 \description{
 The function runs delta lognormal models.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataprep_functions.R
 \name{makedmy}
 \alias{makedmy}
-\title{Prepare Seychelles longline data.}
+\title{Turn YMD data into day month and year.}
 \usage{
 makedmy(yy, mm, dd)
 }
@@ -12,22 +12,10 @@ makedmy(yy, mm, dd)
 \item{mm}{Month}
 
 \item{dd}{Day}
-
-\item{dat}{Input dataset}
-
-\item{region}{IO or AO.}
-
-\item{splist}{Define the species in the dataset}
 }
 \value{
-Modified dataset.
-
-Turn YMD data into day month and year.
-
-The function provides a dmy field.
-
 dmy
 }
 \description{
-The function prepares Seychelles longline data for IO analyses.
+The function provides a dmy field.
 }

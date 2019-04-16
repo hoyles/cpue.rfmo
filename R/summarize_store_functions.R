@@ -12,7 +12,7 @@
 #'
 summarize_and_store <- function(mod, dat, fname, modlab, dohbf = dohbf, addcl=addcl, docl=docl, keepd = TRUE) {
   coefs <- get.coefs(mod)
-  x11()
+  dev.new()
   par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))  # plot diagnostics
   plotdiags(mod$residuals, ti = paste(fname, modlab))
   savePlot(paste(fname, modlab, "diags", sep = "_"), type = "png")
@@ -96,7 +96,7 @@ summarize_and_store_dl <- function(modb, modp, dat, datpos, fname, modlab, dohbf
 
   coefs.bin <- get.bin.coefs(modb, abin, dat)
   coefs.pos <- get.coefs(modp)
-  x11()
+  dev.new()
   par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))  # plot diagnostics
   plotdiags(modp$residuals, ti = paste(fname, modlab))
   savePlot(paste(fname, modlab, "diags.png", sep = "_"), type = "png")
@@ -206,7 +206,7 @@ summarize_and_store_dlx <- function(modb1, modb2, modp1, modp2, dat, datpos, fna
   coefs1 <- coefs.bin1[a] * coefs.pos1
   coefs2 <- coefs.bin2[a] * coefs.pos2
 
-  x11(width = 12, height = 14)
+  dev.new(width = 12, height = 14)
   par(mfrow = c(2, 1), mar = c(4.2, 5, 2, 2))
   yq1 <- as.numeric(names(coefs1))
   yq2 <- as.numeric(names(coefs2))
@@ -217,7 +217,7 @@ summarize_and_store_dlx <- function(modb1, modb2, modp1, modp2, dat, datpos, fna
   plot(yqall, coefs1[match(yqall, yq1)]/coefs2[match(yqall, yq1)], type = "p", ylim = c(0, 3), xlab = "Year - quarter", ylab = "Ratio of models, area x time / area + time")
   savePlot(paste(fname, modlab, "compare_types", sep = "_"), type = "png")
 
-  x11()
+  dev.new()
   par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))  # plot diagnostics
   plotdiags(modp1$residuals, ti = paste(fname, modlab, "area intx"))
   savePlot(paste(fname, modlab, "diags_intx.png", sep = "_"), type = "png")
@@ -301,7 +301,7 @@ summarize_and_store_logCx <- function(mod1, mod2, dat, fname, modlab, addcl = ad
 
   coefsx <- get.coefsx(ndx, mn, bcorr = bcorr, cell_areas)
   coefs2 <- get.coefsx(nd2, mn, bcorr = bcorr, cell_areas)
-  x11(width = 12, height = 14)
+  dev.new(width = 12, height = 14)
   par(mfrow = c(2, 1), mar = c(4.2, 5, 2, 2))
   yqx <- as.numeric(names(coefsx))
   yq2 <- as.numeric(names(coefs2))
@@ -312,11 +312,11 @@ summarize_and_store_logCx <- function(mod1, mod2, dat, fname, modlab, addcl = ad
   plot(yqall, coefsx[match(yqall, yqx)]/coefs2[match(yqall, yqx)], type = "p", ylim = c(0, 3), xlab = "Year - quarter", ylab = "Ratio of models, area x time / area + time")
   savePlot(paste(fname, modlab, "compare_types", sep = "_"), type = "png")
 
-  x11()
+  dev.new()
   par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))  # plot diagnostics
   plotdiags(mod1$residuals, ti = paste(fname, modlab))
   savePlot(paste(fname, modlab, "diags1", sep = "_"), type = "png")
-  x11()
+  dev.new()
   par(mfrow = c(2, 1), mar = c(4, 4, 3, 1))  # plot diagnostics
   plotdiags(mod2$residuals, ti = paste(fname, modlab))
   savePlot(paste(fname, modlab, "diags2", sep = "_"), type = "png")

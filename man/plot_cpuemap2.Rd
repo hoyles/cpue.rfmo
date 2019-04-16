@@ -24,6 +24,10 @@ plot_cpuemap2(indat, vb1, vb2, dcd, latlim = c(-40, 40),
 \item{ti}{Title of the plot.}
 
 \item{delta}{The spatial resolution of the data being used.}
+
+\item{bgc}{Background color}
+
+\item{maptype}{Set to world, world2 or EPO.}
 }
 \description{
 Function to plot map of cpue or other spatial variable. This version has no defined breaks, but ensures that the spatial effects are constrained within the correct 1x1 square.

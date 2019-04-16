@@ -1,6 +1,6 @@
 Package: cpue.rfmo
 Type: Package
-Title: Functions for Analysing  RFMO CPUE Data  
+Title: Functions for Analysing RFMO CPUE Data  
 Version: 0.1.0
 Authors@R: person("Simon", "Hoyle", email = "simon.hoyle@gmail.com", role = c("aut","cre"))
 Description: Code for loading, standardizing, and plotting tuna longline CPUE data for RFMOs such as the IOTC.  

@@ -26,6 +26,10 @@ plot_cpuemap(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(120,
 \item{brk2}{Transition levels for the contour lines.}
 
 \item{ti}{Title of the plot.}
+
+\item{bgc}{Background color}
+
+\item{maptype}{Set to world, world2 or EPO.}
 }
 \description{
 Function to plot map of cpue or other spatial variable. This version has defined breaks, but doesn't ensure the spatial effects are constrained within the correct 1x1 square.

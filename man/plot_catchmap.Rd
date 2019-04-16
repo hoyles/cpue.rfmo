@@ -26,6 +26,8 @@ plot_catchmap(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20,
 \item{ti}{Title of the plot.}
 
 \item{bgc}{Background color of the plot, defaults to grey.}
+
+\item{maptype}{Set to world, world2, or EPO.}
 }
 \description{
 Function to plot map of catches or other spatial variable.

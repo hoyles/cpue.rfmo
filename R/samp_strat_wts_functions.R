@@ -68,6 +68,7 @@ make_strat <- function(dat) {
 #' @param wttype Type of statistical weighting method; 'equal' gives equal weight to all rows, 'area' weights rows in inverse proportion to the number of rows per stratum; 'catch' weights rows in proportion to the catch in the stratum divided by the number of rows in the stratum; cell_area weights rows in proportion to the ocean area of the stratum divided by the number of rows in the stratum
 #' @param catch An optional vector of catch per stratum.
 #' @param sp The species to be used for catch weighting.
+#' @param cell_areas An object containing the areas of all cells.
 #' @return A vector indicating the statistical weight to apply to the stratum of which the row is a member.
 #'
 mk_wts <- function(dat, wttype, catch = NULL, sp = NULL, cell_areas = NA) {

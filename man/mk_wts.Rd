@@ -14,6 +14,8 @@ mk_wts(dat, wttype, catch = NULL, sp = NULL, cell_areas = NA)
 \item{catch}{An optional vector of catch per stratum.}
 
 \item{sp}{The species to be used for catch weighting.}
+
+\item{cell_areas}{An object containing the areas of all cells.}
 }
 \value{
 A vector indicating the statistical weight to apply to the stratum of which the row is a member.

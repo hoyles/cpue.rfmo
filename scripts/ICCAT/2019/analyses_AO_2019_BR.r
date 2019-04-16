@@ -1,4 +1,4 @@
-projdir <- "~/ICCAT/2019_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 
 brdir <- paste0(projdir, "BR/")
 datadir <- paste0(brdir, "data/")
@@ -37,29 +37,16 @@ library("cpue.rfmo")
 
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
-#rawdat <- read.csv(paste0(datadir,"KR_AO_LL_DB_20180413.csv"), header = TRUE, stringsAsFactors = FALSE)
-coltypes <- c("text","date",rep("numeric",20))
-rawdat <- read_excel(paste0(datadir,"KR_AO_LL_DB_20180413.xlsx"), sheet = "DB", col_types = coltypes)
-
-str(rawdat)
-
+load(paste0(datadir, "Pelagic_LL_BR_ver00.RData"))
 # check the data
-str(rawdat)
-br_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","whm","yft")
-a <- c("VESSEL_NAME","DATE","Lat01","NS","Long01","EW","hooks","floats",br_splist,"Total")
-cbind(names(rawdat),a)
-names(rawdat) <- a
-head(rawdat)
-str(rawdat)
+str(dt)
+names(dt)
 
+br_splist <- c("yft", "alb","bet", "swo", "sai", "whm", "bum", "bsh",
+               "spx", "bth", "sma", "ocs", "fal", "ccs")
 
 
 # Prepare and clean the data
-rawdat$op_yr <- year(rawdat$DATE)
-rawdat$op_mon <- month(rawdat$DATE)
-prepdat <- dataprep_BR(rawdat, splist = br_splist)
-head(prepdat)
-
 prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE)
 head(prepdat2)
 prepdat2 <- as.data.frame(prepdat2)

@@ -60,7 +60,7 @@ doplot_yr_cpue <- function(a,vartype, mdti, regstr, runreg) {
 #' @param wmf Window mfrow parameter
 #'
 make_index_windows <- function(wh=12,ww=12,wmf=c(2,2)) {
-  dev.new(height=wh,width=ww)
+  dev.new(width=ww, height=wh, noRStudioGD = TRUE)
   par(mfrow=wmf,mar=c(4,4,3,1))
   }
 
@@ -189,7 +189,8 @@ prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"),
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
-  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(width = 10, height = 10, noRStudioGD = TRUE)
+  par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   for (cl in sort(unique(a$clust))) {
     loc <- as.character(a$clust)==cl
     bb <- tapply(b[loc],as.numeric(as.character(a$yrqtr[loc])),median)
@@ -210,7 +211,8 @@ resplot_med_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_all_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
-  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(width = 10, height = 10, noRStudioGD = TRUE)
+  par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   for (cl in sort(unique(a$clust))) {
     loc <- as.character(a$clust)==cl
     boxplot(b[loc] ~ as.numeric(as.character(a$yrqtr[loc])),xlab="Year-quarter",ylab="Residuals",main=cl)
@@ -230,7 +232,8 @@ resplot_all_by_yq_cl <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_map_cl <- function(a,b,mf,outdir,fname,modtype) {
-  dev.new(10,10);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
+  dev.new(width = 10, height = 10, noRStudioGD = TRUE)
+  par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
   for (cl in sort(unique(a$clust))) {
     loc <- as.character(a$clust)==cl
     bb <- tapply(b[loc],as.character(a$latlong[loc]),median)
@@ -260,7 +263,8 @@ resplot_med_by_map_cl <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
-  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(width = 10, height = 10, noRStudioGD = TRUE)
+  par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   xrange=range(as.numeric(as.character(a$yrqtr)))
   for (fl in sort(unique(a$flag))) {
     loc <- as.character(a$flag)==fl
@@ -282,7 +286,8 @@ resplot_med_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_all_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
-  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(width = 10, height = 10, noRStudioGD = TRUE)
+  par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   xrange=range(as.numeric(as.character(a$yrqtr)))
   for (fl in sort(unique(a$flag))) {
     loc <- as.character(a$flag)==fl
@@ -303,7 +308,8 @@ resplot_all_by_yq_flg <- function(a,b,mf,outdir,fname,modtype) {
 #' @param modtype Either dellog or logC, to determine the filename.
 #'
 resplot_med_by_map_flg <- function(a,b,mf,outdir,fname,modtype) {
-  dev.new(10,10);par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
+  dev.new(width = 10, height = 10, noRStudioGD = TRUE)
+  par(mfrow=mf,mar=c(4,4,2,1),oma=c(0,0,2,0))
   for (fl in sort(unique(a$flag))) {
     loc <- as.character(a$flag)==fl
     bb <- tapply(b[loc],as.character(a$latlong[loc]),median)

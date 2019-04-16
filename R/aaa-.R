@@ -12,7 +12,7 @@ NULL
 NULL
 #' @importFrom dplyr case_when mutate
 NULL
-#' @importFrom grDevices dev.cur dev.new dev.set graphics.off heat.colors savePlot windows
+#' @importFrom grDevices dev.cur dev.new dev.set graphics.off heat.colors savePlot windows X11
 NULL
 #' @importFrom lubridate week ymd
 NULL

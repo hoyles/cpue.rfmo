@@ -295,7 +295,7 @@ combine_delta_xl_indices <- function(fnamedelta, fnamepos, runsp) {
   coefs.boat <- xl_delta[, 3] * xl_pos[, 3]
   fishlab <- switch(runsp, yft = "Yellowfin", bet = "Bigeye", alb = "Albacore")
   yrpos <- xl_delta[, 2]
-  dev.new()
+  dev.new(noRStudioGD = TRUE)
   par(mar = c(5, 4, 1, 1))
   plot(yrpos, coefs.boat, type = "l", ylab = "Relative abundance estimate", xlab = "Year", ylim = c(0, 2.5))
   fname2 <- gsub("deltabin", "deltacomb", fnamedelta)

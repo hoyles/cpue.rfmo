@@ -1,11 +1,11 @@
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 twdir <- paste0(projdir, "TW/")
-datadir1 <- paste0(twdir, "data/Simon_new data_April 20/")
+datadir <- paste0(twdir, "data/")
 twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 dir.create(twdir)
-dir.create(datadir1)
+dir.create(datadir)
 dir.create(twalysis_dir)
 dir.create(twfigs)
 
@@ -38,7 +38,7 @@ library("cpue.rfmo")
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 
-nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","bft_w","sbt_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
+  nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","bft_w","sbt_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
 wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
 cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccc"
 sum(wdths2)
@@ -46,7 +46,7 @@ length(wdths2)
 
 
 # Check data loading
-a <- read_fwf(file = paste0(datadir1,"/LOG1981A.ATL"),fwf_widths(wdths2),col_types = cc2,n_max = 20);gc()
+a <- read_csv(file = paste0(datadir,"/LOG1981A.ATL"),fwf_widths(wdths2),col_types = cc2,n_max = 20);gc()
 names(a) <- nms2
 a <- data.frame(a)
 a

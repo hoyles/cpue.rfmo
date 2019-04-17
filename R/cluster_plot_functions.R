@@ -423,8 +423,11 @@ beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
 #' @param regtype Deprecated, not used.
 #' @param ncl Number of clusters.
 #' @param r Deprecated, not used.
+#' @param xl Longitude range.
+#' @param yl Latitude range.
+#' @param savedir Directory to save the plot in, defaulting to current.
 #'
-map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "regY", ncl, r = r) {
+map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "regY", ncl, r = r, xl = NA, yl=NA, savedir="") {
     if (ncl <= 4) {
         dev.new(width = 20, height = 14,noRStudioGD = TRUE)
         par(mfrow = c(2, 2), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
@@ -448,15 +451,17 @@ map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "reg
         clm <- tapply(ddd[, cl] == clx, list(lo, la), mean)
         lonn <- as.numeric(levels(lo))
         latn <- as.numeric(levels(la))
-        ylm <- range(latn)
-        ylm[1] <- max(ylm[1], -50)
-        image(lonn, latn, clm, ylim = ylm)
+        if(is.na(yl[1])) {
+          ylm <- range(latn)
+          ylm[1] <- max(ylm[1], -50)
+          image(lonn, latn, clm, ylim = ylm)
+        } else image(lonn, latn, clm, xlim=xl, ylim = yl)
         contour(lonn, latn, clm, add = T)
         map(database = "world", add = T, fill = T)
         title(paste(cl, clx), line = 0.5, cex.main = 1.5)
     }
     title(paste(gsub("_", " ", ti), "cluster map"), outer = T, line = -2, cex.main = 1.5)
-    savePlot(paste0(ti, "_mapclust_", cl, ".png"), type = "png")
+    savePlot(paste0(savedir, ti, "_mapclust_", cl, ".png"), type = "png")
 }
 
 # 'Plot the mean catch per year of each species by region.

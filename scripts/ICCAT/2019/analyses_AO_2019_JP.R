@@ -208,22 +208,9 @@ map("worldHires",add = T, interior = F,fill = T)
 savePlot("regyft.png",type = "png")
 
 # Mean fishing location  by yearqtr
-dev.new(width = 15,height = 10);par(mfrow = c(1,2))
-ax <- tapply(dat$yrqtr,dat$yrqtr,mean); ay = tapply(dat$lat5,dat$yrqtr,mean)
-plot(ax,ay,xlab = "yr",ylab = "Mean latitude",type = "n")
-a <- 4*(.125+dat$yrqtr-floor(dat$yrqtr))
-a <- tapply(a,dat$yrqtr,mean)
-text(ax,ay,a,cex = 0.7)
-ax = tapply(dat$lon5,dat$yrqtr,mean);ay = tapply(dat$yrqtr,dat$yrqtr,mean)
-plot(ax,ay,ylab = "yr",xlab = "Mean longitude",type = "n")
-text(ax,ay,a,cex = 0.7)
+dev.new(width = 15,height = 10);
+plot_mean_fishing_location(dat=dat)
 savePlot("mean_fishing_location1.png",type = "png")
-
-# Mean fishing location by year
-dev.new(width = 15,height = 10);par(mfrow = c(1,2))
-plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat5,dat$op_yr,mean),xlab = "yr",ylab = "Mean latitude")
-plot(tapply(dat$lon5,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab = "yr",xlab = "Mean longitude")
-savePlot("mean_fishing_location2.png",type = "png")
 
 write.csv(table(round(dat$hbf,0),dat$regY,useNA = "always"),file = "hbf by region.csv")
 write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regY,useNA = "always"),file = "hbf by region by 5 years.csv")

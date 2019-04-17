@@ -1,4 +1,4 @@
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")
@@ -39,9 +39,7 @@ library("cpue.rfmo")
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 #rawdat <- read.csv(paste0(datadir,"KR_AO_LL_DB_20180413.csv"), header = TRUE, stringsAsFactors = FALSE)
 coltypes <- c("text","date",rep("numeric",20))
-rawdat <- read_excel(paste0(datadir,"KR_AO_LL_DB_20180413.xlsx"), sheet = "DB", col_types = coltypes)
-
-str(rawdat)
+rawdat <- read_excel(paste0(datadir,"KR_AO_LL_DB_20190414.xlsx"), sheet = "DB", col_types = coltypes)
 
 # check the data
 str(rawdat)
@@ -60,7 +58,7 @@ rawdat$op_mon <- month(rawdat$DATE)
 prepdat <- dataprep_KR(rawdat, splist = kr_splist)
 head(prepdat)
 
-prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE)
+prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE)
 head(prepdat2)
 prepdat2 <- as.data.frame(prepdat2)
 dat <- dataclean_KR(prepdat2, yearlim = 2018, splist = kr_splist)
@@ -160,25 +158,27 @@ table(a$VESSEL_NAME)
 dev.new(12,12);par(mfrow = c(4,4), mar = c(4,2,3,1))
 for (y in 2001:2016) with(dat[dat$op_yr == y,],plot(lon, lat, main = y))
 
-a <- tapply(dat$regB,list(dat$lon,dat$lat),mean)
-dev.new(width = 15,height = 10)
-image(as.numeric(dimnames(a)[[1]]) + .5,as.numeric(dimnames(a)[[2]]) + .5,a,col = 1:4)
-map("worldHires",add=T) # delete data outside IO? But maybe it's just the EW code that's wrong - change to 1?
-savePlot("regbet.png",type="png")
-
 # Plot grid squares with sets by region, for each regional structure
-dev.new(width = 15,height = 10);par(mfrow=c(1,2))
-plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat,dat$op_yr,mean),xlab = "yr",ylab = "Mean latitude")
-plot(tapply(dat$lon,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab = "yr",xlab = "Mean longitude")
-savePlot("mean_fishing_location 2.png",type = "png")
-plot(tapply(dat$yrqtr,dat$yrqtr,mean),tapply(dat$lat,dat$yrqtr,mean),xlab = "yr",ylab = "Mean latitude")
-plot(tapply(dat$lon,dat$yrqtr,mean),tapply(dat$yrqtr,dat$yrqtr,mean),ylab = "yr",xlab = "Mean longitude")
-savePlot("mean_fishing_location 1.png",type = "png")
+a <- unique(paste(dat$lat,dat$lon))
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regY1")]
+for (fld in c("regY","regY1")) {
+  dev.new(width = 10,height = 10)
+  reg <- with(a0,get(fld))
+  plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld, xlim = c(-80, 40))
+  text(a0$lon,a0$lat,labels = reg,cex = 0.6,col = reg + 1)
+  map(add = T, fill = TRUE)
+  savePlot(paste0("mapf_",fld),type = "png")
+}
 
-write.csv(table(round(dat$hbf,0),dat$regB,useNA = "always"),file = "hbf by region.csv")
-write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regB,useNA = "always"),file = "hbf by region by 5 years.csv")
+# Mean fishing location  by yearqtr
+dev.new(width = 15,height = 10);
+plot_mean_fishing_location(dat=dat)
+savePlot("mean_fishing_location1.png",type = "png")
 
-dev.new(20,20);par(mfrow = c(3,3), mar = c(4,4,2,1)+.1)
+write.csv(table(round(dat$hbf,0),dat$regY1,useNA = "always"),file = "hbf by region.csv")
+write.csv(table(round(dat$hbf,0),floor(dat$yrqtr/5)*5,dat$regY1,useNA = "always"),file = "hbf by region by 5 years.csv")
+
+dev.new(width = 20,height = 20);par(mfrow = c(3,3), mar = c(4,4,2,1)+.1)
 for (y in seq(1975,2015,5)) {
   a <- dat[floor(dat$yrqtr/5)*5 == y & dat$lon < 125 & dat$lat < 25,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean,na.rm = T)
@@ -187,7 +187,7 @@ for (y in seq(1975,2015,5)) {
   map("world",add = TRUE, fill = TRUE)
 }
 savePlot("mean_HBF.png",type = "png")
-dev.new(20,20);par(mfrow = c(2,2))
+dev.new(width = 20,height = 20);par(mfrow = c(2,2))
 for (y in c(1978,1988,1998,2008)) {
   a <- dat[dat$yrqtr>y & dat$yrqtr < y+10  & dat$lon < 125,]
   a <- tapply(a$hbf,list(a$lon,a$lat),mean)
@@ -205,7 +205,7 @@ write.csv(table(dat$lat5,dat$lon5,5*floor(dat$yrqtr/5)),file = "ops by lat-long-
 
 # data exploration
 library(rpart)
-a <- dat[dat$regB%in% c(2,5),]
+a <- dat[dat$regY1%in% c(2),]
 dim(a)
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
@@ -216,11 +216,11 @@ a$sfacpue <- a$sfa/a$hooks
 a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
-simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$sfacpue + a$mlscpue + a$blmcpue + a$bumcpue)
+simplemod <- rpart(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$sfacpue + a$mlscpue + a$blmcpue + a$bumcpue + a$betcpue)
 dev.new(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
-
+savePlot("rpart_yft_plot", type="png")
 
 ########################
 #Clustering
@@ -260,24 +260,24 @@ flag <- "KR"
 kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","yft")
 
 use_splist <- c("alb","bet","bum","mls","sfa","swo","yft")
-allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regB","regB1")
+allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regY","regY1")
 dat <- data.frame(dat)
 
-for (r in c(2:3)) {
+for (r in c(1:3)) {
   dev.new(15,12); par(mfrow = c(4,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB == r,]
+  a <- dat[dat$regY1 == r,]
   for (sp in kr_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
 }
 
-nclB <- c(4,4,4)
+nclY1 <- c(4,4,4)
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
-regtype <- "regB"
-for (r in 2:3) {
+regtype <- "regY1"
+for (r in 1:3) {
   fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 
@@ -293,7 +293,7 @@ for (r in 2:3) {
 # R2 - 4 clusters. 1=yft+bet, 2=bet+alb, 3=bet, 4=bet+yft+swo. Use 1,2,3,4
 # R3 - 3 or 4 clusters. 1=alb+bet, 2=bet, 3=yft+bet+alb, 4=alb+bft+sfa. Use 1,2,3
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 
 krdir <- paste0(projdir, "KR/")
 datadir <- paste0(krdir, "data/")
@@ -330,20 +330,20 @@ library("cpue.rfmo")
 splist <- c("alb", "bet", "yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks", splist, "hcltrp", "Total","lat","lon","lat5","lon5", "reg", "flag")
 
-#clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
-clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
-clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
-clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+#clkeepCN_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
+clkeepKR_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3)))
+clkeepTW_Y <- list("yft" = list(c(4),c(2,3),c(0)))
+clkeepUS_Y <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clk_Y <- list(JP = clkeepJP_Y,KR = clkeepKR_Y,TW = clkeepTW_Y,US = clkeepUS_Y)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY1", regtype2 = "Y1", clk = clk_Y, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
-runreg = 1; runsp = "bet"
+runreg = 1; runsp = "yft"
 
-keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
-for (runsp in c("bet")) {
+keepd = TRUE; maxyr = 2019; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl

@@ -588,7 +588,9 @@ plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 1
     rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, levels = brk2)
-    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype %in% c("world2", "world")) {
+      maps::map(database = maptype, add = T, interior = F, fill = T)
+    }
     if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }
@@ -618,7 +620,9 @@ plot_catchmap2 <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 
     rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
-    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype %in% c("world2", "world")) {
+      maps::map(database = maptype, add = T, interior = F, fill = T)
+    }
     if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }
@@ -648,7 +652,9 @@ plot_cpuemap <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(1
     rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, levels = brk2)
-    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype %in% c("world2", "world")) {
+       maps::map(database = maptype, add = T, interior = F, fill = T)
+    }
     if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }
@@ -679,7 +685,9 @@ plot_cpuemap2 <- function(indat, vb1, vb2, dcd, latlim = c(-40, 40), lonlim = c(
     rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
     image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T)
-    if(maptype=="world2") maps::map(database = "world2", add = T, interior = F, fill = T)
+    if(maptype %in% c("world2", "world")) {
+      maps::map(database = maptype, add = T, interior = F, fill = T)
+    }
     if(maptype=="EPO") map_EPO()
     title(paste(dcd, ti))
 }

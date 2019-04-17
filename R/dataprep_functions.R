@@ -385,8 +385,8 @@ dataprep <- function(dat, alldat = F) {
  dat$lon[dat$loncode == 2] <- 360 - (dat$lon_raw[dat$loncode == 2] + 1)
  dat <- dat[dat$lon >= 0, ]
 
- dat$lat5 <- 5 * floor(dat$lat/5)
- dat$lon5 <- 5 * floor(dat$lon/5)
+ dat$lat5 <- 5 * floor(dat$lat/5) + 2.5
+ dat$lon5 <- 5 * floor(dat$lon/5) + 2.5
 
  dat$reg <- 0
  dat[dat$lat < 40 & dat$lat >= 20 & dat$lon >= 110 & dat$lon < 170, ]$reg <- 1
@@ -963,7 +963,7 @@ dataprep_BRA<- function(dat, splist) {
     mutate(op_day = dat$day) %>%
     mutate(hbf = parse_integer(hpb)) %>%
     mutate(hooks = dat$effort) %>%
-    mutate(floats=hooks*hbf)
+    mutate(floats=hooks/hbf)
   dat$moon <- dat$IL
   dat$lon <- dat$lng
   dat$lon5 <- dat$lng5

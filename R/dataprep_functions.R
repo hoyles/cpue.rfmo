@@ -457,10 +457,11 @@ dataprep <- function(dat, alldat = F) {
 #' @param dat Input dataset
 #' @param alldat Not used.
 #' @param region IO or AO.
-#' @param splist Define the species in the dataset
+#' @param splist Define the species in the dataset.
+#' @param nomlist The list of variable names to return.
 #' @return Modified dataset.
 #'
-dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")) {
+dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt"), nomlist = "noms1") {
   splist_w <- paste0(splist, "_w")
   dat$dmy <- ymd(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = " - "))
   # dat <- dat[!is.na(dat$dmy),]
@@ -472,10 +473,12 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
   #   } else a2 <- yy
   #   return(a2)
   # }
-  dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
-  dat$debark_dmy <- makedmy(dat$debark_yr, dat$debark_mn, dat$debark_dd)
-  dat$op_start_dmy <- makedmy(dat$op_start_yr, dat$op_start_mn, dat$op_start_dd)
-  dat$op_end_dmy <- makedmy(dat$op_end_yr, dat$op_end_mn, dat$op_end_dd)
+  if("embark_yr" %in% names(dat)) {
+    dat$embark_dmy <- makedmy(dat$embark_yr, dat$embark_mn, dat$embark_dd)
+    dat$debark_dmy <- makedmy(dat$debark_yr, dat$debark_mn, dat$debark_dd)
+    dat$op_start_dmy <- makedmy(dat$op_start_yr, dat$op_start_mn, dat$op_start_dd)
+    dat$op_end_dmy <- makedmy(dat$op_end_yr, dat$op_end_mn, dat$op_end_dd)
+  }
 
   # hist(dat$op_start_dmy, breaks = 'months')
   dat$lat <- dat$op_lat
@@ -529,8 +532,9 @@ dataprep_TW <- function(dat, alldat = F, region = "IO", splist = c("alb", "bet",
   }
   dat$Total <- apply(dat[,splist], 1, sum)
   dat$Total2 <- apply(dat[, c("bet", "yft", "alb")], 1, sum)
-  noms <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripid", "tripidmon", "moon", splist, "Total", "Total2", splist_w, "sst", "bt1", "bt2", "bt3", "bt4", "bt5", "hookdp", "target", "rem", "dmy", "embark_dmy", "debark_dmy", "op_start_dmy", "op_end_dmy", "lat", "lon", "lat5", "lon5", "oilv", "foc")
-  dat <- dat[, noms]
+  noms1 <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripid", "tripidmon", "moon", splist, "Total", "Total2", splist_w, "sst", "bt1", "bt2", "bt3", "bt4", "bt5", "hookdp", "target", "rem", "dmy", "embark_dmy", "debark_dmy", "op_start_dmy", "op_end_dmy", "lat", "lon", "lat5", "lon5", "oilv", "foc")
+  noms2 <- c("vessid", "callsign", "yrqtr", "latlong", "op_yr", "op_mon", "hbf", "hooks", "tonnage", "tripid", "tripidmon", "moon", splist, "Total", "Total2", splist_w, "sst", "bt1", "bt2", "bt3", "bt4", "bt5", "hookdp", "target",  "dmy","lat", "lon", "lat5", "lon5")
+  dat <- dat[, get(nomlist)]
   return(dat)
 }
 

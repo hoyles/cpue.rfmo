@@ -164,6 +164,7 @@ dataclean_TW <- function(dat1, rmssp = F, splist = c("alb", "bet", "yft", "ott",
   dat1[dat1$hbf %in% c(35, 155, 20000), "hbf"] <- 15
   dat1[dat1$hbf %in% c(26, 30), "hbf"] <- 20
   dat1[dat1$hbf %in% c(25), "hbf"] <- 24
+  dat1 <- dat1[dat1$hbf < 25,]
   lenzero <- function(x) sum(x > 0)
   dat1$nsp <- apply(dat1[, splist], 1, lenzero)
   if (rmssp) {

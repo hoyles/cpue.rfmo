@@ -51,9 +51,10 @@ length(wdths2)
 
 
 # Check data loading
-a <- read_fwf(file=paste0(datadir,"LOG1991A.ATL"),fwf_widths(wdths2),col_types=cc2,n_max=20)
+a <- read_fwf(file=paste0(datadir,"LOG1991A.ATL"),fwf_widths(wdths2),col_types=cc2)
 a <- read_fwf(file=paste0(datadir,"LOG2008A.ATL 1x1 bft sbt"),fwf_widths(wdths2),col_types=cc2,n_max=20)
 names(a) <- nms2
+as.data.frame(problems(a))
 a[1:20,]
 
 #a <- read_csv(file = paste0(datadir,"/LOG1981A.ATL"),fwf_widths(wdths2),col_types = cc2,n_max = 20);gc()
@@ -71,16 +72,24 @@ a1 <- lapply(yy,readfun1)
 
 yy <- 1993:2017;yy <- paste0("/LOG",yy,"A.ATL 1x1 bft sbt")
 readfun1 <- function(ff) {
-  read_fwf(paste0(datadir1,ff),fwf_widths(wdths2),col_types = cc2)
+  read_fwf(paste0(datadir,ff),fwf_widths(wdths2),col_types = cc2)
 }
 a2 <- lapply(yy,readfun1)
 
 
-system.time({dat1 <- ldply(a1, data.frame)})
-names(dat1) <- nms2
+system.time({dat_early <- ldply(a1, data.frame)})
+names(dat_early) <- nms2
+system.time({dat_late <- ldply(a2, data.frame)})
+names(dat_late) <- nms2
+
+dat1a <- filter(dat_early, op_day != 99 & !is.na(op_day))
+dat1b <- filter(dat_late, op_day != 99 & !is.na(op_day))
+dat1 <- rbind(dat1a, dat1b)
+
 save(dat1,file = paste0(twalysis_dir, "dat1.RData"))
 load(paste0(twalysis_dir, "dat1.RData"))
 
+rm(dat1a, dat1b, dat_early, dat_late, dat2, dat2b, dat)
 # Check data
 # str(dat1)
 # summary(dat1)
@@ -98,9 +107,11 @@ load(paste0(twalysis_dir, "dat1.RData"))
 
 # Prepare data
 splist <- c("alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth")
+splist %in% names(dat1)
 
-prepdat1 <- dataprep_TW(dat1, alldat = F, region = "AO", splist = splist)
-prepdat <- setup_AO_regions(prepdat1,  regB = TRUE, regB1 = TRUE)
+prepdat1 <- dataprep_TW(dat1, alldat = F, region = "AO", splist = splist, nomlist = "noms2")
+prepdat <- setup_AO_regions(prepdat1,  regB = TRUE, regB1 = TRUE,  regY = TRUE, regY1 = TRUE, regY2 = TRUE)
+prepdat <- prepdat[prepdat$lon < 30,]
 #splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "sbt")
 datold <- dataclean_TW(prepdat, rmssp = F, splist = splist)
 save(datold,file = "TWdat_old.RData")
@@ -123,8 +134,8 @@ table(dat$lon,useNA = "always")
 
 # Data map
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1")]
-for (fld in c("regB","regB1")) {
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB","regB1","regY","regY1", "regY2")]
+for (fld in c("regB","regB1","regY","regY1", "regY2")) {
 dev.new(width = 15,height = 10)
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld)
@@ -182,11 +193,11 @@ a$othcpue <- a$oth/a$hooks
 a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
-simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
+simplemod <- rpart(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
 dev.new(width = 11,height = 7)
 plot(simplemod)
 text(simplemod)
-
+savePlot("yft_rpart_tree", type = "png")
 
 ########################
 #Clustering
@@ -208,9 +219,9 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 twdir <- paste0(projdir, "TW/")
-datadir1 <- paste0(twdir, "data/catch_effort/")
+datadir1 <- paste0(twdir, "data/")
 twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -222,10 +233,6 @@ setwd(clustdir_all)
 load(file = "../analyses/TWdat.RData")
 
 tw_allsp <- c("alb","bet","bft","yft","ott","swo","mls", "blm", "bum", "otb", "skj", "sha", "oth", "sbt")
-use_allsp_allyrs <- c("alb","bet","yft","ott","swo","mls","bum","otb")
-
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_allyrs,"Total","sst","dmy","lat","lon","lat5","lon5","regB")
-
 flag = "TW"
 for (r in c(1:3)) {
   dev.new(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
@@ -235,44 +242,84 @@ for (r in c(1:3)) {
   savePlot(filename = paste("freq",flag,"Region", r, "allyrs", sep = "_"), type = "png")
 }
 
+use_allsp_allyrs <- c("alb","bet","yft","ott","swo","mls","bum","otb")
+
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_allyrs,"Total","sst","dmy","lat","lon","lat5","lon5","regY","regY1","regY2")
+
 ##########
 # All years included, YFT regions
 rm(datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simplemod,rwd,llvall,d2,cld,astd,llvstd,llx,llvold,vvv,llv2)
 
-nclB = c(3,3,4)
+nclY1 = c(3,4,3)
 flag = "TW"
 
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
-regtype = "regB"
+regtype = "regY1"
 for (r in c(1,2,3)) {
   fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_allsp_allyrs,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_allsp_allyrs,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 
 # --------------
-clustdir_2005 <- paste0(twdir,"clustering/")
+clustdir_1995 <- paste0(twdir,"clustering/")
+dir.create(clustdir_1995)
+setwd(clustdir_1995)
+
+use_allsp_1995 <- c("alb","bet","yft","swo","mls", "bum", "otb", "sha", "oth", "sbt")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_1995,"Total","sst","dmy","lat","lon","lat5","lon5","regY1", "regY2")
+dat95 <- dat[dat$yrqtr > 1995,]
+
+for (r in c(1:3)) {
+  dev.new(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
+  a <- dat95[dat95$regY1 == r,]
+  for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
+  title(paste("Region", r ), outer = TRUE)
+  savePlot(filename = paste("freq",flag,"Region", r, "1995", sep = "_"), type = "png")
+}
+
+nclY1 = c(3,3,4)
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
+regtype = "regY1"
+for (r in c(1,2,3)) {
+  fnh <- paste(flag,regtype,r,sep = "_")
+  dataset <- clust_PCA_run(r = r,ddd = dat95,allsp = use_allsp_1995,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  save(dataset,file = paste0(fnh,".RData"))
+}
+
+nclY2 = c(4,4,4,4,4,4)
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
+regtype = "regY2"
+for (r in c(1,2,3,4,5,6)) {
+  fnh <- paste(flag,regtype,r,sep = "_")
+  dataset <- clust_PCA_run(r = r,ddd = dat95,allsp = use_allsp_1995,allabs = allabs,regtype = regtype,ncl = nclY2[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  save(dataset,file = paste0(fnh,".RData"))
+}
+
+######################################
+# --------------
+clustdir_2005 <- paste0(twdir,"clustering_2005/")
 dir.create(clustdir_2005)
 setwd(clustdir_2005)
 
 use_allsp_2005 <- c("alb","bet","yft","swo","mls", "bum", "otb", "sha", "oth", "sbt")
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_2005,"Total","sst","dmy","lat","lon","lat5","lon5","regB", "regB1")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_allsp_2005,"Total","sst","dmy","lat","lon","lat5","lon5","regY1", "regY2")
 dat5 <- dat[dat$yrqtr > 2005,]
 
 for (r in c(1:3)) {
   dev.new(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat5[dat5$regB == r,]
+  a <- dat5[dat5$regY1 == r,]
   for (sp in tw_allsp) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, "2005", sep = "_"), type = "png")
 }
 
-nclB = c(4,3,4)
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regB","regB1")
-regtype = "regB"
+nclY1 = c(3,4,4)
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","regY1","regY2")
+regtype = "regY1"
 for (r in c(1,2,3)) {
   fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat5,allsp = use_allsp_2005,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  dataset <- clust_PCA_run(r = r,ddd = dat5,allsp = use_allsp_2005,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 
@@ -305,37 +352,37 @@ library("cluster")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 twdir <- paste0(projdir, "TW/")
-datadir1 <- paste0(twdir, "data/Simon_new data_April 20/")
+datadir1 <- paste0(twdir, "data/")
 twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 
-std_dir <- paste0(twalysis_dir,"std_cl_TWonly_nohbf/")
+std_dir <- paste0(twalysis_dir,"std_cl_TWonly_95hbf/")
 dir.create(std_dir)
 setwd(std_dir)
 
 load(file = paste0(twalysis_dir, "TWdat.RData"))
 
-use_splist <- use_allsp_2005
+use_splist <- use_allsp_1995
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",use_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
 
 dat <- data.frame(dat)
 
-#clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
-clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
-clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
-clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+#clkeepCN_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y1 <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
+clkeepKR_Y1 <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3)))
+clkeepTW_Y1 <- list("yft" = list(c(1,2,3),c(1,2,3),c(1,2,3,4)))
+clkeepUS_Y1 <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clk_Y1 <- list(JP = clkeepJP_Y1,KR = clkeepKR_Y1,TW = clkeepTW_Y1,US = clkeepUS_Y1)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY1", regtype2 = "Y1", clk = clk_Y1, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
-runsp <- "bet"; runreg <- 2
-maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5); keepd <- TRUE
-for (runsp in c("bet")) {
+runsp <- "yft"; runreg <- 2
+maxyr <- 2019; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5); keepd <- TRUE
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -392,30 +439,28 @@ for (runsp in c("bet")) {
 
 #######################------------------------------------
 
-std_dir <- paste0(twalysis_dir,"std_cl_TWonly_hbf/")
+std_dir <- paste0(twalysis_dir,"std_cl_TWonly_95hbf/")
 dir.create(std_dir)
 setwd(std_dir)
 
-load(file = paste0(twalysis_dir, "TWdat.RData"))
-
-use_splist <- use_allsp_2005
+use_splist <- use_allsp_1995
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",use_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
 
 dat <- data.frame(dat)
 
-#clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
-clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
-clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
-clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+#clkeepCN_Y2 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y2 <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3),c(0),c(0),c(0)))
+clkeepKR_Y2 <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3),c(0),c(0),c(0)))
+clkeepTW_Y2 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepUS_Y2 <- list("yft" = list(c(2,3),c(1,3),c(0),c(0),c(0),c(0)))
+clk_Y2 <- list(JP = clkeepJP_Y2, KR = clkeepKR_Y2, TW = clkeepTW_Y2, US = clkeepUS_Y2)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY2", regtype2 = "Y2", clk = clk_Y2, doregs = 4:6, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
-runsp <- "bet"; runreg <- 2
-maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5); keepd <- TRUE
-for (runsp in c("bet")) {
+runsp <- "yft"; runreg <- 2
+maxyr <- 2018; maxqtrs <- 200; minqtrs_byreg <- c(5,5,5,5,5,5); keepd <- TRUE
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl

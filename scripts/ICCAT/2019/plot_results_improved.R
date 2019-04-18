@@ -2,30 +2,32 @@
 # Plots
 ########################################
 # Joint standardization
-projdir <- "~/IOTC/2019_CPUE_ALB/"
+projdir <- "~/ICCAT/2019_YFT/"
 
 jointdir <- paste0(projdir, "joint/")
 JPdir <- paste0(projdir, "JP/")
 KRdir <- paste0(projdir, "KR/")
-#SYdir <- paste0(projdir, "SY/")
+BRdir <- paste0(projdir, "BR/")
 TWdir <- paste0(projdir, "TW/")
+USdir <- paste0(projdir, "US/")
 
-alldirs <- c(paste0(jointdir,"analyses/cl1_hb0_hk1/"),
-             paste0(jointdir,"analyses/cl1_hb1_hk1/"),
-             paste0(jointdir,"analyses/cl0_hb1_hk1/"))
+alldirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
+             paste0(BRdir,"analyses/std_cl_BRonly_hbf/"),
+             paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"),
+             paste0(USdir,"analyses/std_cl_USonly_hbf/"))
 
-alldirs <- c(paste0(jointdir,"analyses/cl1_hb0_hk1_b/"))
+alldirsY1 <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
+               paste0(BRdir,"analyses/std_cl_BRonly_hbf/"),
+               paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"),
+               paste0(USdir,"analyses/std_cl_USonly_hbf/"))
 
-natdirs <- c(paste0(JPdir,"analyses/std_cl_JPonly_hbf/"),
-             paste0(KRdir,"std/"),
-             paste0(TWdir,"analyses/std/"))
+alldirsY2 <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
+               paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"))
 
 
 
-
-# reglist <- list("regA4" = c(1:4), "regA5" = 1, "regB3" = c(1,2,3,4,5), "regY" = c(2:5), "regY2" = c(2:5,7))
-reglist <- list("regA4" = c(1:4), "regA5" = 1)
-splist <- list("regA4" = "alb", "regA5" = "alb", "regB3" = "bet", "regY" = "yft", "regY2" = "yft")
+reglist <- list("regY1" = c(1:3), "regY2" = 1:6)
+splist <- list("regY1" = "yft", "regY2" = "yft")
 
 library("beanplot")
 library("cluster")
@@ -52,18 +54,15 @@ mdtv <- "boat_allyrs"
 md5279 <- "novess_5279"
 md79nd <- "vessid_79nd"
 keepd <- TRUE
-yr1 = 1952
+yr1 = 1958
 
 mdt_all <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")
 mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")
-#reg_strs <- c("regY","regY2","regA4","regA5")
-reg_strs <- c("regA4")
-#reg_strs <- c("regY","regY2")
+#reg_strs <- c("regA4")
+reg_strs <- c("regY1","regY2")
 
-
-#resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
-
-prep_indices(resdirs=alldirs[1], reg_strs=c("regA4"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
+prep_indices(resdirs=alldirsY1[2:4], reg_strs=c("regY1"), reglist, vartypes = c("lognC","dellog"), yr1=1958)
+prep_indices(resdirs=alldirsY2[2], reg_strs=c("regY2"), reglist, vartypes = c("lognC","dellog"), yr1=1958)
 
 #prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 

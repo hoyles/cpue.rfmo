@@ -3,9 +3,9 @@
 # Remove TW before 2005
 # Joint standardization
 
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 
-cndir <- paste0(projdir, "CN/")
+brdir <- paste0(projdir, "BR/")
 krdir <- paste0(projdir, "KR/")
 twdir <- paste0(projdir, "TW/")
 jpdir <- paste0(projdir, "JP/")
@@ -35,16 +35,16 @@ library("survival")
 library("cpue.rfmo")
 
 
-#clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepBR_Y <- list("yft" = list(c(0),c(1,2,3,4,5),c(1,2,3,4)))
-clkeepKR_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3)))
-clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
-clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+#clkeepCN_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepBR_Y1 <- list("yft" = list(c(0),c(1,2,3,4,5),c(1,2,3,4)))
+clkeepKR_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3)))
+clkeepTW_Y1 <- list("yft" = list(c(4),c(2,3),c(0)))
+clkeepUS_Y1 <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clk_Y1 <- list(JP = clkeepJP_Y1,KR = clkeepKR_Y1,TW = clkeepTW_Y1,US = clkeepUS_Y1)
 
 
-short_splist <- c("alb","bet","yft")
+short_splist <- c("alb","yft","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks",short_splist,"lat","lon","lat5","lon5", "reg", "hcltrp", "flag")
 
 #---------------------------------------
@@ -54,15 +54,15 @@ dir.create(resdir)
 setwd(resdir)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohooks = TRUE)
+runpars[["yft"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_Y1, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohooks = TRUE)
 
 flaglist <- list(cn = "CN", jp = "JP", kr = "KR", tw = "TW", us = "US",all=c("JP","KR","TW","US"))
 
-clk <- clk_B   # for testing
+clk <- clk_Y1   # for testing
 vars <- c("vessid","hooks","yrqtr","latlong")
 
-maxyr = 2018; keepd = TRUE; maxqtrs=200; addbranch<-F;addother=F;addalb=F
-for(runsp in c("bet")) {
+maxyr = 2019; keepd = TRUE; maxqtrs=200; addbranch<-F;addother=F;addalb=F
+for(runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -156,15 +156,15 @@ dir.create(resdir)
 setwd(resdir)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE)
+runpars[["yft"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_Y1, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE)
 
 flaglist <- list(cn = "CN", jp = "JP", kr = "KR", tw = "TW", us = "US",all=c("JP","KR","TW","US"))
 
-clk <- clk_B   # for testing
+clk <- clk_Y1   # for testing
 vars <- c("vessid","hooks","yrqtr","latlong")
 
-maxyr = 2018; keepd = TRUE; maxqtrs=200
-for(runsp in c("bet")) {
+maxyr = 2019; keepd = TRUE; maxqtrs=200
+for(runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -202,7 +202,7 @@ for(runsp in c("bet")) {
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
     wtt.79nd   <- mk_wts(glmdat79nd,wttype="area")
-    dohook <- runpars[["bet"]]$dohook
+    dohook <- runpars[["yft"]]$dohook
     fmla.oplogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=T,nhbf=3, dohook = dohook)
     fmla.oplogn_ncl <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=F,nhbf=3, dohook = dohook)
     fmla.boatlogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=T,addcl=T,nhbf=3, dohook = dohook)
@@ -259,15 +259,15 @@ dir.create(resdir)
 setwd(resdir)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE, minyqll = 1)
+runpars[["yft"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_Y1, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE, minyqll = 1)
 
 flaglist <- list(cn = "CN", jp = "JP", kr = "KR", tw = "TW", us = "US",all=c("JP","KR","TW","US"))
 
-clk <- clk_B   # for testing
+clk <- clk_Y1   # for testing
 vars <- c("vessid","hooks","yrqtr","latlong")
 
-maxyr = 2018; keepd = TRUE; maxqtrs=200
-for(runsp in c("bet")) {
+maxyr = 2019; keepd = TRUE; maxqtrs=200
+for(runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -306,7 +306,7 @@ for(runsp in c("bet")) {
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
     wtt.79nd   <- mk_wts(glmdat79nd,wttype="area")
-    dohook <- runpars[["bet"]]$dohook
+    dohook <- runpars[["yft"]]$dohook
     fmla.oplogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=T,nhbf=3, dohook = dohook)
     fmla.oplogn_ncl <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=F,nhbf=3, dohook = dohook)
     fmla.boatlogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=T,addcl=T,nhbf=3, dohook = dohook)
@@ -362,15 +362,15 @@ dir.create(resdir)
 setwd(resdir)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE, minyqll = 5)
+runpars[["yft"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_Y1, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE, minyqll = 5)
 
 flaglist <- list(cn = "CN", jp = "JP", kr = "KR", tw = "TW", us = "US",all=c("JP","KR","TW","US"))
 
-clk <- clk_B   # for testing
+clk <- clk_Y1   # for testing
 vars <- c("vessid","hooks","yrqtr","latlong")
 
-maxyr = 2018; keepd = TRUE; maxqtrs=200
-for(runsp in c("bet")) {
+maxyr = 2019; keepd = TRUE; maxqtrs=200
+for(runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -409,7 +409,7 @@ for(runsp in c("bet")) {
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
     wtt.79nd   <- mk_wts(glmdat79nd,wttype="area")
-    dohook <- runpars[["bet"]]$dohook
+    dohook <- runpars[["yft"]]$dohook
     fmla.oplogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=T,nhbf=3, dohook = dohook)
     fmla.oplogn_ncl <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=F,nhbf=3, dohook = dohook)
     fmla.boatlogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=T,addcl=T,nhbf=3, dohook = dohook)
@@ -468,8 +468,8 @@ datmeds <- list()
 for(regtype in c("regB")) {
   print(regtype)
   datmeds[[regtype]] <- regtype
-  runsp <- switch(regtype,regB="bet")
-  clk <- switch(regtype,regB=clk_B)
+  runsp <- switch(regtype,regB="yft")
+  clk <- switch(regtype,regB=clk_Y1)
   jdat <- data.frame()
   for(flag in flaglist$all) {
       for(r in runpars[[runsp]]$doregs) {
@@ -522,15 +522,15 @@ dir.create(resdir)
 setwd(resdir)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE, minyqll = 5)
+runpars[["yft"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_Y1, doregs = 1:3, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp", minq_byreg = c(5,5,5), dohook = FALSE, minyqll = 5)
 
 flaglist <- list(cn = "CN", jp = "JP", kr = "KR", tw = "TW", us = "US",all=c("JP","KR","TW","US"))
 
-clk <- clk_B   # for testing
+clk <- clk_Y1   # for testing
 vars <- c("vessid","hooks","yrqtr","latlong")
 
-maxyr = 2018; keepd = TRUE; maxqtrs=200
-for(runsp in c("bet")) {
+maxyr = 2019; keepd = TRUE; maxqtrs=200
+for(runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -569,7 +569,7 @@ for(runsp in c("bet")) {
     wtt.all   <- mk_wts(glmdat,wttype="area")
     wtt.5279   <- mk_wts(glmdat5279,wttype="area")
     wtt.79nd   <- mk_wts(glmdat79nd,wttype="area")
-    dohook <- runpars[["bet"]]$dohook
+    dohook <- runpars[["yft"]]$dohook
     fmla.oplogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=T,nhbf=3, dohook = dohook)
     fmla.oplogn_ncl <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=F,addcl=F,nhbf=3, dohook = dohook)
     fmla.boatlogn <- make_formula_IO(runsp,modtype="logn",dohbf=dohbf,addboat=T,addcl=T,nhbf=3, dohook = dohook)

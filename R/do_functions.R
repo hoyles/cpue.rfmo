@@ -150,18 +150,21 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdla
   runsp <- rp$runsp
   addcl <- rp$addcl
   dohbf <- rp$dohbf
-  ylall <- rp$ylall
+  if(is.null(rp$ylall)) ylall <- NA else ylall <- rp$ylall
   if(length(doflags)==1) onefl <- doflags else onefl <- NA
   jdat <- data.frame()
   if("strsmp" %in% names(rp))  strsmp <- rp$strsmp else strsmp <- NA
 
   for (flag in doflags) {
     for (r in rp$doregs) {
-      load(paste0(projdir,flag,"/clustering/",paste(flag,regstr,r,sep = "_"),".RData"))
-      dataset$flag <- flag
-      dataset$qtr <- revtrunc(defactor(dataset$yrqtr))
-      jdat <- rbind(jdat,dataset[,stdlabs])
-      rm(dataset)
+      datfl <- paste0(projdir,flag,"/clustering/",paste(flag,regstr,r,sep = "_"),".RData")
+      if(file.exists(datfl)) {
+        load(datfl)
+        dataset$flag <- flag
+        dataset$qtr <- revtrunc(defactor(dataset$yrqtr))
+        jdat <- rbind(jdat,dataset[,stdlabs])
+        rm(dataset)
+      }
     }
   }
   jdat <- jdat[jdat$yrqtr < maxyr,]
@@ -174,10 +177,10 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, do_early, stdla
   for (runreg in rp$doregs) {
     jdat2 <- jdat[jdat$yrqtr < jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
     if(!is.na(krlimit)) {
-      jdat3 <- jdat2[(jdat2$yrqtr > krlimit$yr[1] & jdat2$yrqtr < krlimit$yr[2]) |
+      jdat2 <- jdat2[(jdat2$yrqtr > krlimit$yr[1] & jdat2$yrqtr < krlimit$yr[2]) |
                      !jdat2$reg %in% krlimit$reg | jdat2$flag != "KR",]
     }
-    glmdat <- select_data_IO2(jdat3,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars, yrlims = ylall, oneflag = onefl)
+    glmdat <- select_data_IO2(jdat2,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars, yrlims = ylall, oneflag = onefl)
     if (!is.na(strsmp) & nrow(glmdat) > 60000)
       glmdat <- samp_strat_data(glmdat, strsmp)
 

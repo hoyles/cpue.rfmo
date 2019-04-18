@@ -56,7 +56,7 @@ library("cpue.rfmo")
 
 # If good, load the whole file
 #dat5216 <- read_fwf(file = paste0(datadir1,"/JPNLL_20170524.dat"),fwf_widths(wdths),col_types = cc)
-dat1 <- read.csv(paste0(datadir1,"USLLV1.2simonV3.csv"))
+dat1 <- read.csv(paste0(datadir1,"USLLV1.2simonV3.2019.csv"))
 #dat1 <- read.csv("C:/blackdrive/NEWPLL/BETCPUE/USLLV1.2simonV2.csv")
 head(dat1)
 a <- names(dat1)
@@ -77,7 +77,7 @@ table(dat1$op_yr)
 rawdat$lat5 = rawdat$lat
 rawdat$lon5 = rawdat$lon
 
-pd2 <- setup_AO_regions(rawdat, regB = TRUE, regB1 = TRUE) # Later will also need YFT regions,
+pd2 <- setup_AO_regions(rawdat, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE, regY2 = TRUE) # Later will also need YFT regions,
 #and possibly alternative BET regions
 head(pd2)
 table(pd2$regB)
@@ -118,8 +118,8 @@ apply(a,2,lu)
 # Plot grid squares with sets by region, for each regional structure
 a <- unique(paste(dat$lat,dat$lon))
 
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB", "regB1")]
-for (fld in c("regB", "regB1")) {
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regB", "regB1", "regY", "regY1", "regY2")]
+for (fld in c("regB", "regB1", "regY", "regY1", "regY2")) {
   windows(width = 15,height = 10)
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type = "n",xlab = "Longitude",ylab = "Latitude",main = fld)
@@ -270,7 +270,7 @@ savePlot("Rpart bet cpue",type = "png")
 
 
 
-a <- dat[dat$regB == 2,]  # smaller component, with 33000 rows. Still takes 5 minutes or more.
+a <- dat[dat$regY1 == 2,]  # smaller component, with 33000 rows. Still takes 5 minutes or more.
 a$betcpue <- a$bet/a$hooks
 a$albcpue <- a$alb/a$hooks
 a$yftcpue <- a$yft/a$hooks
@@ -318,9 +318,7 @@ library("lubridate")
 
 library("cpue.rfmo")
 
-
-projdir <- "~/ICCAT/2018_Bigeye/"
-#projdir <- "C:/blackdrive/ICCAT/2018/BET/2018_CPUE/"
+projdir <- "~/ICCAT/2019_YFT/"
 USdir <- paste0(projdir, "US/")
 datadir1 <- paste0(USdir, "data/")
 USalysis_dir <- paste0(USdir, "analyses/")
@@ -344,27 +342,27 @@ dat$tripidmon <- paste(dat$vessid,year(a),month(a), sep = "_")
 gc()
 us_splist <- c("alb","bft","bet","yft","swo","mls","bum","bsh","sma","por")
 use_splist <- c("alb","bft","bet","yft","swo","mls","bum","bsh","sma")
-allabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks","tripidmon",use_splist,"Total","lat","lon","lat5","lon5","regB", "regB1")
+allabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks","tripidmon",use_splist,"Total","lat","lon","lat5","lon5","regY","regY1", "regY2")
 dat <- data.frame(dat)
 
-nclB = c(4,4,0) # Number of bigeye clusters. Will need to be adjusted for each fleet.
+nclY1 = c(4,4,0) # Number of bigeye clusters. Will need to be adjusted for each fleet.
 flag = "US"
-cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","op_yr","tripidmon","regB","regB1")
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","op_yr","tripidmon")
 r = 1
 names(dat)
 
 for (r in c(1:2)) {
   windows(15,12); par(mfrow = c(5,3), mar = c(3,2,2,1), oma = c(0,0,2,0))
-  a <- dat[dat$regB == r,]
+  a <- dat[dat$regY1 == r,]
   for (sp in us_splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = sp)
   title(paste("Region", r ), outer = TRUE)
   savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
 }
 
-regtype = "regB"
+regtype = "regY1"
 for (r in 2:1) {
   fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F, ll5 = TRUE, flag = flag, fnhead = fnh,covarnames = cvn)
+  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F, ll5 = TRUE, flag = flag, fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 
@@ -378,11 +376,11 @@ resdir <- paste0(USalysis_dir,"std_cl_USonly_nohbf/")
 dir.create(resdir)
 setwd(resdir)
 
-#clkeepCN_Y <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+#clkeepCN_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepJP_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
 clkeepKR_Y <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3)))
 clkeepTW_Y <- list("yft" = list(c(4),c(2,3),c(0)))
-clkeepUS_Y <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clkeepUS_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(0)))
 clk_Y1 <- list(JP = clkeepJP_Y,KR = clkeepKR_Y,TW = clkeepTW_Y,US = clkeepUS_Y)
 
 runpars <- list()
@@ -458,11 +456,11 @@ setwd(resdir)
 clkeepJP_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
 clkeepKR_Y <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3)))
 clkeepTW_Y <- list("yft" = list(c(4),c(2,3),c(0)))
-clkeepUS_Y <- list("yft" = list(c(2,3),c(1,3),c(0)))
-clk_Y <- list(JP = clkeepJP_Y,KR = clkeepKR_Y,TW = clkeepTW_Y,US = clkeepUS_Y)
+clkeepUS_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(0)))
+clk_Y1 <- list(JP = clkeepJP_Y,KR = clkeepKR_Y,TW = clkeepTW_Y,US = clkeepUS_Y)
 
 runpars <- list()
-runpars[["yft"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_Y, doregs = 1:2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY1", regtype2 = "Y1", clk = clk_Y1, doregs = 1:2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks",short_splist,"lat","lon","lat5","lon5", "reg", "hcltrp", "flag")
 

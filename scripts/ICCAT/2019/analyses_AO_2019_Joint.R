@@ -36,8 +36,9 @@ library("cpue.rfmo")
 
 
 #clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
-clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
+clkeepJP_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepBR_Y <- list("yft" = list(c(0),c(1,2,3,4,5),c(1,2,3,4)))
+clkeepKR_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3)))
 clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
 clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
 clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)

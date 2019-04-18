@@ -35,12 +35,14 @@ library("cpue.rfmo")
 #source(paste0(Rdir,"support_functions.r"))
 #xsd # stop!
 
+options(device = "windows")
+
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
-load(paste0(datadir, "Pelagic_LL_BR_ver00.RData"))
+load(paste0(datadir, "BRdat.RData"))
 # check the data
-str(dt)
-names(dt)
+str(dat)
+names(dat)
 
 br_splist <- c("yft", "alb","bet", "swo", "sai", "whm", "bum", "bsh",
                "spx", "bth", "sma", "ocs", "fal", "ccs")
@@ -51,9 +53,10 @@ if(a==0) {
   prepdat$lat5 <- prepdat$lat5 + 2.5
   prepdat$lon5 <- prepdat$lon5 + 2.5
 }
+prepdat$latlong <- paste(prepdat$lat5, prepdat$lon5)
 
 # Prepare and clean the data
-prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE)
+prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE, regY2 = TRUE)
 
 table(prepdat2$regB, prepdat2$regY)
 
@@ -61,15 +64,14 @@ head(prepdat2)
 prepdat2 <- as.data.frame(prepdat2)
 dat <- dataclean_BR(prepdat2, yearlim = 2018, splist = br_splist)
 
-
-save(prepdat,dat,file = "BRdat.RData")
+save(prepdat,dat,file = "BRdat2.RData")
 
 
 # ===================================================================================
 # Plot and explore the data
 # ===================================================================================
 # These plots are for checking the data. Not especially important.
-load(file = "BRdat.RData")
+load(file = "BRdat2.RData")
 str(dat)
 summary(dat)
 table(dat$vessid,dat$op_yr)
@@ -286,7 +288,7 @@ for (r in 2:3) {
 
 
 ##################################################
-# Korea only, clusters, HBF
+# Brazil only, clusters, HBF
 #
 # R2 - 4 clusters. 1=yft+bet, 2=bet+alb, 3=bet, 4=bet+yft+swo. Use 1,2,3,4
 # R3 - 3 or 4 clusters. 1=alb+bet, 2=bet, 3=yft+bet+alb, 4=alb+bft+sfa. Use 1,2,3

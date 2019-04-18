@@ -35,30 +35,48 @@ library("cpue.rfmo")
 #source(paste0(Rdir,"support_functions.r"))
 #xsd # stop!
 
+# Test data format
+
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
 
-  nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","bft_w","sbt_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
-wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
-cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccc"
+#nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","bft_w","sbt_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon","cpr","embark_yr","embark_mn","embark_dd","op_start_yr","op_start_mn","op_start_dd","op_end_yr","op_end_mn","op_end_dd","debark_yr","debark_mn","debark_dd","oil","foc","rem")
+nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","bet","yft","bft","sbt","ott","swo","mls","bum","blm","otb","skj","sha","oth","alb_w","bet_w","yft_w","bft_w","sbt_w","ott_w","swo_w","mls_w","bum_w","blm_w","otb_w","skj_w","sha_w","oth_w","sst","bait1","bait2","bait3","bait4","bait5","hookdp","target","group","NS","op_lat","EW","op_lon")
+#wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
+wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3) # Changed cpr width to 1 instead of 2.
+#cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccc"
+cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
 sum(wdths2)
 length(wdths2)
 
 
 # Check data loading
-a <- read_csv(file = paste0(datadir,"/LOG1981A.ATL"),fwf_widths(wdths2),col_types = cc2,n_max = 20);gc()
+a <- read_fwf(file=paste0(datadir,"LOG1991A.ATL"),fwf_widths(wdths2),col_types=cc2,n_max=20)
+a <- read_fwf(file=paste0(datadir,"LOG2008A.ATL 1x1 bft sbt"),fwf_widths(wdths2),col_types=cc2,n_max=20)
 names(a) <- nms2
-a <- data.frame(a)
-a
-cbind(nms2,wdths2,cumsum(c(wdths2)),unlist(strsplit(cc2,"")))
+a[1:20,]
+
+#a <- read_csv(file = paste0(datadir,"/LOG1981A.ATL"),fwf_widths(wdths2),col_types = cc2,n_max = 20);gc()
+# names(a) <- nms2
+# a <- data.frame(a)
+# a
+# cbind(nms2,wdths2,cumsum(c(wdths2)),unlist(strsplit(cc2,"")))
 
 # Load data
-yy <- 1981:2017;yy <- paste0("/LOG",yy,"A.ATL")
+yy <- 1981:1992;yy <- paste0("/LOG",yy,"A.ATL")
+readfun1 <- function(ff) {
+  read_fwf(paste0(datadir,ff),fwf_widths(wdths2),col_types = cc2)
+}
+a1 <- lapply(yy,readfun1)
+
+yy <- 1993:2017;yy <- paste0("/LOG",yy,"A.ATL 1x1 bft sbt")
 readfun1 <- function(ff) {
   read_fwf(paste0(datadir1,ff),fwf_widths(wdths2),col_types = cc2)
 }
-a <- lapply(yy,readfun1)
-system.time({dat1 <- ldply(a, data.frame)})
+a2 <- lapply(yy,readfun1)
+
+
+system.time({dat1 <- ldply(a1, data.frame)})
 names(dat1) <- nms2
 save(dat1,file = paste0(twalysis_dir, "dat1.RData"))
 load(paste0(twalysis_dir, "dat1.RData"))

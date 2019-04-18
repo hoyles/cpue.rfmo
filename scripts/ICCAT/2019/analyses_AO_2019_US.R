@@ -1,4 +1,4 @@
-projdir <- "~/ICCAT/2018_Bigeye/"
+projdir <- "~/ICCAT/2019_YFT/"
 # install.packages("tm")
 # install.packages("devtools")
 # install.packages("readr")
@@ -378,21 +378,21 @@ resdir <- paste0(USalysis_dir,"std_cl_USonly_nohbf/")
 dir.create(resdir)
 setwd(resdir)
 
-#clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
-clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
-clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
-clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+#clkeepCN_Y <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
+clkeepKR_Y <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3)))
+clkeepTW_Y <- list("yft" = list(c(4),c(2,3),c(0)))
+clkeepUS_Y <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clk_Y1 <- list(JP = clkeepJP_Y,KR = clkeepKR_Y,TW = clkeepTW_Y,US = clkeepUS_Y)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:2, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regY1", regtype2 = "Y1", clk = clk_Y1, doregs = 1:2, addcl = TRUE, dohbf = FALSE, cltype = "hcltrp")
 
 short_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks",short_splist,"lat","lon","lat5","lon5", "reg", "hcltrp", "flag")
 
 keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
-for (runsp in c("bet")) {
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl
@@ -454,20 +454,20 @@ resdir <- paste0(USalysis_dir,"std_cl_USonly_hbf/")
 dir.create(resdir)
 setwd(resdir)
 
-#clkeepCN_B <- list("bet" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_B <- list("bet" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
-clkeepKR_B <- list("bet" = list(c(0),c(1,2,3,4),c(1,2,3)))
-clkeepTW_B <- list("bet" = list(c(4),c(2,3),c(0)))
-clkeepUS_B <- list("bet" = list(c(2,3),c(1,3),c(0)))
-clk_B <- list(JP = clkeepJP_B,KR = clkeepKR_B,TW = clkeepTW_B,US = clkeepUS_B)
+#clkeepCN_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
+clkeepKR_Y <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3)))
+clkeepTW_Y <- list("yft" = list(c(4),c(2,3),c(0)))
+clkeepUS_Y <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clk_Y <- list(JP = clkeepJP_Y,KR = clkeepKR_Y,TW = clkeepTW_Y,US = clkeepUS_Y)
 
 runpars <- list()
-runpars[["bet"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_B, doregs = 1:2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
+runpars[["yft"]] <- list(regtype = "regB", regtype2 = "B", clk = clk_Y, doregs = 1:2, addcl = TRUE, dohbf = TRUE, cltype = "hcltrp")
 
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks",short_splist,"lat","lon","lat5","lon5", "reg", "hcltrp", "flag")
 
 keepd = TRUE; maxyr = 2018; maxqtrs = 200; minqtrs_byreg = c(5,5,5);
-for (runsp in c("bet")) {
+for (runsp in c("yft")) {
   regtype <- runpars[[runsp]]$regtype
   clk <- runpars[[runsp]]$clk
   addcl <- runpars[[runsp]]$addcl

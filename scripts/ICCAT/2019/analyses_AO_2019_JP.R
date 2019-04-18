@@ -392,7 +392,6 @@ for (r in 1:length(nclY2)) {
 }
 
 
-
 # ========= as an exercise, run clustering without the species of interest ===========
 clusdir_xsoi <- paste0(jpdir, "clustering_xsoi/")
 dir.create(clusdir_xsoi)
@@ -458,7 +457,7 @@ dir.create(resdir)
 setwd(resdir)
 
 #clkeepCN_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
+clkeepJP_Y <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepBR_Y <- list("yft" = list(c(1,2,4),c(1,2,3,4),c(1,2,3)))
 clkeepKR_Y <- list("yft" = list(c(0),c(1,2,3,4),c(1,2,3)))
 clkeepTW_Y <- list("yft" = list(c(4),c(2,3),c(0)))

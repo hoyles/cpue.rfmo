@@ -45,7 +45,7 @@ nms2 <- c( "callsign","op_yr","op_mon","op_day","op_area","hbf","hooks","alb","b
 #wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3,2,4,2,2,4,2,2,4,2,2,4,2,2,5,5,11)
 wdths2 <- c(5,4,2,2,4,3,5,rep(4,14),rep(5,14),2,1,1,1,1,1,3,3,5,2,2,1,3) # Changed cpr width to 1 instead of 2.
 #cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiicccccccccccccccc"
-cc2 <- "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+cc2 <-  "ciiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiicciiii"
 sum(wdths2)
 length(wdths2)
 
@@ -55,7 +55,7 @@ a <- read_fwf(file=paste0(datadir,"LOG1991A.ATL"),fwf_widths(wdths2),col_types=c
 a <- read_fwf(file=paste0(datadir,"LOG2008A.ATL 1x1 bft sbt"),fwf_widths(wdths2),col_types=cc2,n_max=20)
 names(a) <- nms2
 as.data.frame(problems(a))
-a[1:20,]
+a[960:980,28:48]
 
 #a <- read_csv(file = paste0(datadir,"/LOG1981A.ATL"),fwf_widths(wdths2),col_types = cc2,n_max = 20);gc()
 # names(a) <- nms2
@@ -64,7 +64,7 @@ a[1:20,]
 # cbind(nms2,wdths2,cumsum(c(wdths2)),unlist(strsplit(cc2,"")))
 
 # Load data
-yy <- 1981:1992;yy <- paste0("/LOG",yy,"A.ATL")
+yy <- c(1981:1992,2018);yy <- paste0("/LOG",yy,"A.ATL")
 readfun1 <- function(ff) {
   read_fwf(paste0(datadir,ff),fwf_widths(wdths2),col_types = cc2)
 }
@@ -262,7 +262,7 @@ for (r in c(1,2,3)) {
 }
 
 # --------------
-clustdir_1995 <- paste0(twdir,"clustering/")
+clustdir_1995 <- paste0(twdir,"clustering_1995/")
 dir.create(clustdir_1995)
 setwd(clustdir_1995)
 
@@ -298,7 +298,7 @@ for (r in c(1,2,3,4,5,6)) {
 
 ######################################
 # --------------
-clustdir_2005 <- paste0(twdir,"clustering_2005/")
+clustdir_2005 <- paste0(twdir,"clustering/")
 dir.create(clustdir_2005)
 setwd(clustdir_2005)
 

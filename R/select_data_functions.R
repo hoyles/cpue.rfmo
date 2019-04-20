@@ -220,6 +220,10 @@ select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtr
     a <- a[a >= minvess]  # At least 'minvess' sets by the vessel
     gdat <- gdat[gdat$vessid %in% names(a), ]
 
+    a <- tapply(gdat[,runsp], gdat$vessid, sum) # Only vessels that have caught the species
+    a <- a[a > 0]
+    gdat <- gdat[gdat$vessid %in% names(a), ]
+
     if (!is.na(addpca))
       vars <- c(vars, addpca)
     vars <- c(vars, runsp)
@@ -327,6 +331,10 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
     gdat <- gdat[gdat$latlong %in% names(a), ]
     a <- table(gdat$vessid)
     a <- a[a >= minvess]  # Each vessel has at least 'minvess' sets
+    gdat <- gdat[gdat$vessid %in% names(a), ]
+
+    a <- tapply(gdat[,runsp], gdat$vessid, sum) # Only vessels that have caught the species
+    a <- a[a > 0]
     gdat <- gdat[gdat$vessid %in% names(a), ]
 
     yqll <- paste(gdat$yrqtr, gdat$latlong)

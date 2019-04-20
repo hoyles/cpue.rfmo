@@ -40,15 +40,15 @@ library(cpue.rfmo)
 #clkeepCN_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepJP_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepBR_Y1 <- list("yft" = list(c(0),c(1,2,3,4,5),c(1,2,3,4)))
-clkeepKR_Y1 <- list("yft" = list(c(1,2,3),c(1,2,3),c(1,2,3)))
-clkeepTW_Y1 <- list("yft" = list(c(4),c(2,3),c(0)))
-clkeepUS_Y1 <- list("yft" = list(c(2,3),c(1,3),c(0)))
+clkeepKR_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepTW_Y1 <- list("yft" = list(c(1,2,3),c(1,2,3),c(1,2,3,4)))
+clkeepUS_Y1 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(0)))
 clk_Y1 <- list(JP = clkeepJP_Y1, BR = clkeepBR_Y1, KR = clkeepKR_Y1,TW = clkeepTW_Y1,US = clkeepUS_Y1)
 
 clkeepJP_Y2 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepBR_Y2 <- list("yft" = list(c(0),c(1,2,3,4,5),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4,5),c(0)))
-clkeepKR_Y2 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepTW_Y2 <- list("yft" = list(c(1,2,3),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(1,2,3),c(1,2,3)))
+clkeepKR_Y2 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepTW_Y2 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clkeepUS_Y2 <- list("yft" = list(c(1,2,3,4),c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
 clk_Y2 <- list(JP = clkeepJP_Y2, BR = clkeepBR_Y2, KR = clkeepKR_Y2,TW = clkeepTW_Y2,US = clkeepUS_Y2)
 
@@ -61,12 +61,12 @@ stdlabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks",std_splist,"lat","
 ## ---------------------------------------------
 
 # The runpars define the approach to be used in this run
-regY1_minss <- list(minq_byreg = c(3,5,3), minvess=c(20,60,30), minll=c(20,50,30), minyrqtr = c(20,50,30), minyqll = c(3,5,3))
-regY2_minss <- list(minq_byreg = c(3,5,3,3,5,3), minvess=c(20,40,20,20,40,20), minll=c(20,40,20,20,40,20), minyrqtr = c(20,40,20,20,40,20), minyqll = c(3,5,3,3,5,3))
+regY1_minss <- list(minq_byreg = c(3,5,3), minvess=c(20,60,20), minll=c(20,50,20), minyrqtr = c(20,50,20), minyqll = c(3,5,3))
+regY2_minss <- list(minq_byreg = c(3,5,3,3,5,3), minvess=c(20,40,10,20,40,20), minll=c(20,40,20,20,40,20), minyrqtr = c(20,40,10,20,40,20), minyqll = c(3,5,3,3,5,3))
 
 runpars <- list()
 runpars[["regY1"]] <-list(runsp = "yft", regtype2 = "Y1", clk = clk_Y1, doregs = 1:3, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY1_minss, strsmp = 30)
-runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(3), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(1,2,4,5,6), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss, strsmp = 30)
 
 regstr <- "regY1"; runreg <- 2; keepd <- TRUE; doflags <- "TW"
 maxyr <- 2019

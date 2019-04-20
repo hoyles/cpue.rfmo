@@ -34,6 +34,7 @@ library("cpue.rfmo")
 
 #source(paste0(Rdir,"support_functions.r"))
 #xsd # stop!
+options(device = "windows")
 
 # ===================================================================================
 # Please keep the data format consistent between years and for the ICCAT + IOTC analyses.
@@ -58,7 +59,7 @@ rawdat$op_mon <- month(rawdat$DATE)
 prepdat <- dataprep_KR(rawdat, splist = kr_splist)
 head(prepdat)
 
-prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE)
+prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE, regY2 = TRUE)
 head(prepdat2)
 prepdat2 <- as.data.frame(prepdat2)
 dat <- dataclean_KR(prepdat2, yearlim = 2018, splist = kr_splist)
@@ -260,7 +261,7 @@ flag <- "KR"
 kr_splist <- c("alb","bet","bft","blm","bum","mls","oth","sfa","sha","skj","swo","yft")
 
 use_splist <- c("alb","bet","bum","mls","sfa","swo","yft")
-allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regY","regY1")
+allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regY","regY1","regY2")
 dat <- data.frame(dat)
 
 for (r in c(1:3)) {
@@ -272,12 +273,20 @@ for (r in c(1:3)) {
 }
 
 nclY1 <- c(4,4,4)
+nclY2 <- c(4,4,4,4,4,4)
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
 regtype <- "regY1"
 for (r in 1:3) {
   fnh <- paste(flag,regtype,r,sep = "_")
   dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  save(dataset,file = paste0(fnh,".RData"))
+}
+
+regtype <- "regY2"
+for (r in 1:6) {
+  fnh <- paste(flag,regtype,r,sep = "_")
+  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY2[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 

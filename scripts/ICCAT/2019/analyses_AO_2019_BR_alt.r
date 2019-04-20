@@ -250,13 +250,13 @@ clustdir <- paste0(brdir,"clustering/")
 dir.create(clustdir)
 setwd(clustdir)
 
-load(file = paste0(bralysis_dir, "BRdat.RData"))
+load(file = paste0(bralysis_dir, "BRdat2.RData"))
 
 flag <- "BR"
 br_splist <- c("yft", "alb","bet", "swo", "sai", "whm", "bum", "bsh","spx", "bth", "sma", "ocs", "fal", "ccs")
 
 use_splist <- c("yft", "alb","bet", "swo", "sai", "whm", "bum", "bsh","sma")
-allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regY","regY1")
+allabs <- c("op_yr","op_mon","hooks",use_splist, "Total","dmy","hbf","moon","lat","lon","lat5","lon5","yrqtr","latlong","vessid","tripidmon","regY","regY1","regY2")
 dat <- data.frame(dat)
 allabs %in% names(dat)
 
@@ -269,7 +269,8 @@ for (r in c(2:3)) {
   savePlot(filename = paste("freq",flag,"Region", r, sep = "_"), type = "png")
 }
 
-nclB <- c(4,5,4)
+nclY1 <- c(4,5,4)
+nclY2 <- c(0,5,4,0,5,0)
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
 cvn %in% names(dat)
@@ -277,7 +278,14 @@ cvn %in% names(dat)
 regtype <- "regY1"
 for (r in 2:3) {
   fnh <- paste(flag,regtype,r,sep = "_")
-  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclB[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
+  save(dataset,file = paste0(fnh,".RData"))
+}
+
+regtype <- "regY2"
+for (r in c(2:3,5)) {
+  fnh <- paste(flag,regtype,r,sep = "_")
+  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY2[r],plotPCA = F,clustid = "tripidmon",allclust = F,flag = flag,fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 

@@ -192,7 +192,7 @@ splist <- c("yft", "alb", "bet", "swo", "sai", "whm", "bum", "bsh",
 
 ######@> Setup Regions...
 prepdat2 <- setup_AO_regions(dat = prepdat, regB = TRUE, regB1 = TRUE,
-                             regY = TRUE, regY1 = TRUE)
+                             regY = TRUE, regY1 = TRUE, regY2 = TRUE)
 
 #####@> Visualizing spatial distribution of sets...
 p00 <- ggplot(data = prepdat2, aes(x = lon5, y = lat5)) +
@@ -500,13 +500,15 @@ dat <- data.frame(dat)
 #####@> Number of yellowfin clusters. Will need to be adjusted for each
 #####@> fleet...
 nclB <- c(0, 5, 4)
+nclY1 <- c(0, 5, 4)
+nclY2 <- c(0, 5, 4,0,4,0)
 flag <- "BR"
 cvn <- c("yrqtr", "latlong", "hooks", "hbf", "vessid", "Total", "lat",
          "lon", "lat5", "lon5", "op_yr", "tripidmon", "regB", "regB1",
          "regY", "regY1")
 allabs <- c("vessid", "yrqtr", "latlong", "op_yr", "hbf", "hooks",
             "tripidmon", use_splist, "Total", "lat", "lon", "lat5",
-            "lon5", "regB", "regB1", "regY", "regY1")
+            "lon5", "regB", "regB1", "regY", "regY1", "regY2")
 
 #####@> Looping for the analysis of the species - regB region...
 for (r in unique(dat$regB)) {
@@ -524,16 +526,29 @@ for (r in unique(dat$regB)) {
 
 #####@> Looping for the analysis of the species - regY1 region...
 for (r in unique(dat$regY1)) {
-    dev.new(15, 12)
-    par(mfrow = c(5, 3), mar = c(3, 2, 2, 1), oma = c(0, 0, 2, 0))
-    a <- dat[dat$regY1 == r, ]
-    for (sp in br_splist) {
-        plot(sort(unique(a$yrqtr)), tapply(a[, sp], a$yrqtr, mean), main = sp)
-        title(paste("Region", r ), outer = TRUE)
-        savePlot(filename = paste("freq", flag, "regY1_Region", r, sep = "_"),
-                 type = "png")
-    }
-    dev.off()
+  dev.new(15, 12)
+  par(mfrow = c(5, 3), mar = c(3, 2, 2, 1), oma = c(0, 0, 2, 0))
+  a <- dat[dat$regY1 == r, ]
+  for (sp in br_splist) {
+    plot(sort(unique(a$yrqtr)), tapply(a[, sp], a$yrqtr, mean), main = sp)
+    title(paste("Region", r ), outer = TRUE)
+    savePlot(filename = paste("freq", flag, "regY1_Region", r, sep = "_"),
+             type = "png")
+  }
+  dev.off()
+}
+
+for (r in unique(dat$regY2)) {
+  dev.new(15, 12)
+  par(mfrow = c(5, 3), mar = c(3, 2, 2, 1), oma = c(0, 0, 2, 0))
+  a <- dat[dat$regY2 == r, ]
+  for (sp in br_splist) {
+    plot(sort(unique(a$yrqtr)), tapply(a[, sp], a$yrqtr, mean), main = sp)
+    title(paste("Region", r ), outer = TRUE)
+    savePlot(filename = paste("freq", flag, "regY2_Region", r, sep = "_"),
+             type = "png")
+  }
+  dev.off()
 }
 
 
@@ -552,15 +567,28 @@ for (r in unique(dat$regB)) {
 
 #####@> Cluster analyses for regY1 region...
 regtype <- "regY1"
-for (r in unique(dat$regY1)) {
-    fnh <- paste(flag, regtype, r, sep = "_")
-    dataset <- clust_PCA_run(r = r, ddd = dat, allsp = use_splist,
-                             allabs = allabs, regtype = regtype,
-                             ncl = nclB[r], plotPCA = FALSE,
-                             clustid = "tripidmon",
-                             allclust = FALSE, ll5 = TRUE, flag = flag,
-                             fnhead = fnh, covarnames = cvn)
-    save(dataset, file = paste0(fnh, ".RData"))
+for (r in c(2,3)) {
+  fnh <- paste(flag, regtype, r, sep = "_")
+  dataset <- clust_PCA_run(r = r, ddd = dat, allsp = use_splist,
+                           allabs = allabs, regtype = regtype,
+                           ncl = nclY1[r], plotPCA = FALSE,
+                           clustid = "tripidmon",
+                           allclust = FALSE, ll5 = TRUE, flag = flag,
+                           fnhead = fnh, covarnames = cvn)
+  save(dataset, file = paste0(fnh, ".RData"))
+}
+
+#####@> Cluster analyses for regY1 region...
+regtype <- "regY2"
+for (r in c(2,3,5)) {
+  fnh <- paste(flag, regtype, r, sep = "_")
+  dataset <- clust_PCA_run(r = r, ddd = dat, allsp = use_splist,
+                           allabs = allabs, regtype = regtype,
+                           ncl = nclY2[r], plotPCA = FALSE,
+                           clustid = "tripidmon",
+                           allclust = FALSE, ll5 = TRUE, flag = flag,
+                           fnhead = fnh, covarnames = cvn)
+  save(dataset, file = paste0(fnh, ".RData"))
 }
 
 #####@> Cluster analyses for both regions integrated...

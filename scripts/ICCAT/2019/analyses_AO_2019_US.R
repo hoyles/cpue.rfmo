@@ -345,7 +345,9 @@ use_splist <- c("alb","bft","bet","yft","swo","mls","bum","bsh","sma")
 allabs <- c("vessid","yrqtr","latlong","op_yr","hbf","hooks","tripidmon",use_splist,"Total","lat","lon","lat5","lon5","regY","regY1", "regY2")
 dat <- data.frame(dat)
 
-nclY1 = c(4,4,0) # Number of bigeye clusters. Will need to be adjusted for each fleet.
+nclY1 = c(4,4,0) # Number of clusters.
+nclY2 = c(4,4,0,0,0,4) #
+
 flag = "US"
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","op_yr","tripidmon")
 r = 1
@@ -363,6 +365,13 @@ regtype = "regY1"
 for (r in 2:1) {
   fnh <- paste(flag,regtype,r,sep = "_")
   dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY1[r],plotPCA = F,clustid = "tripidmon",allclust = F, ll5 = TRUE, flag = flag, fnhead = fnh,covarnames = cvn)
+  save(dataset,file = paste0(fnh,".RData"))
+}
+
+regtype = "regY2"
+for (r in c(1,2,6)) {
+  fnh <- paste(flag,regtype,r,sep = "_")
+  dataset <- clust_PCA_run(r = r,ddd = dat,allsp = use_splist,allabs = allabs,regtype = regtype,ncl = nclY2[r],plotPCA = F,clustid = "tripidmon",allclust = F, ll5 = TRUE, flag = flag, fnhead = fnh,covarnames = cvn)
   save(dataset,file = paste0(fnh,".RData"))
 }
 

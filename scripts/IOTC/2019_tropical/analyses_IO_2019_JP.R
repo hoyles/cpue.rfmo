@@ -53,21 +53,21 @@ library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ign
 
 # Load data. This section will only need to be changed if the data format changes.
 nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
-      "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid","bait")
-wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9,1)
-cc <- "iiiiiiiciiiiiiiiiiiiiccii"
+         "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid","bait","vtype","albw","betw","yftw")
+wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9,1,1,5,5,5)
+cc <- "iiiiiiiciiiiiiiiiiiiicciiiiii"
 posses <- cumsum(c(1,wdths))
-cc <- "iiiiiiiciiiiiiiiiiiiiccii"
+cc <- "iiiiiiiciiiiiiiiiiiiicciiiiii"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
 # Load initial test segment of data
-a <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+a <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
 names(a)
 names(a) <- nms
 head(data.frame(a))
 
 # Load the entire dataset
-dat1 <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904.dat"),fwf_widths(wdths),col_types=cc)
+dat1 <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc)
 a <- problems(dat1) # Report problems
 a[160:200,]
 names(dat1) <- nms
@@ -441,8 +441,10 @@ str(dat[,allabs])
 reglist <- list()
 reglist$regA4 <- list(allreg = 1:4, ncl = c(4,5,4,4))
 reglist$regA5 <- list(allreg = 1,   ncl = 4)
-reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
-reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
+reglist$regB2 <- list(allreg = 1:4, ncl = c(4,4,4,4))
+#reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
+reglist$regB3 <- list(allreg = 1:5, ncl = c(4,4,4,4,4))
+#reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
 reglist$regB4 <- list(allreg = 1, ncl = c(5))
 reglist$regY <-  list(allreg = 1:6, ncl = c(4,4,4,4,4,4))
 reglist$regY2 <- list(allreg = 2:7, ncl = c(5,5,5,5,5,4))

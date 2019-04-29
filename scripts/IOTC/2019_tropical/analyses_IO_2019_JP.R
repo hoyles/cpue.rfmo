@@ -37,10 +37,10 @@ library("maps")
 library("mapdata")
 library("maptools")
 
-# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
-# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
-
-# Alternatively either:
+# The new library 'cpue.rfmo' replaces the 'support functions.r' file.
+# The command 'install_github("hoyles/cpue.rfmo")' should now install cpue.rfmo succcessfully.
+#
+# The current workaround is either:
 # a) download cpue.rfmo from github and compile it into a package, following the instructions here:
 # http://kbroman.org/pkg_primer/pages/build.html. This is the best approach; or
 # b) download cpue.rfmo from github, and install from the binary package (cpue.rfmo_0.1.0.zip) in the top dir.
@@ -445,8 +445,8 @@ reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
 reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
 reglist$regB4 <- list(allreg = 1, ncl = c(5))
 reglist$regY <-  list(allreg = 1:6, ncl = c(4,4,4,4,4,4))
-reglist$regY2 <- list(allreg = c(2,7), ncl = c(4,5,5,5,5,5,4))
-reglist$regY2 <- list(allreg = 1, ncl = c(5))
+reglist$regY2 <- list(allreg = 2:7, ncl = c(5,5,5,5,5,4))
+reglist$regY3 <- list(allreg = 1, ncl = c(5))
 
 flag="JP"
 
@@ -549,7 +549,7 @@ runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs 
 runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)
 
 regstr <- "regY2"; runreg <- 7; keepd <- TRUE; doflags <- "JP" # Values used for testing
-maxyr <- 2018
+maxyr <- 2019
 for (regstr in c("regY2")) {
   rp <- runpars[[regstr]]
   runsp <- rp$runsp

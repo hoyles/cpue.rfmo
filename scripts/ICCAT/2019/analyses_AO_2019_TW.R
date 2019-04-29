@@ -226,7 +226,6 @@ twalysis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
 
-str(dat)
 clustdir_all <- paste0(twdir,"clustering_all/")
 dir.create(clustdir_all)
 setwd(clustdir_all)

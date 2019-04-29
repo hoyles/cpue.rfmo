@@ -42,6 +42,7 @@ nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
 wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,3,8,3,4,3,30,9)
 cc <- "iiiiiiiciiiiiiiiiiiiiicci"
 posses <- cumsum(c(1,wdths))
+posses
 cc <- "iiiiiiiciiiiiiiiiiiiiicci"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
@@ -97,6 +98,7 @@ table(clndat$op_yr)
 table(prepdat1$op_yr)
 table(prepdat$op_yr)
 table(is.na(dat$clid))
+table(dat$regY2, dat$op_yr)
 
 xfun <- function(x) sum(x > 0)
 a <- table(dat$vessid,dat$op_yr)
@@ -756,3 +758,33 @@ for (runsp in c("yft")) {
   }
 }
 
+# Check early data
+a <- dat[dat$yrqtr >1959 & dat$regY1==2,]
+by <- table(a$yft==0, a$op_yr)
+bb <- table(a$bet==0, a$op_yr)
+ba <- table(a$alb==0, a$op_yr)
+yrs <- as.numeric(colnames(bb))
+windows()
+plot(1:10, 1:10, xlim = range(yrs), ylim = c(0, 1), xlab = "Year", ylab = "Proportion zero", main = "Proportion zero by set")
+lim <- par("usr")
+rect(lim[1], lim[3], lim[2], lim[4], col = "grey")
+lines(as.numeric(colnames(bb)), bb[2,]/ apply(bb,2,sum), col = "red", lwd=2)
+lines(as.numeric(colnames(by)), by[2,]/ apply(by,2,sum), col = "yellow", lwd=2)
+legend("topright",legend = c("Bigeye", "Yellowfin"), col = c("red", "yellow"), lty = 1, lwd=2)
+savePlot("propzero_by_set.png", type = "png")
+
+va <- aggregate(cbind(yft, bet, alb) ~ op_yr + logbookid, data=a, FUN=sum)
+vn <- aggregate(cbind(yft, bet) ~ op_yr + logbookid, data=a, FUN=length)
+hist(vn$bet)
+by <- with(va[vn$bet > 20,], table(yft==0, op_yr))
+ba <- with(va[vn$bet > 20,], table(alb==0, op_yr))
+bb <- with(va[vn$bet > 20,], table(bet==0, op_yr))
+windows()
+yrs <- as.numeric(colnames(bb))
+plot(1:10, 1:10, xlim = range(yrs), ylim = c(0, .5), xlab = "Year", ylab = "Proportion zero", main = "Zero catches by vessel-year (vessels with 20+ sets)")
+lim <- par("usr")
+rect(lim[1], lim[3], lim[2], lim[4], col = "grey")
+lines(as.numeric(colnames(bb)), bb[2,]/ apply(bb,2,sum), col = "red", lwd=2)
+lines(as.numeric(colnames(by)), by[2,]/ apply(by,2,sum), col = "yellow", lwd=2)
+legend("topright",legend = c("Bigeye", "Yellowfin"), col = c("red", "yellow"), lty = 1, lwd=2)
+savePlot("propzero_by_year.png", type = "png")

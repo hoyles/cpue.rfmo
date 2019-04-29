@@ -11,20 +11,20 @@ BRdir <- paste0(projdir, "BR/")
 TWdir <- paste0(projdir, "TW/")
 USdir <- paste0(projdir, "US/")
 
-alldirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
-             paste0(BRdir,"analyses/std_cl_BRonly_hbf/"),
-             paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"),
-             paste0(USdir,"analyses/std_cl_USonly_hbf/"))
+# alldirs <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
+#              paste0(BRdir,"analyses/std_cl_BRonly_hbf/"),
+#              paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"),
+#              paste0(USdir,"analyses/std_cl_USonly_hbf/"))
+#
+# alldirsY1 <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
+#                paste0(BRdir,"analyses/std_cl_BRonly_hbf/"),
+#                paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"),
+#                paste0(USdir,"analyses/std_cl_USonly_hbf/"))
+#
+# alldirsY2 <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
+#                paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"))
 
-alldirsY1 <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
-               paste0(BRdir,"analyses/std_cl_BRonly_hbf/"),
-               paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"),
-               paste0(USdir,"analyses/std_cl_USonly_hbf/"))
-
-alldirsY2 <- c(paste0(KRdir,"analyses/std_cl_KRonly_hbf/"),
-               paste0(TWdir,"analyses/std_cl_TWonly_95hbf/"))
-
-alldirs <- c(paste0(jointdir,"analyses/cl1_hb1_hk1/"))
+alldirs <- c(paste0(jointdir,"analyses/Y2_cl1_hb1_hk1/"))
 
 reglist <- list("regY1" = c(1:3), "regY2" = 1:6)
 splist <- list("regY1" = "yft", "regY2" = "yft")
@@ -54,15 +54,15 @@ mdtv <- "boat_allyrs"
 md5279 <- "novess_5279"
 md79nd <- "vessid_79nd"
 keepd <- TRUE
-yr1 = 1958
+yr1 = 1959
 
 mdt_all <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")
 mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")
 #reg_strs <- c("regA4")
 reg_strs <- c("regY2")
 
-prep_indices(resdirs=alldirs, reg_strs=c("regY2"), reglist, vartypes = c("lognC","dellog"), yr1=1958)
-prep_indices(resdirs=alldirs, reg_strs=c("regY2"), reglist, vartypes = c("lognC","dellog"), yr1=1958)
+prep_indices(resdirs=alldirs, reg_strs=c("regY2"), reglist, vartypes = c("lognC","dellog"), yr1=yr1)
+prep_indices(resdirs=alldirs, reg_strs=c("regY2"), reglist, vartypes = c("lognC","dellog"), yr1=yr1)
 
 #prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
@@ -197,6 +197,7 @@ for (resdir in alldirs) {
   dir.create(outdir)
   for(regstr in reg_strs) {
     sp <- splist[[regstr]]
+    #for(runreg in 6) {
     for(runreg in reglist[[regstr]]) {
       for(vartype in c("lognC")) {
         for(mdn in 1:4) {
@@ -234,15 +235,18 @@ for (resdir in alldirs) {
   }
 }
 
+alldirs <- c(paste0(jointdir,"analyses/Y1_cl1_hb1_hk1/"))
+reg_strs <- c("regY1")
 
 # Spatial temporal residual plots
 for (resdir in alldirs) {
   for (regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
+ #     for (r in reglist[[regstr]]) {
       outdir <- paste0(resdir,"diags/")
       dir.create(outdir)
       runreg <- r
-      mdn <- 2
+      mdn <- 4
       mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
       mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid")[mdn]
       sp <- splist[[regstr]]

@@ -53,7 +53,7 @@ if(a==0) {
   prepdat$lat5 <- prepdat$lat5 + 2.5
   prepdat$lon5 <- prepdat$lon5 + 2.5
 }
-prepdat$latlong <- paste(prepdat$lat5, prepdat$lon5)
+prepdat$latlong <- paste(prepdat$lat5, prepdat$lon5, sep = "_")
 
 # Prepare and clean the data
 prepdat2 <- setup_AO_regions(prepdat, regB = TRUE, regB1 = TRUE, regY = TRUE, regY1 = TRUE, regY2 = TRUE)

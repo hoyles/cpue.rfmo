@@ -276,9 +276,9 @@ dev.off()
 #####@> structure...
 a <- unique(paste(dat$lat, dat$lon))
 a0 <- dat[match(a, paste(dat$lat, dat$lon)),
-          c("lat","lon","regB", "regB1", "regY", "regY1")]
+          c("lat","lon","regB", "regB1", "regY", "regY1", "regY2")]
 
-for (fld in c("regB", "regB1", "regY", "regY1")) {
+for (fld in c("regB", "regB1", "regY", "regY1",  "regY2")) {
     dev.new(widath = 10, height = 10)
     reg <- with(a0, get(fld))
     plot(a0$lon, a0$lat, type = "n", xlab = "Longitude",

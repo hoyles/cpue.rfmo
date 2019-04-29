@@ -92,6 +92,8 @@ prepdat <- clndat
 dat = dataprep_US(prepdat, splist = splist)
 head(dat)
 save(dat,file = "USdat.RData")
+load("USdat.RData")
+
 
 # ===================================================================================
 # Plot and explore the data

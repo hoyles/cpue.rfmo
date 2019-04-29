@@ -37,9 +37,10 @@ library(tm)
 library(devtools)
 
 # The new library 'cpue.rfmo' replaces the 'support functions.r' file.
-# The command 'install_github("hoyles/cpue.rfmo")' should install cpue.rfmo, but currently doesn't work,
-# possibly due to a bug in devtools with private github repositories, or something else, I'm still looking.
-# The current workaround is either:
+# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
+# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line.
+
+# Alternatively either:
 # a) download cpue.rfmo from github and compile it into a package, following the instructions here:
 # http://kbroman.org/pkg_primer/pages/build.html. This is the best approach; or
 # b) download cpue.rfmo from github, and install from the binary package (cpue.rfmo_0.1.0.zip) in the top dir.

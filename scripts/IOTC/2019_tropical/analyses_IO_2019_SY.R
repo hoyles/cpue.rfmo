@@ -44,6 +44,10 @@ library(scales)       #color gradient with alpha()
 #install.packages("../../../../../cpue.rfmo_0.1.0.zip",repos = NULL,type = "win.binary")
 library(cpue.rfmo)
 
+# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
+# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line.
+
+
 ### Sources functions updated through the GitHub (instead of loading the library as it needs to be built)
 # source("../../../../../R/dataclean_functions.R")
 # source("../../../../../R/dataprep_functions.R")

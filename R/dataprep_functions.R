@@ -663,8 +663,7 @@ make_lbidmon <- function(dat) {
 #' @param regA5 If TRUE, set up regA5
 #' @return Modified dataset.
 #'
-setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB1 = F, regB2 = F, regB3 = F, regA = F, regA1 = F, regA2 = F, regA3 = F,
-                             regA4 = F, regA5 = F) {
+setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regY3 = F, regB = F, regB1 = F, regB2 = F, regB3 = F, regB4 = F, regA = F, regA1 = F, regA2 = F, regA3 = F, regA4 = F, regA5 = F) {
   lat5 <- lon5 <- NULL
   if (regY) {
     dat$regY <- 0
@@ -699,7 +698,7 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
   if(regY2) {
     dat$regY2 <- 0
     dat <- mutate(dat,
-             regY2 = replace(regY2,which(lat5 >=  10 & lon5 < 80 & !is.na(lat5)),1)) %>%
+                  regY2 = replace(regY2,which(lat5 >=  10 & lon5 < 80 & !is.na(lat5)),1)) %>%
       mutate(regY2 = replace(regY2,which(lat5 <  10 & lat5 >=    0 & lon5 >= 40 & lon5 < 75 & !is.na(lat5)),7))  %>%
       mutate(regY2 = replace(regY2,which(lat5 <   0 & lat5 >=  -10 & lon5 >= 35 & lon5 < 75 & !is.na(lat5)),2))  %>%
       mutate(regY2 = replace(regY2,which(lat5 <  -10 & lat5 >=  -15 & lon5 >= 60 & lon5 < 75 & !is.na(lat5)),2)) %>%
@@ -714,6 +713,12 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
       mutate(regY2 = replace(regY2,which(lat5 < -5 & lat5 >= -15 & lon5 >= 100 & lon5 < 110 & !is.na(lat5)),5))  %>%
       mutate(regY2 = replace(regY2,which(lat5 < -10 & lat5 >= -15 & lon5 >= 110 & lon5 < 130 & !is.na(lat5)),5)) %>%
       mutate(regY2 = replace(regY2,which(lat5 < 30 & lat5 >= 10 & lon5 >= 80 & lon5 < 100 & !is.na(lat5)),6))
+  }
+
+  if(regY3) {
+    dat$regY3 <- 0
+    dat <- mutate(dat,
+                  regY3 = replace(regY3,which(lat5 >=  -40 & lat5 < 30 & lon5 < 140 & !is.na(lat5)),1))
   }
 
   # regB North of 15S and west of 80 is R1, or north of 20 and west of 45; north of 15S and east of 80 is R2; north of 35S is R3
@@ -774,6 +779,12 @@ setup_IO_regions <- function(dat, regY = F, regY1 = F, regY2 = F, regB = F, regB
       mutate(regB3 = replace(regB3, which(lat5 < -15 & lat5 >= -35 & lon5 >= 46 & lon5 < 75 & !is.na(lat5)), 3)) %>%
       mutate(regB3 = replace(regB3, which(lat5 < -15 & lat5 >= -20 & lon5 >= 75 & lon5 < 125 & !is.na(lat5)), 4)) %>%
       mutate(regB3 = replace(regB3, which(lat5 < -20 & lat5 >= -35 & lon5 >= 75 & lon5 < 120 & !is.na(lat5)), 4))
+  }
+
+  if(regB4) {
+    dat$regB4 <- 0
+    dat <- mutate(dat,
+                  regB4 = replace(regB4,which(lat5 >=  -35 & lat5 < 10 & lon5 < 140 & !is.na(lat5)),1))
   }
 
   # regA

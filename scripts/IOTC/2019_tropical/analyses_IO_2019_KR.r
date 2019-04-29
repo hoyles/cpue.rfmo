@@ -36,9 +36,8 @@ library(dtplyr)
 library(tm)
 library(devtools)
 
-# The new library 'cpue.rfmo' replaces the 'support functions.r' file.
 # The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
-# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line.
+# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
 
 # Alternatively either:
 # a) download cpue.rfmo from github and compile it into a package, following the instructions here:
@@ -52,7 +51,7 @@ library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ign
 ##################
 
 # Load data. This section will only need to be changed if the data format changes.
-rawdat <- read.csv(paste0(datadir,"IO_KOR_LL_OP_data_20180524_rev.csv"), header = TRUE, stringsAsFactors = FALSE)
+rawdat <- read.csv(paste0(datadir,"IO_KOR_LL_OP_data_20190428.csv"), header = TRUE, stringsAsFactors = FALSE)
 str(rawdat) #test
 
 # Set up standard names, the same as for other fleets

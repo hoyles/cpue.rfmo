@@ -45,7 +45,7 @@ library(scales)       #color gradient with alpha()
 library(cpue.rfmo)
 
 # The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
-# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line.
+# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
 
 
 ### Sources functions updated through the GitHub (instead of loading the library as it needs to be built)

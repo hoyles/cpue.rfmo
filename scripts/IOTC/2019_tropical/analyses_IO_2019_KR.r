@@ -151,13 +151,14 @@ savePlot("Setmap_logscale.png",type="png")
 
 # Make maps to check regional patterns
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY", "regY1", "regY2", "regB", "regB1", "regB2", "regB3", "regA", "regA1", "regA2", "regA3", "regA4","regA5")]
+regnames <- names(dat)[grep("reg", names(dat))]
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon",regnames)]
 windows(width=15,height=10)
-for(fld in c("regY", "regY1", "regY2", "regB", "regB1", "regB2", "regB3", "regA", "regA1", "regA2", "regA3", "regA4","regA5")) {
+for(fld in regnames) {
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
   text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
-  map(add=T)
+  maps::map(database = "world", add=T, fill = F)
   savePlot(paste0("map_",fld),type="png")
 }
 

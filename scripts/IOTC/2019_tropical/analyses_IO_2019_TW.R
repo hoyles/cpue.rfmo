@@ -1,12 +1,14 @@
 # Set up directories
-projdir <- "~/IOTC/2019_CPUE_ALB/"
+projdir <- "~/IOTC/2019_CPUE_tropical/"
 twdir <- paste0(projdir, "TW/")
-datadir <- paste0(twdir, "data/1979-2017/")
-datadir_oil <- paste0(twdir, "data/revisedoildatav2/")
-datadir_2019 <- paste0(twdir, "data/")
+datadir_oil <- paste0(twdir, "data/newfileadd1979-2018(preliminary for 2018)/")
 twylisis_dir <- paste0(twdir, "analyses/")
 twfigs <- paste0(twdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
+
+dir.create(twdir)
+dir.create(twylisis_dir)
+dir.create(twfigs)
 setwd(twylisis_dir)
 
 # Install any missing packages
@@ -80,18 +82,19 @@ c(0,0,wdths)- wdths_oil
 # nms2 <- c("op_yr","op_mon","")
 
 # Load names and widths provided by TW; compare locations and widths
-ffo <- read.csv(paste0(datadir,"outcodeP2.csv"), stringsAsFactors=FALSE)
+#ffo <- read.csv(paste0(datadir,"outcodeP2.csv"), stringsAsFactors=FALSE)
 ffo_oil <- read.csv(paste0(datadir_oil,"outcodeP2oil.csv"), stringsAsFactors=FALSE)
-cbind(nms, ffo$item, nms_oil, ffo_oil$item)
+#cbind(nms, ffo$item, nms_oil, ffo_oil$item)
+cbind(nms, nms_oil, ffo_oil$item)
 wdths==ffo$width; sum(wdths!=ffo$width)
 wdths_oil==ffo_oil$width; sum(wdths_oil!=ffo_oil$width)
 
 # Load example to check processing
-a <- read_fwf(file=paste0(datadir,"LOG2005.IND"),col_positions=fwf_widths(wdths),col_types=cc,n_max=20);gc()
-names(a); dim(a)
-names(a) <- nms
-head(data.frame(a))
-cbind(nms,wdths,cumsum(c(wdths)),unlist(strsplit(cc,"")))
+# a <- read_fwf(file=paste0(datadir,"LOG2005.IND"),col_positions=fwf_widths(wdths),col_types=cc,n_max=20);gc()
+# names(a); dim(a)
+# names(a) <- nms
+# head(data.frame(a))
+# cbind(nms,wdths,cumsum(c(wdths)),unlist(strsplit(cc,"")))
 
 ao <- read_fwf(file=paste0(datadir_oil,"LOG2005.IND"),fwf_widths(wdths_oil),col_types=cc_oil,n_max=20);gc()
 names(ao); dim(ao)
@@ -99,39 +102,38 @@ names(ao) <- nms_oil
 head(as.data.frame(ao))
 
 # Load all the files
-yy <- 1979:2017;yy <- paste0("/LOG",yy,".IND")
+yy <- 1979:2018;yy <- paste0("/LOG",yy,".IND")
 readfun1 <- function(ff) {
   read_fwf(paste0(datadir,ff),fwf_widths(wdths),col_types=cc)
 }
 readfun_oil <- function(ff) {
   read_fwf(paste0(datadir_oil,ff),fwf_widths(wdths_oil),col_types=cc_oil)
 }
-a <- lapply(yy,readfun1)
+#a <- lapply(yy,readfun1)
 a_oil <- lapply(yy,readfun_oil)
-system.time({ dat1 <- ldply(a, data.frame) })
+#system.time({ dat1 <- ldply(a, data.frame) })
 system.time({ dat1_oil <- ldply(a_oil, data.frame) })
-names(dat1) <- nms
+#names(dat1) <- nms
 names(dat1_oil) <- nms_oil
-save(dat1,dat1_oil, file="dat1.RData")
+save(dat1_oil, file="dat1.RData")
 load(paste0(twylisis_dir, "dat1.RData"))
 
 makekey <- function(x) {
   paste(a$vessid, a$op
-
 }
 
-table(dat1[dat1$op_yr==2017,]$oth)
+table(dat1_oil[dat1_oil$op_yr==2018,]$oth)
 
-str(dat1)
-table(dat1$op_yr)
-table(is.na(dat1$embark_yr),dat1$op_yr)
-table(is.na(dat1$debark_yr),dat1$op_yr)
-table(is.na(dat1$op_start_yr),dat1$op_yr)
-table(is.na(dat1$op_end_yr),dat1$op_yr)
-table(is.na(dat1$target),dat1$op_yr)
-table(is.na(dat1$op_lon),dat1$op_yr)
-table(is.na(dat1$hbf),dat1$op_yr)
-table(dat1$op_yr,dat1$op_yr==1)
+str(dat1_oil)
+table(dat1_oil$op_yr)
+table(is.na(dat1_oil$embark_yr),dat1_oil$op_yr)
+table(is.na(dat1_oil$debark_yr),dat1_oil$op_yr)
+table(is.na(dat1_oil$op_start_yr),dat1_oil$op_yr)
+table(is.na(dat1_oil$op_end_yr),dat1_oil$op_yr)
+table(is.na(dat1_oil$target),dat1_oil$op_yr)
+table(is.na(dat1_oil$op_lon),dat1_oil$op_yr)
+table(is.na(dat1_oil$hbf),dat1_oil$op_yr)
+table(dat1_oil$op_yr,dat1_oil$op_yr==1)
 
 splist1 <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt")
 splist_oil <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth", "pbf", "sbt", "oil")
@@ -141,36 +143,36 @@ splist_oil <- c("alb", "bet","yft", "ott", "swo", "mls", "bum", "blm", "otb", "s
 # Prepare and check the data
 # ========================
 
-prepdat1 <-     dataprep_TW(dat1,     splist = splist1)
+#prepdat1 <-     dataprep_TW(dat1,     splist = splist1)
 prepdat1_oil <- dataprep_TW(dat1_oil, splist = splist_oil)
 
-prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
-prepdat_oil <- setup_IO_regions(prepdat1_oil,  regY=T, regY1=T, regY2=T, regB=T, regB1 = T, regB2=T, regB3=T, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
-datold <-     dataclean_TW(prepdat, splist = splist1)
-datold_oil <- dataclean_TW(prepdat_oil, splist = splist_oil)
-save(datold,datold_oil, file="TWdat_old.RData")
+#prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regY3=T, regB=T, regB1 = T, regB2=T, regB3=T, regB4=T, regA=F, regA1=F, regA2=F, regA3=FT, regA4=F, regA5=F)
+prepdat_oil <- setup_IO_regions(prepdat1_oil,  regY=T, regY1=T, regY2=T, regY3=T, regB=T, regB1 = T, regB2=T, regB3=T, regB4=T, regA=F, regA1=F, regA2=F, regA3=F, regA4=F, regA5=F)
+#datold <-     dataclean_TW(prepdat, splist = splist1)
+# datold_oil <- dataclean_TW(prepdat_oil, splist = splist_oil)
+# save(datold,datold_oil, file="TWdat_old.RData")
 
-splist2 <- splist1[splist1 != "pbf"] # remove 'pbf' which was removed by 'dataprep'
+#splist2 <- splist1[splist1 != "pbf"] # remove 'pbf' which was removed by 'dataprep'
 splist_oil2 <- splist_oil[splist_oil != "pbf"]
-dat <-     dataclean_TW(prepdat, rmssp=T, splist = splist2)
+#dat <-     dataclean_TW(prepdat, rmssp=T, splist = splist2)
 dat_oil <- dataclean_TW(prepdat_oil, rmssp=T, splist = splist_oil2)
-save(dat, dat_oil, file="TWdat.RData")
+save(dat_oil, file="TWdat.RData")
 getwd()
 
-windows(12,9)
-plot(1979:2017,tapply(dat_oil$oil, list(dat_oil$op_yr), mean), ylim = c(0, 90), xlim = c(1990, 2018))
-points(1979:2017,tapply(dat_oil$oth, list(dat_oil$op_yr), mean), col = 2, pch = 2)
-points(1979:2017,tapply(dat$oth, list(dat$op_yr), mean), col = 3, pch = 3)
-points(1979:2017,tapply(dat_oil$oth + dat_oil$oil, list(dat_oil$op_yr), mean), col = 4, pch = 4)
-legend("topleft", legend = c("dat_oil$oil","dat_oil$oth", "dat$oth", "dat_oil$oil + dat_oil$oth"), pch=1:4, col = 1:4)
-savePlot("oil_v_oth_1", type = "png")
-
-windows(12,9)
-o1 <- tapply(dat$oth, list(dat$op_yr), mean)
-o2 <- tapply(dat_oil$oth + dat_oil$oil, list(dat_oil$op_yr), mean)
-plot(1979:2017,o1 - o2, xlim = c(2000, 2018))
-legend("bottomleft", legend = "dat$oth - (dat_oil$oth + dat_oil$oil)", col=1, pch = 1)
-savePlot("oil_v_oth_2", type = "png")
+# windows(12,9)
+# plot(1979:2018,tapply(dat_oil$oil, list(dat_oil$op_yr), mean), ylim = c(0, 90), xlim = c(1990, 2018))
+# points(1979:2018,tapply(dat_oil$oth, list(dat_oil$op_yr), mean), col = 2, pch = 2)
+# points(1979:2018,tapply(dat$oth, list(dat$op_yr), mean), col = 3, pch = 3)
+# points(1979:2018,tapply(dat_oil$oth + dat_oil$oil, list(dat_oil$op_yr), mean), col = 4, pch = 4)
+# legend("topleft", legend = c("dat_oil$oil","dat_oil$oth", "dat$oth", "dat_oil$oil + dat_oil$oth"), pch=1:4, col = 1:4)
+# savePlot("oil_v_oth_1", type = "png")
+#
+# windows(12,9)
+# o1 <- tapply(dat$oth, list(dat$op_yr), mean)
+# o2 <- tapply(dat_oil$oth + dat_oil$oil, list(dat_oil$op_yr), mean)
+# plot(1979:2018,o1 - o2, xlim = c(2000, 2018))
+# legend("bottomleft", legend = "dat$oth - (dat_oil$oth + dat_oil$oil)", col=1, pch = 1)
+# savePlot("oil_v_oth_2", type = "png")
 
 # It looks like the best option is to use oth + oil
 dat_oil$ot2 <- dat_oil$oth + dat_oil$oil
@@ -186,12 +188,14 @@ load(file="../analyses/TW_newdat.RData")
 #table(dat$op_lon,dat$lon,useNA="always")
 table(dat$op_lon,useNA="always")
 table(dat$lon,useNA="always")
+table(dat$lon,dat$lon5,useNA="always")
 
 # Make maps to check regional patterns
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY","regY1","regY2","regB","regB1","regB2","regB3","regA","regA1","regA2","regA3","regA4","regA5")]
+regnames <- names(dat)[grep("reg", names(dat))]
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon",regnames)]
 windows(width=15,height=10)
-for(fld in c("regY","regY1","regY2","regB","regB1","regB2","regB3","regA","regA1","regA2","regA3","regA4","regA5")) {
+for(fld in regnames) {
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
   text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
@@ -203,21 +207,22 @@ table(is.na(dat$embark_dmy),dat$op_yr)
 head(dat)
 
 # Look for outliers. Individual sets with high catch are not a problem.
-table(prepdat$alb)   # ask sets with 910 alb
-table(prepdat$bet)   # ask set with 461 bet
-table(prepdat$yft)   # ask set with 1038
-table(prepdat$sbt)   # ask set with 380
-table(prepdat$ott)   # ask sets with 186
-table(prepdat$swo)   # ask sets with 269
-table(prepdat$mls)   # ask set with 454
-table(prepdat$bum)   # ask set with 130
-table(prepdat$blm)   # ask set with 75 blm
-table(prepdat$otb)   # ask sets with 150
-table(prepdat$skj)   # ask set with 143
-table(prepdat$sha)   # ask majority of sets (=719211) with 0 sha. Also one set with 663
-table(prepdat$oth)   # ask sets with 3059! But most (=636641) have 0.
-table(prepdat$hbf,useNA="always")  # 6408 with NA! All in 1973-75
-table(prepdat$hbf,prepdat$yr,useNA="always")  #
+table(dat$alb)   # ask sets with 1215 alb
+table(dat$bet)   # ask set with 461 bet
+table(dat$yft)   # ask set with 1038
+table(dat$ott)   # 131
+table(dat$swo)   # ask sets with 269
+table(dat$mls)   # 76
+table(dat$bum)   # ask set with 89
+table(dat$blm)   # 75
+table(dat$otb)   # 90
+table(dat$skj)   # 143
+table(dat$sha)   # 367
+table(dat$oth)   # 1107
+table(dat$sbt)   # 380
+table(dat$ot2)   # high
+table(dat$hbf,useNA="always")  # 6408 with NA! All in 1973-75
+table(dat$hbf,dat$yr,useNA="always")  #
 a <- table(dat$yr,round(dat$hbf,0),useNA="always")
 write.csv(a,"table hbf by year.csv")
 
@@ -239,7 +244,13 @@ simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue +
 windows(width=11,height=7)
 plot(simplemod)
 text(simplemod)
+savePlot("bet_tree", type = "png")
 
+simplemod <- rpart(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$othcpue + a$mlscpue + a$blmcpue + a$bumcpue)
+windows(width=11,height=7)
+plot(simplemod)
+text(simplemod)
+savePlot("yft_tree", type = "png")
 
 # ===================================================================================
 # Start the analysis proper
@@ -256,16 +267,18 @@ library("data.table")
 library("plyr")
 library("dplyr")
 library("cluster")
+library("fastcluster")
 library("splines")
 library("boot")
 library("beanplot")
 library("cpue.rfmo")
 
-projdir <- "~/IOTC/2019_CPUE_ALB/"
+projdir <- "~/IOTC/2019_CPUE_tropical/"
 twdir <- paste0(projdir, "TW/")
 twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(twdir,"clustering/")
+dir.create(clustdir)
 setwd(clustdir)
 #load(file="../analyses/TWdat.RData")
 load(file="../analyses/TW_newdat.RData")
@@ -273,15 +286,18 @@ load(file="../analyses/TW_newdat.RData")
 tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "sha", "ot2", "sbt")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-# plot_spfreqyq(indat = dat, reg_struc = "regY", splist = tw_allsp, flag = "TW", mfr = c(5,3))
-# plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
-plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = tw_allsp, flag = "TW", mfr = c(5,3))
-plot_spfreqyq(indat = dat, reg_struc = "regA5", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+dat2005 <- dat[dat$op_yr > 2005,]
+plot_spfreqyq(indat = dat2005, reg_struc = "regB2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+plot_spfreqyq(indat = dat2005, reg_struc = "regB3", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+plot_spfreqyq(indat = dat2005, reg_struc = "regY", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+plot_spfreqyq(indat = dat2005, reg_struc = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+# plot_spfreqyq(indat = dat2005, reg_struc = "regA4", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+# plot_spfreqyq(indat = dat2005, reg_struc = "regA5", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 
 # Put chosen species here
 use_sp <- c("alb","bet","yft","swo","mls","blm", "bum","ot2","sbt")
 # Variables to use
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_sp,"Total","sst","dmy","lat","lon","lat5","lon5", "regY","regY2","regB","regB3","regB2","regA","regA1","regA2","regA3","regA4","regA5")
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_sp,"Total","sst","dmy","lat","lon","lat5","lon5", regnames)
 
 
 ##########
@@ -290,12 +306,14 @@ rm(a,dat_oil,datold,pd,prepdat,dat1,dat2,ds,dat_std,junk,a1,a2,a3,a4,aprep,simpl
 
 # Determine the number of clusters. Come back and edit this.
 reglist <- list()
-reglist$regA4 <- list(allreg = 1:4, ncl = c(4,4,3,5))
-reglist$regA5 <- list(allreg = 1,   ncl = 5)
-reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
-reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
-reglist$regY <-  list(allreg = 1:6, ncl = c(3,4,4,4,5,5))
+# reglist$regA4 <- list(allreg = 1:4, ncl = c(4,4,3,5))
+# reglist$regA5 <- list(allreg = 1,   ncl = 5)
+reglist$regB2 <- list(allreg = 1:4, ncl = c(4,4,3,4))
+reglist$regB3 <- list(allreg = c(1,5), ncl = c(4,4,4,4,4))
+reglist$regB4 <- list(allreg = 1, ncl = c(4))
+reglist$regY <-  list(allreg = 1:6, ncl = c(5,4,3,4,5,5))
 reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,4,4,5,5,4))
+reglist$regY3 <- list(allreg = 1, ncl = c(5))
 
 flag="TW"
 
@@ -303,28 +321,33 @@ flag="TW"
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-# run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-# run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+# run_clustercode_byreg(indat=dat2005, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+# run_clustercode_byreg(indat=dat2005, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat2005, reg_struc = "regB2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat2005, reg_struc = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat2005, reg_struc = "regB4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat2005, reg_struc = "regY", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat2005, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat2005, reg_struc = "regY3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
 
-clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
-clk_A4 <- list(TW=clkeepTW_A4)
+# clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
+# clk_A4 <- list(TW=clkeepTW_A4)
+# clkeepTW_A5 <- list("alb"=list(c(1:5)))
+# clk_A5 <- list(TW=clkeepTW_A5)
 
-clkeepTW_A5 <- list("alb"=list(c(1:5)))
-clk_A5 <- list(TW=clkeepTW_A5)
+clkeepTW_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3),c(1,2,3,4)))
+clkeepTW_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clkeepTW_B4 <- list("bet"=list(c(1,2,3,4)))
+clkeepTW_Y <- list("yft"=list(c(1,2,3,4,5), c(1,2,3,4), c(1,2,3), c(1,2,3,4), c(1,2,3,4,5)), c(1,2,3,4,5))
+clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
+clkeepTW_Y3 <- list("yft"=list(c(1,2,3,4,5)))
 
-# clkeepTW_Y <- list("yft"=list(c(1,2,3), c(1,2,3,4), c(1,2,3), c(1,2,3,4),   c(1,2,3,4,5)), c(1,2,3,4,5))
-# clk_Y <- list(TW=clkeepTW_Y)
-#
-# clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
-# clk_Y2 <- list(TW=clkeepTW_Y2)
-#
-# clkeepTW_B2 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4)))
-# clk_B2 <- list(TW=clkeepTW_B2)
-#
-# clkeepTW_B3 <- list("bet"=list(c(1,2,3,4,5),c(1,2,3,4,5),c(2,3),c(1,2,3,4),c(1,2,3,4,5)))
-# clk_B3 <- list(TW=clkeepTW_B3)
+clk_Y <- list(TW=clkeepTW_Y)
+clk_Y2 <- list(TW=clkeepTW_Y2)
+clk_Y3 <- list(TW=clkeepTW_Y3)
+clk_B2 <- list(TW=clkeepTW_B2)
+clk_B3 <- list(TW=clkeepTW_B3)
+clk_B4 <- list(TW=clkeepTW_B4)
 
 # ========================================================
 # Standardizations, TW only
@@ -350,7 +373,7 @@ library("survival")
 library("cpue.rfmo")
 
 
-projdir <- "~/IOTC/2019_CPUE_ALB/"
+projdir <- "~/IOTC/2019_CPUE_tropical/"
 twdir <- paste0(projdir, "TW/")
 twylisis_dir <- paste0(twdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -386,10 +409,10 @@ runpars[["regY"]] <- list(runsp = "yft", regtype2 =  "Y", clk = clk_Y,  doregs =
 runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)
 
 regstr <- "regA4"; runreg <- 2; keepd <- TRUE; doflags <- "TW"
-maxyr <- 2018
+maxyr <- 2019
 
-run_standardization(runpars, doflags = "TW", regstr = "regY",  maxyr = 2018, do_early = FALSE)
-run_standardization(runpars, doflags = "TW", regstr = "regY2", maxyr = 2018, do_early = FALSE)
+run_standardization(runpars, doflags = "TW", regstr = "regY",  maxyr = 2019, do_early = FALSE)
+run_standardization(runpars, doflags = "TW", regstr = "regY2", maxyr = 2019, do_early = FALSE)
 
 
 ##### Finish here  #### -----------------------------------------------------------------

@@ -61,13 +61,21 @@ cc <- "iiiiiiiciiiiiiiiiiiiicciiiiii"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
 # Load initial test segment of data
+<<<<<<< HEAD
+a <- read_fwf(file=paste0(datadir,"/JPNLL_IO_201904.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+=======
 a <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+>>>>>>> e5f2f318829978191d194b0de2b4de88ab5cc773
 names(a)
 names(a) <- nms
 head(data.frame(a))
 
 # Load the entire dataset
+<<<<<<< HEAD
+dat1 <- read_fwf(file=paste0(datadir,"/JPNLL_IO_201904.dat"),fwf_widths(wdths),col_types=cc)
+=======
 dat1 <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc)
+>>>>>>> e5f2f318829978191d194b0de2b4de88ab5cc773
 a <- problems(dat1) # Report problems
 a[160:200,]
 names(dat1) <- nms
@@ -136,15 +144,16 @@ table(dat$vesselname,useNA="always")
 
 # Make maps to check regional patterns
 a <- unique(paste(dat$lat,dat$lon))
-a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon","regY", "regY1", "regY2", "regY3", "regB", "regB2", "regB3", "regB4")]
-windows(width=12,height=10)
-for(fld in c("regY", "regY1", "regY2", "regY3", "regB", "regB2", "regB3", "regB4")) {
+regnames <- names(dat)[grep("reg", names(dat))]
+a0 <- dat[match(a,paste(dat$lat,dat$lon)),c("lat","lon",regnames)]
+windows(width=15,height=10)
+for(fld in regnames) {
   reg <- with(a0,get(fld))
   plot(a0$lon,a0$lat,type="n",xlab="Longitude",ylab="Latitude",main=fld)
   text(a0$lon,a0$lat,labels=reg,cex=0.6,col=reg+1)
-  maps::map(add=T)
+  maps::map(database = "world", add=T, fill = F)
   savePlot(paste0("map_",fld),type="png")
-  }
+}
 
 # Plot effort proportions by yr & region, indicating proportions of strata with > 5000 hooks, i.e. at least 2 sets.
 regYord <- c(1,2,3,6,5,4)
@@ -458,12 +467,12 @@ r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
 
-run_clustercode_byreg(indat=dat, reg_struc = "regB2", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regB4", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY3", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regB2", clustid="lbid_mon", rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", clustid="lbid_mon", rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regB4", clustid="lbid_mon", rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY",  clustid="lbid_mon", rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY2", clustid="lbid_mon", rgl = reglist)
+run_clustercode_byreg(indat=dat, reg_struc = "regY3", clustid="lbid_mon", rgl = reglist)
 # run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
 # run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
 
@@ -497,17 +506,25 @@ jalysis_dir <- paste0(jpdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
-clkeepJP_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4,5), c(1,2,3,4), c(1,2,3,4)))
-clk_A4 <- list(JP=clkeepJP_A4)
+# clkeepJP_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4,5), c(1,2,3,4), c(1,2,3,4)))
+# clk_A4 <- list(JP=clkeepJP_A4)
+#
+# clkeepJP_A5 <- list("alb"=list(c(2,3,4)))
+# clk_A5 <- list(JP=clkeepJP_A5)
 
-clkeepJP_A5 <- list("alb"=list(c(2,3,4)))
-clk_A5 <- list(JP=clkeepJP_A5)
+clkeepJP_Y  <- list("yft"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(03),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepJP_Y3 <- list("yft"=list(c(1,2,3,4)))
+clkeepJP_B2 <- list("bet"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_B3 <- list("bet"=list(c(1,2,3,4), c(0), c(0), c(0), c(1,2,3,4)))
+clkeepJP_B4 <- list("bet"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
 
-clkeepJP_Y <- list("yft"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
+clk_B2 <- list(JP=clkeepJP_B2)
+clk_B3 <- list(JP=clkeepJP_B3)
+clk_B4 <- list(JP=clkeepJP_B4)
 clk_Y <- list(JP=clkeepJP_Y)
-
-clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3,4)))
 clk_Y2 <- list(JP=clkeepJP_Y2)
+clk_Y3 <- list(JP=clkeepJP_Y3)
 
 clkeepJP_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
 clk_B2 <- list(JP=clkeepJP_B2)

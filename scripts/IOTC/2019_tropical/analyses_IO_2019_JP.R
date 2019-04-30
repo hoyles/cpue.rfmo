@@ -544,6 +544,7 @@ regA5_minss <- list(minq_byreg = c(5), minvess=c(100), minll=c(50), minyrqtr = c
 regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
 regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
 regY_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40), minll=c(20,50,50,20,50,20), minyrqtr = c(20,50,50,20,50,20), minyqll = c(3,5,5,3,5,3))
+regB2_minss <- list(minq_byreg = c(5,5,5,5), minvess=c(100,100,100,100), minll=c(50,50,50,50), minyrqtr = c(50,50,50,50), minyqll = c(5,5,5,5))
 
 runpars <- list()
 runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss)
@@ -551,6 +552,7 @@ runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs 
 runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)
 runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)
 runpars[["regY"]] <- list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(2:5), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss)
+runpars[["regB2"]] <- list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = 1:4, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regB2_minss)
 
 regstr <- "regY2"; runreg <- 7; keepd <- TRUE; doflags <- "JP" # Values used for testing
 maxyr <- 2019

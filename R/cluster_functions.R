@@ -114,7 +114,10 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
 #' @param rgl A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
 #' @return Nothing is returned but each dataset is saved.
 #'
-run_clustercode_byreg <- function(indat, reg_struc, allsp, allabs, ncl="lst", plotPCA=F, clustid="tripidmon", allclust=F, flag, dohbf = TRUE, cvnames, rgl) {
+run_clustercode_byreg <- function(indat, reg_struc, allsp = parent.frame()$allsp,
+                                  allabs = parent.frame()$allabs, ncl="lst", plotPCA=F,
+                                  clustid="tripidmon", allclust=F, flag = parent.frame()$flag,
+                                  dohbf = TRUE, cvnames = parent.frame()$cvn, rgl) {
   if (ncl == "lst") ncl <- rgl[[reg_struc]]$ncl
   for(r in rgl[[reg_struc]]$allreg) {
     fnh <- paste(flag,reg_struc,r,sep="_")
@@ -236,8 +239,8 @@ make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid 
     }
     claratrp <- clara(atrp, ncl)  #clustering based upon the percent of spp in total catch of tuna
     claraset <- clara(aset, ncl)  #clustering based upon the percent of spp in total catch of tuna
-    kmtrp <- kmeans(atrp, centers = ncl, iter.max = 60)
-    kmset <- kmeans(aset, centers = ncl, iter.max = 60)
+    kmtrp <- kmeans(atrp, centers = ncl, iter.max = 60, nstart = 4)
+    kmset <- kmeans(aset, centers = ncl, iter.max = 60, nstart = 4)
     setdat$kcltrp <- kmtrp$cluster[match(setdat$TRIP_NUM, indat$TRIP_NUM)]
     setdat$clrtrp <- claratrp$clustering[match(setdat$TRIP_NUM, indat$TRIP_NUM)]
     setdat$hcltrp <- grptrp[match(setdat$TRIP_NUM, indat$TRIP_NUM)]

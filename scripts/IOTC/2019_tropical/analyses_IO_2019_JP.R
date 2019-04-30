@@ -509,6 +509,12 @@ clk_Y <- list(JP=clkeepJP_Y)
 clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3,4)))
 clk_Y2 <- list(JP=clkeepJP_Y2)
 
+clkeepJP_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clk_B2 <- list(JP=clkeepJP_B2)
+
+clkeepJP_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
+clk_B3 <- list(JP=clkeepJP_B3)
+
 minqtrs_Y  <- c(1,8,2,2,5,1)
 minqtrs_Y2  <- c(1,7,2,2,5,1,7)
 minqtrs_B2 <- c(8,8,2,2)

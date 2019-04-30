@@ -37,10 +37,10 @@ library("maps")
 library("mapdata")
 library("maptools")
 
-# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
-# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
-
-# Alternatively either:
+# The new library 'cpue.rfmo' replaces the 'support functions.r' file.
+# The command 'install_github("hoyles/cpue.rfmo")' should now install cpue.rfmo succcessfully.
+#
+# The current workaround is either:
 # a) download cpue.rfmo from github and compile it into a package, following the instructions here:
 # http://kbroman.org/pkg_primer/pages/build.html. This is the best approach; or
 # b) download cpue.rfmo from github, and install from the binary package (cpue.rfmo_0.1.0.zip) in the top dir.
@@ -53,21 +53,29 @@ library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ign
 
 # Load data. This section will only need to be changed if the data format changes.
 nms <- c("op_yr","op_mon","op_day","lat","latcode","lon","loncode","callsign",
-      "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid","bait")
-wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9,1)
-cc <- "iiiiiiiciiiiiiiiiiiiiccii"
+         "hbf","hooks","sbt","alb","bet","yft","swo","mls","bum","blm","trip_st","sas","shk","prefecture","vesselname","logbookid","bait","vtype","albw","betw","yftw")
+wdths <- c(4,2,2,2,1,3,1,6,3,6,3,3,3,3,3,3,3,3,8,3,4,3,30,9,1,1,5,5,5)
+cc <- "iiiiiiiciiiiiiiiiiiiicciiiiii"
 posses <- cumsum(c(1,wdths))
-cc <- "iiiiiiiciiiiiiiiiiiiiccii"
+cc <- "iiiiiiiciiiiiiiiiiiiicciiiiii"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
 # Load initial test segment of data
+<<<<<<< HEAD
 a <- read_fwf(file=paste0(datadir,"/JPNLL_IO_201904.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+=======
+a <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+>>>>>>> e5f2f318829978191d194b0de2b4de88ab5cc773
 names(a)
 names(a) <- nms
 head(data.frame(a))
 
 # Load the entire dataset
+<<<<<<< HEAD
 dat1 <- read_fwf(file=paste0(datadir,"/JPNLL_IO_201904.dat"),fwf_widths(wdths),col_types=cc)
+=======
+dat1 <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc)
+>>>>>>> e5f2f318829978191d194b0de2b4de88ab5cc773
 a <- problems(dat1) # Report problems
 a[160:200,]
 names(dat1) <- nms
@@ -442,12 +450,14 @@ str(dat[,allabs])
 reglist <- list()
 reglist$regA4 <- list(allreg = 1:4, ncl = c(4,5,4,4))
 reglist$regA5 <- list(allreg = 1,   ncl = 4)
-reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
-reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
+reglist$regB2 <- list(allreg = 1:4, ncl = c(4,4,4,4))
+#reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
+reglist$regB3 <- list(allreg = 1:5, ncl = c(4,4,4,4,4))
+#reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
 reglist$regB4 <- list(allreg = 1, ncl = c(5))
 reglist$regY <-  list(allreg = 1:6, ncl = c(4,4,4,4,4,4))
-reglist$regY2 <- list(allreg = c(2,7), ncl = c(4,5,5,5,5,5,4))
-reglist$regY2 <- list(allreg = 1, ncl = c(5))
+reglist$regY2 <- list(allreg = 2:7, ncl = c(5,5,5,5,5,4))
+reglist$regY3 <- list(allreg = 1, ncl = c(5))
 
 flag="JP"
 
@@ -550,15 +560,17 @@ regA4_minss <- list(minq_byreg = c(3,2,5,5), minvess=c(60,40,100,100), minll=c(3
 regA5_minss <- list(minq_byreg = c(5), minvess=c(100), minll=c(50), minyrqtr = c(50), minyqll = c(5))
 regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
 regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
+regY_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40), minll=c(20,50,50,20,50,20), minyrqtr = c(20,50,50,20,50,20), minyqll = c(3,5,5,3,5,3))
 
 runpars <- list()
-runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss)
-runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
-runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)
+runpars[["regA4"]] <- list(runsp = "alb", regtype2 = "A4", clk = clk_A4, doregs = 1:4, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA4_minss)
+runpars[["regB3"]] <- list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = 1:5, addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regB3_minss)
+runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)
 runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)
+runpars[["regY"]] <- list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(2:5), addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regY_minss)
 
 regstr <- "regY2"; runreg <- 7; keepd <- TRUE; doflags <- "JP" # Values used for testing
-maxyr <- 2018
+maxyr <- 2019
 for (regstr in c("regY2")) {
   rp <- runpars[[regstr]]
   runsp <- rp$runsp

@@ -1,12 +1,14 @@
 # Set up directories
 projdir <- "~/IOTC/2019_CPUE_tropical/"
-krdir <- paste0(projdir, "KR/")
-datadir <- paste0(krdir, "data/")
-kralysis_dir <- paste0(krdir, "analyses/")
-krfigs <- paste0(krdir, "figures/")
+natdir <- paste0(projdir, "KR/")
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-dir.create(kralysis_dir)
-setwd(kralysis_dir)
+
+dir.create(figdir)
+dir.create(analysis_dir)
+setwd(analysis_dir)
 
 # Install any missing packages
 #install.packages("date")
@@ -68,12 +70,12 @@ str(rawdat)
 splist <- c("alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj","swo","yft")
 prepdat <- dataprep_KR(rawdat, splist)
 head(prepdat)
-prepdat2 <- setup_IO_regions(prepdat,  regY=F, regY1=F, regY2=F, regB=F, regB3=F, regB2=F, regA=T, regA1=T, regA2=T, regA3=T, regA4=T, regA5=T)
+prepdat2 <- setup_IO_regions(prepdat,  regY=T, regY1=T, regY2=T, regY3=T, regB=T, regB2=T, regB3=T, regB4=T, regA=F, regA1=F, regA2=F, regA3=F, regA4=F, regA5=F)
 head(prepdat2)
-dat <- dataclean_KR(prepdat2, yearlim = 2018, splist = splist)
-save(prepdat,dat,file="KRdat.RData")
+dat <- dataclean_KR(prepdat2, yearlim = 2019, splist = splist)
+save(prepdat,dat,file=paste0(analysis_dir, "KRdat.RData"))
 
-load(file="KRdat.RData")
+load(file=paste0(analysis_dir, "KRdat.RData"))
 str(dat)
 summary(dat)
 table(dat$vessid,dat$op_yr)
@@ -162,15 +164,23 @@ for(fld in regnames) {
   savePlot(paste0("map_",fld),type="png")
 }
 
+# Mean fishing location, yrqtr scale
+windows(width=15,height=10);par(mfrow=c(1,2))
+ax <- tapply(dat$yrqtr,dat$yrqtr,mean); ay=tapply(dat$lat5,dat$yrqtr,mean)
+plot(ax,ay,xlab="yr",ylab="Mean latitude",type="n")
+a <- 4*(.125+dat$yrqtr-floor(dat$yrqtr))
+a <- tapply(a,dat$yrqtr,mean)
+text(ax,ay,a,cex=0.7)
+ax=tapply(dat$lon5,dat$yrqtr,mean);ay=tapply(dat$yrqtr,dat$yrqtr,mean)
+plot(ax,ay,ylab="yr",xlab="Mean longitude",type="n")
+text(ax,ay,a,cex=0.7)
+savePlot("mean_fishing_location1.png",type="png")
+
 # Mean fishing location, year scale
 windows(width=15,height=10);par(mfrow=c(1,2))
-plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat,dat$op_yr,mean),xlab="yr",ylab="Mean latitude")
-plot(tapply(dat$lon,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab="yr",xlab="Mean longitude")
-savePlot("mean_fishing_location 2.png",type="png")
-# Mean fishing location, yrqtr scale
-plot(tapply(dat$yrqtr,dat$yrqtr,mean),tapply(dat$lat,dat$yrqtr,mean),xlab="yr",ylab="Mean latitude")
-plot(tapply(dat$lon,dat$yrqtr,mean),tapply(dat$yrqtr,dat$yrqtr,mean),ylab="yr",xlab="Mean longitude")
-savePlot("mean_fishing_location 1.png",type="png")
+plot(tapply(dat$op_yr,dat$op_yr,mean),tapply(dat$lat5,dat$op_yr,mean),xlab="yr",ylab="Mean latitude")
+plot(tapply(dat$lon5,dat$op_yr,mean),tapply(dat$op_yr,dat$op_yr,mean),ylab="yr",xlab="Mean longitude")
+savePlot("mean_fishing_location2.png",type="png")
 
 # Store summaries of hbf by region and through time
 write.csv(table(round(dat$hbf,0),dat$regY,useNA="always"),file="hbf by region.csv")
@@ -213,6 +223,14 @@ a$mlscpue <- a$mls/a$hooks
 a$blmcpue <- a$blm/a$hooks
 a$bumcpue <- a$bum/a$hooks
 simplemod <- rpart(a$betcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$sfacpue + a$mlscpue + a$blmcpue + a$bumcpue)
+windows(width=11,height=7)
+plot(simplemod)
+text(simplemod)
+simplemod <- rpart(a$yftcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$albcpue + a$sfacpue + a$mlscpue + a$blmcpue + a$bumcpue)
+windows(width=11,height=7)
+plot(simplemod)
+text(simplemod)
+simplemod <- rpart(a$albcpue ~ a$lon + a$lat + a$yrqtr + a$swocpue + a$betcpue + a$yftcpue + a$sfacpue + a$mlscpue + a$blmcpue + a$bumcpue)
 windows(width=11,height=7)
 plot(simplemod)
 text(simplemod)
@@ -321,44 +339,46 @@ for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a,vbl=a$oth,dcd=d,latlim=c(-45,
 savePlot("Catchmap_OTH",type="png")
 for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a,vbl=a$skj,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SKJ Catch")
 savePlot("Catchmap_SKJ",type="png")
+graphics.off()
 
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$bet,dcd=d,latlim=c(-45,20),lonlim=c(40,120),ti="BET Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$bet,dcd=d,latlim=c(-45,20),lonlim=c(40,120),ti="BET Catch", delta = 5)
 savePlot("Catchmap5_BET",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$swo,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SWO Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$swo,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SWO Catch", delta = 5)
 savePlot("Catchmap5_SWO",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$alb,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="ALB Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$alb,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="ALB Catch", delta = 5)
 savePlot("Catchmap5_ALB",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sfa,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SFA Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sfa,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SFA Catch", delta = 5)
 savePlot("Catchmap5_sfa",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sha,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SHA Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sha,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SHA Catch", delta = 5)
 savePlot("Catchmap5_SHA",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$yft,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="YFT Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$yft,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="YFT Catch", delta = 5)
 savePlot("Catchmap5_YFT",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$mls,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="MLS Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$mls,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="MLS Catch", delta = 5)
 savePlot("Catchmap5_MLS",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sbt,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SBT Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$sbt,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SBT Catch", delta = 5)
 savePlot("Catchmap5_SBT",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$blm,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BLM Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$blm,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BLM Catch", delta = 5)
 savePlot("Catchmap5_BLM",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$bum,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BUM Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$bum,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BUM Catch", delta = 5)
 savePlot("Catchmap5_BUM",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$oth,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="OTH Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$oth,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="OTH Catch", delta = 5)
 savePlot("Catchmap5_OTH",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$skj,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SKJ Catch")
+for(d in seq(1975,2015, 5)) plot_catchmap2(indat=a5,vbl=a5$skj,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SKJ Catch", delta = 5)
 savePlot("Catchmap5_SKJ",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
+graphics.off()
 
 #CPUE maps
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
@@ -386,43 +406,45 @@ for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a,vb1=a$oth,vb2=a$hooks,dcd=d,la
 savePlot("Cpuemap_OTH",type="png")
 for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a,vb1=a$skj,vb2=a$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SKJ CPUE")
 savePlot("Cpuemap_SKJ",type="png")
+graphics.off()
 
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$bet,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(40,120),ti="BET CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$bet,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(40,120),ti="BET CPUE", delta = 5)
 savePlot("CPUEmap5_BET",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$swo,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SWO CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$swo,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SWO CPUE", delta = 5)
 savePlot("CPUEmap5_SWO",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$alb,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="ALB CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$alb,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="ALB CPUE", delta = 5)
 savePlot("CPUEmap5_ALB",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sfa,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SFA CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sfa,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SFA CPUE", delta = 5)
 savePlot("CPUEmap5_sfa",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sha,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SHA CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sha,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SHA CPUE", delta = 5)
 savePlot("CPUEmap5_SHA",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$yft,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="YFT CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$yft,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="YFT CPUE", delta = 5)
 savePlot("CPUEmap5_YFT",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$mls,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="MLS CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$mls,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="MLS CPUE", delta = 5)
 savePlot("CPUEmap5_MLS",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sbt,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SBT CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$sbt,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SBT CPUE", delta = 5)
 savePlot("CPUEmap5_SBT",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$blm,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BLM CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$blm,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BLM CPUE", delta = 5)
 savePlot("CPUEmap5_BLM",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$bum,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BUM CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$bum,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="BUM CPUE", delta = 5)
 savePlot("CPUEmap5_BUM",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$oth,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="OTH CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$oth,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="OTH CPUE", delta = 5)
 savePlot("CPUEmap5_OTH",type="png")
 windows(width=20,height=15);par(mfrow=c(3,3), mar = c(4,4,2,1)+.1)
-for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$skj,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SKJ CPUE")
+for(d in seq(1975,2015, 5)) plot_cpuemap2(indat=a5,vb1=a5$skj,vb2=a5$hooks,dcd=d,latlim=c(-45,20),lonlim=c(20,120),ti="SKJ CPUE", delta = 5)
 savePlot("CPUEmap5_SKJ",type="png")
+graphics.off()
 
 # ===================================================================================
 # Start the analysis proper
@@ -443,6 +465,7 @@ library("data.table")
 library("plyr")
 library("dplyr")
 library("cluster")
+library("fastcluster")
 library("splines")
 library("boot")
 library("beanplot")
@@ -450,17 +473,17 @@ library("beanplot")
 library("cpue.rfmo")
 
 projdir <- "~/IOTC/2019_CPUE_ALB/"
-krdir <- paste0(projdir, "KR/")
-datadir <- paste0(krdir, "data/")
-kralysis_dir <- paste0(krdir, "analyses/")
-krfigs <- paste0(krdir, "figures/")
+natdir <- paste0(projdir, "KR/")
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-clustdir <- paste0(krdir,"clustering/")
+clustdir <- paste0(natdir,"clustering/")
 
 dir.create(clustdir)
 
 setwd(clustdir)
-load(file=paste0(kralysis_dir, "KRdat.RData"))
+load(file=paste0(analysis_dir, "KRdat.RData"))
 
 # Set up input variables for clustering and standardization
 dat <- data.frame(dat)
@@ -468,14 +491,16 @@ kr_splist <-  c("alb","bet","blm","bum","mls","oth","sbt","sfa","sha","skj","swo
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
 # plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = kr_splist, flag = "KR", mfr = c(4,3))
-plot_spfreqyq(indat = dat, reg_struc = "regA4", splist = kr_splist, flag = "KR", mfr = c(4,3))
-plot_spfreqyq(indat = dat, reg_struc = "regA5", splist = kr_splist, flag = "KR", mfr = c(4,3))
+plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = kr_splist, flag = "KR", mfr = c(4,3))
+plot_spfreqyq(indat = dat, reg_struc = "regB3", splist = kr_splist, flag = "KR", mfr = c(4,3))
+graphics.off()
 
 # Put chosen species here
 use_splist <- c("alb","bet","blm","bum","mls","oth","sbt","swo","yft")
 
+regnames <- names(dat)[grep("reg", names(dat))]
 # Variables to use
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regA","regA1","regA2","regA3","regA4","regA5")
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5",regnames)
 str(dat[,allabs])
 
 # Determine the number of clusters. Come back and edit this.
@@ -483,9 +508,11 @@ reglist <- list()
 reglist$regA4 <- list(allreg = 1:4, ncl = c(5,4,4,4))
 reglist$regA5 <- list(allreg = 1,   ncl = 4)
 reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
-reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
-reglist$regY <-  list(allreg = 4, ncl = c(3,5,4,4,4,4))
+reglist$regB3 <- list(allreg = c(1,5), ncl = c(5,5,4,4,5))
+reglist$regB4 <- list(allreg = 1, ncl = c(5))
+reglist$regY <-  list(allreg = 4, ncl = c(3,5,4,4))
 reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,4,5,4,5,4))
+reglist$regY3 <- list(allreg = c(1), ncl = c(5))
 flag="KR"
 
 # Covariates to pass to next stage
@@ -493,11 +520,10 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lo
 r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
-# run_clustercode_byreg(indat=dat, reg_struc = "regY",  allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
-# run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
-
+dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
+for (rg in dorg) {
+  run_clustercode_byreg(indat=dat, reg_struc = rg, allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+}
 
 # ========================================================
 # Standardizations, Korea only
@@ -523,12 +549,12 @@ library("survival")
 library("cpue.rfmo")
 
 projdir <- "~/IOTC/2019_CPUE_ALB/"
-krdir <- paste0(projdir, "KR/")
-datadir <- paste0(krdir, "data/")
-kralysis_dir <- paste0(krdir, "analyses/")
-krfigs <- paste0(krdir, "figures/")
+natdir <- paste0(projdir, "KR/")
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-clustdir <- paste0(krdir,"clustering/")
+clustdir <- paste0(natdir,"clustering/")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
 clkeepKR_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4), c(1:4), c(1:4)))
@@ -555,7 +581,7 @@ stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",st
 ## ---------------------------------------------
 
 # With clusters, and hbf
-std_dir <- paste0(krdir,"std/")
+std_dir <- paste0(natdir,"std/")
 setwd(std_dir)
 
 # The runpars define the approach to be used in this run
@@ -571,7 +597,7 @@ runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs 
 runpars[["regA5"]] <- list(runsp = "alb", regtype2 = "A5", clk = clk_A5, doregs = 1,   addcl = TRUE, dohbf = TRUE, dohook = TRUE, cltype = "hcltrp", minss = regA5_minss)
 
 regstr <- "regY2"; runreg <- 2; keepd <- TRUE; doflags <- "KR" # Values used for testing
-maxyr <- 2018
+maxyr <- 2019
 for (regstr in c("regY2")) {
   rp <- runpars[[regstr]]
   runsp <- rp$runsp

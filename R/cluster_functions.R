@@ -16,10 +16,13 @@
 #' @param fnhead File name head
 #' @param ll5 If TRUE, ll5 variables are used instead of 1 degree versions
 #' @param covarnames Names of covariates to return with dataset.
+#' @param saveplot Should be set to FALSE when working in RMarkdown.
 #' @return The original dataset with added columns for the clusters and PCAs;
 #'
-clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T, clustid = "tripidmon", allclust = F, flag = "JP", dbh = TRUE,
-    cllist = NA, fnhead = "", ll5=F, covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr", "op_mon")) {
+clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA = T,
+                          clustid = "tripidmon", allclust = F, flag = "JP", dbh = TRUE,
+                          cllist = NA, fnhead = "", ll5=F,
+                          covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid", "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr", "op_mon"), saveplot = TRUE) {
     datr <- ddd[with(ddd, get(regtype)) == r, allabs]
     datr$reg <- datr[, regtype]
     spec_dat <- datr[, allsp]  #extract catch composition
@@ -28,13 +31,15 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
     for (sp in allsp) {
       if (sum(datr[,sp], na.rm = T) == 0) datr[1,sp] <- 1
     }
-    pcaset <- PCA_by_set(datr, Screeplotname = paste0(fnhead, " ", "screeplot set"), allsp)
-    pcatrp <- PCA_by_trip(datr, Screeplotname = paste0(fnhead, " ", "screeplot trip"), allsp, clustid = clustid)
+    pcaset <- PCA_by_set(datr, Screeplotname = paste0(fnhead, " ", "screeplot set"), allsp, saveplot)
+    pcatrp <- PCA_by_trip(datr, Screeplotname = paste0(fnhead, " ", "screeplot trip"), allsp, clustid = clustid, saveplot)
     #################### Clustering
     datr <- data.frame(datr)
-    cldat <- make_clusters(setdat = data.frame(datr), spp = allsp, ncl = ncl, titx = paste0(flag, " ", regtype, r, " "), setclust = F, tripid = clustid,
-        fname = fnhead, regtype = regtype)
-    plot_km_deviance_trip(ddd = datr, allsp, r = r, ti = fnhead, regtype = regtype, tripid = clustid)
+    cldat <- make_clusters(setdat = data.frame(datr), spp = allsp, ncl = ncl,
+                           titx = paste0(flag, " ", regtype, r, " "), setclust = F,
+                           tripid = clustid, fname = fnhead, regtype = regtype, saveplot = saveplot)
+    plot_km_deviance_trip(ddd = datr, allsp, r = r, ti = fnhead, regtype = regtype,
+                          tripid = clustid, saveplot = saveplot)
 
     # outputs
     datprop <- cldat$setdat
@@ -69,31 +74,48 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
         dataset <- cbind(datr[, covarnames], datr[, allsp], cldat$setdat[, cllist])
     ti = paste(fnhead, clustid, sep = "_")
     # Examine factors associated with each cluster or PCA
-    boxplots_spCL_comp(dat = dataset, cl = "hcltrp", ti = ti, outL = F, nsp = length(allsp), regtype = regtype, r = r, allsp)
-    beanplots_spCL_comp(dat = dataset, cl = "hcltrp", ti = ti, outL = F, nsp = length(allsp), regtype = regtype, r = r, allsp)
-    boxplots_CL(dat = dataset, cl = "hcltrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
-    boxplots_CL_bean(dat = dataset, cl = "hcltrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
-    map_clusters(ddd = dataset, cl = "hcltrp", ti = ti, lat5 = ll5, regtype = regtype, r = r, ncl = ncl)
+    boxplots_spCL_comp(dat = dataset, cl = "hcltrp", ti = ti, outL = F, nsp = length(allsp),
+                       regtype = regtype, r = r, allsp, saveplot = saveplot)
+    beanplots_spCL_comp(dat = dataset, cl = "hcltrp", ti = ti, outL = F, nsp = length(allsp),
+                        regtype = regtype, r = r, allsp, saveplot = saveplot)
+    boxplots_CL(dat = dataset, cl = "hcltrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5,
+                regtype = regtype, r = r, saveplot = saveplot)
+    boxplots_CL_bean(dat = dataset, cl = "hcltrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5,
+                     regtype = regtype, r = r, saveplot = saveplot)
+    map_clusters(ddd = dataset, cl = "hcltrp", ti = ti, lat5 = ll5,
+                 regtype = regtype, r = r, ncl = ncl, saveplot = saveplot)
     if (allclust) {
-        boxplots_spCL_comp(dat = dataset, cl = "kcltrp", ti = ti, outL = F, nsp = length(allsp), regtype = regtype, r = r, allsp)
-        boxplots_spCL_comp(dat = dataset, cl = "clrtrp", ti = ti, outL = F, nsp = length(allsp), regtype = regtype, r = r, allsp)
-        boxplots_spCL_comp(dat = dataset, cl = "kclset", ti = ti, outL = F, nsp = length(allsp), regtype = regtype, r = r, allsp)
-        boxplots_spCL_comp(dat = dataset, cl = "clrset", ti = ti, outL = F, nsp = length(allsp), regtype = regtype, r = r, allsp)
-        boxplots_CL(dat = dataset, cl = "kcltrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
-        boxplots_CL(dat = dataset, cl = "clrtrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
-        boxplots_CL(dat = dataset, cl = "FT", ti = ti, outL = F, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
-        boxplots_CL(dat = dataset, cl = "kclset", ti = ti, outL = F, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
-        boxplots_CL(dat = dataset, cl = "clrset", ti = ti, outL = F, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
+        boxplots_spCL_comp(dat = dataset, cl = "kcltrp", ti = ti, outL = F, nsp = length(allsp),
+                           regtype = regtype, r = r, allsp, saveplot = saveplot)
+        boxplots_spCL_comp(dat = dataset, cl = "clrtrp", ti = ti, outL = F, nsp = length(allsp),
+                           regtype = regtype, r = r, allsp, saveplot = saveplot)
+        boxplots_spCL_comp(dat = dataset, cl = "kclset", ti = ti, outL = F, nsp = length(allsp),
+                           regtype = regtype, r = r, allsp, saveplot = saveplot)
+        boxplots_spCL_comp(dat = dataset, cl = "clrset", ti = ti, outL = F, nsp = length(allsp),
+                           regtype = regtype, r = r, allsp, saveplot = saveplot)
+        boxplots_CL(dat = dataset, cl = "kcltrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5,
+                    regtype = regtype, r = r, saveplot = saveplot)
+        boxplots_CL(dat = dataset, cl = "clrtrp", ti = ti, outL = F, dohbf = dbh, lat5 = ll5,
+                    regtype = regtype, r = r, saveplot = saveplot)
+        boxplots_CL(dat = dataset, cl = "FT", ti = ti, outL = F, dohbf = dbh, lat5 = ll5,
+                    regtype = regtype, r = r, saveplot = saveplot)
+        boxplots_CL(dat = dataset, cl = "kclset", ti = ti, outL = F, dohbf = dbh, lat5 = ll5,
+                    regtype = regtype, r = r, saveplot = saveplot)
+        boxplots_CL(dat = dataset, cl = "clrset", ti = ti, outL = F, dohbf = dbh, lat5 = ll5,
+                    regtype = regtype, r = r, saveplot = saveplot)
     }
     graphics.off()
 
     if (plotPCA) {
-        boxplots_PCA(dat = dataset, nPCA = 4, ti = ti, dohbf = dbh, lat5 = ll5, regtype = regtype, r = r)
-        boxplots_spPCA(dat = dataset, nPCA = 4, ti = ti, nsp = 8, regtype = regtype, r = r, allsp)
-        mapPCA(ddd = dataset, nPCA = 4, ti = ti, lat5 = ll5, regtype = regtype, r = r)
-        boxplots_TPCA(dat = dataset, nPCA = 4, ti = ti, dohbf = dbh, lat5 = ll5)
-        boxplots_spTPCA(dat = dataset, nPCA = 4, ti = ti, nsp = 8, allsp)
-        mapTPCA(ddd = dataset, nPCA = 4, ti = ti, lat5 = ll5)
+        boxplots_PCA(dat = dataset, nPCA = 4, ti = ti, dohbf = dbh, lat5 = ll5, regtype = regtype,
+                     r = r, saveplot = saveplot)
+        boxplots_spPCA(dat = dataset, nPCA = 4, ti = ti, nsp = 8, regtype = regtype, r = r,
+                       allsp, saveplot = saveplot)
+        mapPCA(ddd = dataset, nPCA = 4, ti = ti, lat5 = ll5, regtype = regtype, r = r,
+               saveplot = saveplot)
+        boxplots_TPCA(dat = dataset, nPCA = 4, ti = ti, dohbf = dbh, lat5 = ll5, saveplot = saveplot)
+        boxplots_spTPCA(dat = dataset, nPCA = 4, ti = ti, nsp = 8, allsp, saveplot = saveplot)
+        mapTPCA(ddd = dataset, nPCA = 4, ti = ti, lat5 = ll5, saveplot = saveplot)
         graphics.off()
     }
     return(invisible(dataset))
@@ -112,16 +134,19 @@ clust_PCA_run <- function(r, ddd, allsp, allabs, regtype = "regY", ncl, plotPCA 
 #' @param dohbf Include HBF in cluster plots if TRUE.
 #' @param cvnames Names of covariates to return with dataset.
 #' @param rgl A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.
+#' @param saveplot Should be set to FALSE when working in RMarkdown.
+#' @param basedir The folder in which to save the dataset.
 #' @return Nothing is returned but each dataset is saved.
 #'
 run_clustercode_byreg <- function(indat, reg_struc, allsp = parent.frame()$allsp,
                                   allabs = parent.frame()$allabs, ncl="lst", plotPCA=F,
                                   clustid="tripidmon", allclust=F, flag = parent.frame()$flag,
-                                  dohbf = TRUE, cvnames = parent.frame()$cvn, rgl) {
+                                  dohbf = TRUE, cvnames = parent.frame()$cvn, rgl,
+                                  saveplot = TRUE, basedir = getwd()) {
   if (ncl == "lst") ncl <- rgl[[reg_struc]]$ncl
   for(r in rgl[[reg_struc]]$allreg) {
-    fnh <- paste(flag,reg_struc,r,sep="_")
-    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r], plotPCA=F, clustid="tripidmon", allclust=F, flag=flag, dbh = dohbf, fnhead=fnh,covarnames=cvnames)
+    fnh <- paste0(basedir, paste(flag,reg_struc,r,sep="_"))
+    dataset <- clust_PCA_run(r=r,ddd=indat,allsp=allsp,allabs=allabs,regtype=reg_struc,ncl=ncl[r], plotPCA=F, clustid="tripidmon", allclust=F, flag=flag, dbh = dohbf, fnhead=fnh,covarnames=cvnames, saveplot = saveplot)
     save(dataset,file=paste0(fnh,".RData"))
   }
 }
@@ -133,8 +158,9 @@ run_clustercode_byreg <- function(indat, reg_struc, allsp = parent.frame()$allsp
 #' @param allsp Species codes / variable names to use in the PCA.
 #' @param clustid Name of variable to aggregate across for trip-level clustering.
 #' @return A list of two objects based on standard PCA and binomial PCA.
+#' @param saveplot Should be set to FALSE when working in RMarkdown.
 #'
-PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp, clustid) {
+PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp, clustid, saveplot = TRUE) {
     spec_dat <- datr[, allsp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
     nspec <- length(allsp)
@@ -153,7 +179,7 @@ PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp, clustid) {
    dev.new(noRStudioGD = TRUE)
     plotnScree(OCtesttp)
     par(col = "black")
-    savePlot(Screeplotname, type = "png")
+    if (saveplot) savePlot(Screeplotname, type = "png")
     nPC = min(OCtesttp$Components$nkaiser, OCtesttp$Components$noc)  # retain number of PCs in combination with Eigenvalue > 1
     pcsBin = ifelse(pcs > 0.5, 1, 0)  ### GLM - DPC variable as binary PCs
     dimnames(pcsBin)[[2]] <- paste0("B", names(pcs))
@@ -167,8 +193,9 @@ PCA_by_trip <- function(datr, Screeplotname = "screeplot set", allsp, clustid) {
 #' @param Screeplotname File name of the diagnostic Scree plot.
 #' @param allsp Species codes / variable names to use in the PCA.
 #' @return A list of two objects based on standard PCA and binomial PCA.
+#' @param saveplot Should be set to FALSE when working in RMarkdown.
 #'
-PCA_by_set <- function(datr, Screeplotname = "screeplot set", allsp) {
+PCA_by_set <- function(datr, Screeplotname = "screeplot set", allsp, saveplot = TRUE) {
   spec_dat <- datr[, allsp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
     nspec <- length(allsp)
@@ -184,7 +211,7 @@ PCA_by_set <- function(datr, Screeplotname = "screeplot set", allsp) {
     dev.new(noRStudioGD = TRUE)
     plotnScree(OCtest)
     par(col = "black")
-    savePlot(Screeplotname, type = "png")
+    if (saveplot) savePlot(Screeplotname, type = "png")
     nPC = min(OCtest$Components$nkaiser, OCtest$Components$noc)  # retain number of PCs in combination with Eigenvalue > 1
     pcsBin = ifelse(pcs > 0.5, 1, 0)  ### GLM - DPC variable as binary PCs
     dimnames(pcsBin)[[2]] <- paste0("B", names(pcs))
@@ -201,9 +228,10 @@ PCA_by_set <- function(datr, Screeplotname = "screeplot set", allsp) {
 #' @param tripid Name of variable used to aggreate for trip-level clustering.
 #' @param fname File name header for saving plots.
 #' @param regtype Region type code.
+#' @param saveplot Should be set to FALSE when working in RMarkdown.
 #' @return A list of four objects: d, the normalised trip-level dataset; fit, the hclust results; clarax, the clara trip level results; setdat, all the clustering results, as additional columns added to the input dataset.
 #'
-make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid = "tripid", fname = "", regtype = "regY") {
+make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid = "tripid", fname = "", regtype = "regY", saveplot = TRUE) {
     setdat$TRIP_NUM <- as.vector(setdat[, tripid])
     spec_dat <- setdat[, spp]  #extract catch composition
     spec_dat$sum <- apply(spec_dat, 1, sum)
@@ -226,7 +254,7 @@ make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid 
     grptrp <- cutree(fittrp, k = ncl)  # cut tree into ncl clusters
     print(table(grptrp))
     rect.hclust(fittrp, k = ncl, border = "red")
-    savePlot(paste0(fname, "_hclusters_trip.png"), type = "png")
+    if (saveplot) savePlot(paste0(fname, "_hclusters_trip.png"), type = "png")
     if (setclust) {
         dset <- dist(aset, method = "euclidean")  # distance matrix
         fitset <- fastcluster::hclust(dset, method = "ward.D")
@@ -235,7 +263,7 @@ make_clusters <- function(setdat, spp, ncl = 5, titx = "", setclust = T, tripid 
         grpset <- cutree(fitset, k = ncl)  # cut tree into ncl clusters
         print(table(grpset))
         rect.hclust(fitset, k = ncl, border = "red")
-        savePlot(paste0(fname, "_hclusters_trip.png"), type = "png")
+        if (saveplot) savePlot(paste0(fname, "_hclusters_trip.png"), type = "png")
     }
     claratrp <- clara(atrp, ncl)  #clustering based upon the percent of spp in total catch of tuna
     claraset <- clara(aset, ncl)  #clustering based upon the percent of spp in total catch of tuna

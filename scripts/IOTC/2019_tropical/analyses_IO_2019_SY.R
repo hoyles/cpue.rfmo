@@ -122,6 +122,7 @@ sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbf","skh","bxq","sfa
 ### Plot the mean catch per year of each species by region, to use when deciding which species to cluster
 plot_spfreqyq(indat = dat, reg_struc = "regY", splist = sy_splist, flag = "SY", mfr = c(5,4))
 plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(5,4))
+graphics.off()
 
 # Put chosen species here
 cl_splist <- c("alb","bet","yft","swo","oil","mzz","bll")

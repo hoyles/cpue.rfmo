@@ -275,6 +275,7 @@ r=4
 
 # Do the clustering and save the results for later
 dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
+dorg <- c("regB4")
 for (rg in dorg) {
   run_clustercode_byreg(indat=dat, reg_struc = rg, allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
 }

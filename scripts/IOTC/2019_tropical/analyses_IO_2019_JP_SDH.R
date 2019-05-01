@@ -1,53 +1,28 @@
 # Set up directories
 projdir <- "~/IOTC/2019_CPUE_tropical/"
-jpdir <- paste0(projdir, "JP/")
-datadir <- paste0(jpdir, "data/")
-jalysis_dir <- paste0(jpdir, "analyses/")
-jpfigs <- paste0(jpdir, "figures/")
+natdir <- paste0(projdir, "JP/")
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-dir.create(jpfigs)
-dir.create(jalysis_dir)
-setwd(jalysis_dir)
+dir.create(figdir)
+dir.create(analysis_dir)
+setwd(analysis_dir)
 
-# Install any missing packages
-#install.packages("date")
-#install.packages("maps")
-#install.packages("mapdata")
-#install.packages("maptools")
-#install.packages("data.table")
-#install.packages("lunar")
-#install.packages("dtplyr")
-#install.packages("tm")
-#install.packages("devtools")
-#devtools::install_github("hadley/readr")
+### install.packages("../../../../../influ_0.8.zip", repos = NULL, type = "win.binary")
+library("influ",quietly = TRUE) # downloaded here (https://github.com/trophia/influ/releases/) after installing 'proto'
 
-# Load packages
-library("date")
-library(splines)
-library("data.table")
-library("lunar")
-library(lubridate)
-library(tidyverse)
-library(plyr)
-library(dplyr)
-library(dtplyr)
-library(tm)
-library(devtools)
-library("maps")
-library("mapdata")
-library("maptools")
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
+sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
+invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
-# The new library 'cpue.rfmo' replaces the 'support functions.r' file.
-# The command 'install_github("hoyles/cpue.rfmo")' should now install cpue.rfmo succcessfully.
-#
-# The current workaround is either:
-# a) download cpue.rfmo from github and compile it into a package, following the instructions here:
-# http://kbroman.org/pkg_primer/pages/build.html. This is the best approach; or
-# b) download cpue.rfmo from github, and install from the binary package (cpue.rfmo_0.1.0.zip) in the top dir.
-# Check first that cpue.rfmo has been recompiled to match the latest source code, which may not be the case.
-# c) ask me to email you a copy of the binary package, then install it.
+# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
+# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
 
-library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ignored.
+### Library developed by Simon
+### Built from the github sudo R CMD build
+#install.packages("../../../../../cpue.rfmo_0.1.0.zip",repos = NULL,type = "win.binary")
+library(cpue.rfmo)
 
 ##################
 
@@ -61,13 +36,13 @@ cc <- "iiiiiiiciiiiiiiiiiiiicciiiiii"
 cbind(nms,wdths,unlist(strsplit(cc,"")))
 
 # Load initial test segment of data
-a <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
+a <- read_fwf(file=paste0(datadir,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc,n_max=20);gc()
 names(a)
 names(a) <- nms
 head(data.frame(a))
 
 # Load the entire dataset
-dat1 <- read_fwf(file=paste0(datadir1,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc)
+dat1 <- read_fwf(file=paste0(datadir,"/JPNLL_IO_201904new.dat"),fwf_widths(wdths),col_types=cc)
 a <- problems(dat1) # Report problems
 a[160:200,]
 names(dat1) <- nms
@@ -77,13 +52,13 @@ table(dat1$op_yr)
 # Prepare and check the data
 rawdat <- as.data.frame(dat1)
 pd1 <- dataprep_JPIO(rawdat)
-pd2 <- setup_IO_regions(pd1, regY=T, regY1=T, regY2=T, regY3=T, regB=T, regB2=T, regB3=T, regB4=T, regA=F, regA1=F, regA2=F, regA3=F, regA4=F, regA5=F)
+pd2 <- setup_IO_regions(pd1, regY=T, regY1=F, regY2=T, regY3=T, regB=F, regB2=T, regB3=T, regB4=T, regA=F, regA1=F, regA2=F, regA3=F, regA4=F, regA5=F)
 
 jp_allsp <- c("sbt","alb","bet","yft","swo","mls","bum","blm","sas","shk")
 
 clndat <- dataclean_JPIO(rawdat, splist = jp_allsp)
 prepdat1 <- dataprep_JPIO(clndat)
-prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=T, regY2=T, regY3=T, regB=T, regB2=T, regB3=T, regB4=T, regA=F, regA1=F, regA2=F, regA3=F, regA4=F, regA5=F)
+prepdat <- setup_IO_regions(prepdat1,  regY=T, regY1=F, regY2=T, regY3=T, regB=F, regB2=T, regB3=T, regB4=T, regA=F, regA1=F, regA2=F, regA3=F, regA4=F, regA5=F)
 save(pd1, pd2, prepdat, file="prepdat.RData")
 
 dat <- make_lbidmon(prepdat)
@@ -387,35 +362,20 @@ savePlot("Rforest yft cpue",type="png")
 # ===================================================================================
 #Clustering
 
-library("date")
-library("lubridate")
-library("maps")
-library("mapdata")
-library("lunar")
-library("mgcv")
-library("randomForest")
-library("influ")
-library("nFactors")
-library("data.table")
-library("plyr")
-library("dplyr")
-library("cluster")
-library("fastcluster")
-library("splines")
-library("boot")
-library("beanplot")
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto','influ')
+invisible(lapply(packages, library, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
-library("cpue.rfmo")
+library(cpue.rfmo)
 
 projdir <- "~/IOTC/2019_CPUE_tropical/"
-jpdir <- paste0(projdir, "JP/")
-datadir <- paste0(jpdir, "data/")
-jalysis_dir <- paste0(jpdir, "analyses/")
+natdir <- paste0(projdir, "JP/")
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
-clusdir <- paste0(jpdir, "clustering/")
+clusdir <- paste0(natdir, "clustering/")
 dir.create(clusdir)
 setwd(clusdir)
-load(file=paste0(jalysis_dir,"JPdat.RData"))
+load(file=paste0(analysis_dir,"JPdat.RData"))
 str(dat)
 
 rm(dat2,prepdat,prepdat1,pd1,pd2,clndat,dat5214,rawdat,dataset,llv,dat9415b,dat9415hd,a5,lnk,a2,a0,a)
@@ -433,23 +393,22 @@ plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = jp_allsp, flag = "JP", 
 graphics.off()
 
 # Put chosen species here
-use_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbt")
+cl_splist <- c("alb","bet","yft","swo","mls","bum","blm","sbt")
 # Variables to use
-allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY2","regY3","regB","regB2","regB3","regB4")
+regnames <- names(dat)[grep("reg", names(dat))]
+allabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","lbid_mon","moon", cl_splist,"Total","dmy","lat","lon","lat5","lon5",regnames)
 str(dat[,allabs])
 
 # Determine the number of clusters. Come back and edit this.
 reglist <- list()
-reglist$regA4 <- list(allreg = 1:4, ncl = c(4,5,4,4))
-reglist$regA5 <- list(allreg = 1,   ncl = 4)
+# reglist$regA4 <- list(allreg = 1:4, ncl = c(4,5,4,4))
+# reglist$regA5 <- list(allreg = 1,   ncl = 4)
 reglist$regB2 <- list(allreg = 1:4, ncl = c(4,4,4,4))
-#reglist$regB2 <- list(allreg = 1:4, ncl = c(5,5,4,4))
-reglist$regB3 <- list(allreg = 1:5, ncl = c(4,4,4,4,4))
-#reglist$regB3 <- list(allreg = 1:5, ncl = c(5,5,4,4,5))
+reglist$regB3 <- list(allreg = c(1,5), ncl = c(5,0,0,0,4))
 reglist$regB4 <- list(allreg = 1, ncl = c(5))
 reglist$regY <-  list(allreg = 1:6, ncl = c(4,4,4,4,4,4))
-reglist$regY2 <- list(allreg = 2:7, ncl = c(5,5,5,5,5,4))
-reglist$regY3 <- list(allreg = 1, ncl = c(5))
+reglist$regY2 <- list(allreg = c(2,7), ncl = c(0,5,0,0,0,0,4))
+reglist$regY3 <- list(allreg = c(1), ncl = c(5))
 
 flag="JP"
 
@@ -459,42 +418,24 @@ r=4
 
 # Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
 
-run_clustercode_byreg(indat=dat, reg_struc = "regB2", clustid="lbid_mon", rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regB3", clustid="lbid_mon", rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regB4", clustid="lbid_mon", rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY",  clustid="lbid_mon", rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", clustid="lbid_mon", rgl = reglist)
-run_clustercode_byreg(indat=dat, reg_struc = "regY3", clustid="lbid_mon", rgl = reglist)
-# run_clustercode_byreg(indat=dat, reg_struc = "regA4", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
-# run_clustercode_byreg(indat=dat, reg_struc = "regA5", allsp=use_splist, allabs=allabs,clustid="lbid_mon", flag=flag, cvnames = cvn, rgl = reglist)
+dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
+for (rg in dorg) {
+  run_clustercode_byreg(indat=dat, reg_struc = rg, allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+}
 
 # ========================================================
 # Standardizations, Japan only
 # ========================================================
 
-library("date")
-library("splines")
-library("maps")
-library("mapdata")
-library("maptools")
-library("lunar")
-library("mgcv")
-library("randomForest")
-library("influ")
-library("nFactors")
-library("plyr")
-library("dplyr")
-library("data.table")
-library("cluster")
-library("beanplot")
-library("survival")
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto','influ')
+invisible(lapply(packages, library, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
-library("cpue.rfmo")
+library(cpue.rfmo)
 
 projdir <- "~/IOTC/2019_CPUE_tropical/"
-jpdir <- paste0(projdir, "JP/")
-datadir1 <- paste0(jpdir, "data/")
-jalysis_dir <- paste0(jpdir, "analyses/")
+natdir <- paste0(projdir, "JP/")
+datadir1 <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
@@ -549,7 +490,7 @@ stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",us
 
 # With clusters, and hbf
 
-resdir <- paste0(jalysis_dir,"std_cl_JPonly_hbf/")
+resdir <- paste0(analysis_dir,"std_cl_JPonly_hbf/")
 dir.create(resdir)
 setwd(resdir)
 

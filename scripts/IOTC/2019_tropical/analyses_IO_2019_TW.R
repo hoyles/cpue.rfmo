@@ -1,57 +1,29 @@
 # Set up directories
 projdir <- "~/IOTC/2019_CPUE_tropical/"
-twdir <- paste0(projdir, "TW/")
-datadir_oil <- paste0(twdir, "data/newfileadd1979-2018(preliminary for 2018)/")
-twylisis_dir <- paste0(twdir, "analyses/")
-twfigs <- paste0(twdir, "figures/")
+natdir <- paste0(projdir, "TW/")
+datadir <- paste0(natdir, "data/")
+datadir_oil <- paste0(natdir, "data/newfileadd1979-2018(preliminary for 2018)/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
+dir.create(figdir)
+dir.create(analysis_dir)
+setwd(analysis_dir)
 
-dir.create(twdir)
-dir.create(twylisis_dir)
-dir.create(twfigs)
-setwd(twylisis_dir)
+### install.packages("../../../../../influ_0.8.zip", repos = NULL, type = "win.binary")
+library("influ",quietly = TRUE) # downloaded here (https://github.com/trophia/influ/releases/) after installing 'proto'
 
-# Install any missing packages
-#install.packages("date")
-#install.packages("maps")
-#install.packages("mapdata")
-#install.packages("maptools")
-#install.packages("data.table")
-#install.packages("lunar")
-#install.packages("dtplyr")
-#install.packages("tm")
-#install.packages("devtools")
-#install.packages("tidyverse")
-#devtools::install_github("hadley/readr")
-
-# Load packages
-library("date")
-library(splines)
-library("maps")
-library("mapdata")
-library("maptools")
-library("data.table")
-library("lunar")
-library(lubridate)
-library(plyr)
-library(dplyr)
-library(dtplyr)
-library(tm)
-library(devtools)
-library(tidyverse)
-#library(readr)
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
+sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
+invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
 # The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
 # You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
 
-# Alternatively either:
-# a) download cpue.rfmo from github and compile it into a package, following the instructions here:
-# http://kbroman.org/pkg_primer/pages/build.html. This is the best approach; or
-# b) download cpue.rfmo from github, and install from the binary package (cpue.rfmo_0.1.0.zip) in the top dir.
-# Check first that cpue.rfmo has been recompiled to match the latest source code, which may not be the case.
-# c) ask me to email you a copy of the binary package, then install it.
-
-library(cpue.rfmo) # This will produce warnings (usually 19) but they can be ignored.
+### Library developed by Simon
+### Built from the github sudo R CMD build
+#install.packages("../../../../../cpue.rfmo_0.1.0.zip",repos = NULL,type = "win.binary")
+library(cpue.rfmo)
 
 ##################
 
@@ -257,31 +229,20 @@ savePlot("yft_tree", type = "png")
 # ===================================================================================
 #Clustering
 
-library("maps")
-library("mapdata")
-library("mgcv")
-library("randomForest")
-library("influ")
-library("nFactors")
-library("data.table")
-library("plyr")
-library("dplyr")
-library("cluster")
-library("fastcluster")
-library("splines")
-library("boot")
-library("beanplot")
-library("cpue.rfmo")
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto', 'influ')
+invisible(lapply(packages, library, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
+
+library(cpue.rfmo)
 
 projdir <- "~/IOTC/2019_CPUE_tropical/"
-twdir <- paste0(projdir, "TW/")
-twylisis_dir <- paste0(twdir, "analyses/")
+natdir <- paste0(projdir, "TW/")
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
-clustdir <- paste0(twdir,"clustering/")
+clustdir <- paste0(natdir, "clustering/")
 dir.create(clustdir)
 setwd(clustdir)
-#load(file="../analyses/TWdat.RData")
-load(file="../analyses/TW_newdat.RData")
+load(file=paste0(analysis_dir,"TW_newdat.RData"))
 
 tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "sha", "ot2", "sbt")
 
@@ -293,11 +254,13 @@ plot_spfreqyq(indat = dat2005, reg_struc = "regY", splist = tw_allsp, flag = "TW
 plot_spfreqyq(indat = dat2005, reg_struc = "regY2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 # plot_spfreqyq(indat = dat2005, reg_struc = "regA4", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 # plot_spfreqyq(indat = dat2005, reg_struc = "regA5", splist = tw_allsp, flag = "TW", mfr = c(5,3))
+graphics.off()
 
 # Put chosen species here
-use_sp <- c("alb","bet","yft","swo","mls","blm", "bum","ot2","sbt")
+cl_splist <- c("alb","bet","yft","swo","mls","blm", "bum","ot2","sbt")
 # Variables to use
-allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",use_sp,"Total","sst","dmy","lat","lon","lat5","lon5", regnames)
+regnames <- names(dat)[grep("reg", names(dat))]
+allabs <- c("vessid","callsign","yrqtr","latlong","op_yr","op_mon","hbf","hooks","tripid","tripidmon","moon","bt1","bt2","bt3","bt4","bt5",cl_splist,"Total","sst","dmy","lat","lon","lat5","lon5", regnames)
 
 
 ##########
@@ -309,10 +272,10 @@ reglist <- list()
 # reglist$regA4 <- list(allreg = 1:4, ncl = c(4,4,3,5))
 # reglist$regA5 <- list(allreg = 1,   ncl = 5)
 reglist$regB2 <- list(allreg = 1:4, ncl = c(4,4,3,4))
-reglist$regB3 <- list(allreg = c(1,5), ncl = c(4,4,4,4,4))
+reglist$regB3 <- list(allreg = c(1,5), ncl = c(4,0,0,0,4))
 reglist$regB4 <- list(allreg = 1, ncl = c(4))
 reglist$regY <-  list(allreg = 1:6, ncl = c(5,4,3,4,5,5))
-reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,4,4,5,5,4))
+reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,4,4,5,4,4))
 reglist$regY3 <- list(allreg = 1, ncl = c(5))
 
 flag="TW"
@@ -320,27 +283,33 @@ flag="TW"
 # Covariates to pass to next stage
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 
-# Do the clustering and save the results for later (we also need to decide on the ALB regional structures below)
-# run_clustercode_byreg(indat=dat2005, reg_struc = "regA4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-# run_clustercode_byreg(indat=dat2005, reg_struc = "regA5", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat2005, reg_struc = "regB2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat2005, reg_struc = "regB3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat2005, reg_struc = "regB4", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat2005, reg_struc = "regY", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat2005, reg_struc = "regY2", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
-run_clustercode_byreg(indat=dat2005, reg_struc = "regY3", allsp=use_sp, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist)
+dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
+for (rg in dorg) {
+  run_clustercode_byreg(indat=dat, reg_struc = rg, allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+}
 
 # clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
 # clk_A4 <- list(TW=clkeepTW_A4)
 # clkeepTW_A5 <- list("alb"=list(c(1:5)))
 # clk_A5 <- list(TW=clkeepTW_A5)
 
-clkeepTW_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3),c(1,2,3,4)))
-clkeepTW_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clkeepTW_B4 <- list("bet"=list(c(1,2,3,4)))
-clkeepTW_Y <- list("yft"=list(c(1,2,3,4,5), c(1,2,3,4), c(1,2,3), c(1,2,3,4), c(1,2,3,4,5)), c(1,2,3,4,5))
+clkeepTW_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(2)))
+# In R3 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye.
+# In R3 drop cl3, the oilfish fishery
+# In R4 drop cl1, cl3, and cl4, the albacore fishery.
+
+clkeepTW_B3 <- list("bet"=list(c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepTW_B4 <- list("bet"=list(c(2,3,4)))
+# In B4 R1 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye. Will give the wrong catch rates for regional scaling.
+
+clkeepTW_Y <- list("yft"=list(c(1,2,3,4,5), c(1,2,3,4), c(2), c(3,4), c(1,2,3,4,5), c(1,2,3,4,5)))
+# In R3 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye.
+# In R3 drop cl3, the oilfish fishery
+# In R4 drop cl1 and cl2, the albacore fishery.
+
 clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
 clkeepTW_Y3 <- list("yft"=list(c(1,2,3,4,5)))
+# In Y3 R1 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye. Will give the wrong catch rates for regional scaling.
 
 clk_Y <- list(TW=clkeepTW_Y)
 clk_Y2 <- list(TW=clkeepTW_Y2)
@@ -353,31 +322,18 @@ clk_B4 <- list(TW=clkeepTW_B4)
 # Standardizations, TW only
 # ========================================================
 
-library("date")
-library("splines")
-library("maps")
-library("mapdata")
-library("maptools")
-library("lunar")
-library("mgcv")
-library("randomForest")
-library("influ")
-library("nFactors")
-library("plyr")
-library("dplyr")
-library("data.table")
-library("cluster")
-library("beanplot")
-library("survival")
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto', 'influ')
+invisible(lapply(packages, library, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
-library("cpue.rfmo")
+library(cpue.rfmo)
 
 
 projdir <- "~/IOTC/2019_CPUE_tropical/"
-twdir <- paste0(projdir, "TW/")
-twylisis_dir <- paste0(twdir, "analyses/")
+natdir <- paste0(projdir, "TW/")
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
-clustdir <- paste0(twdir,"clustering/")
+clustdir <- paste0(natdir, "clustering/")
 
 std_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",std_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")

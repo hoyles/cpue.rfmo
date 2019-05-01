@@ -1,0 +1,306 @@
+---
+title: 'Standardisation of the Catch Per Unit Effort of the Seychelles deep-water longline fishery, 2000-2017'
+date: "`r format(Sys.time(), '%d %B %Y')`"
+author: Seychelles Fishing Authority # and edited by Simon Hoyle
+#classoption: landscape
+output: 
+  pdf_document: 
+    keep_tex: yes 
+  html_document: 
+    keep_md: yes 
+
+---
+
+```{r setup,echo=T,include=F}
+### knitR options
+
+projdir <- "~/IOTC/2019_CPUE_tropical/"
+natdir <- paste0(projdir, "SY/")
+
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
+Rdir <- paste0(projdir, "Rfiles/")
+clusdir <- paste0(natdir, "clustering/")
+dir.create(clusdir)
+
+dir.create(figdir)
+dir.create(analysis_dir)
+
+knitr::opts_knit$set(root.dir = natdir)
+knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,size='normalsize',fig.width = 7,fig.height = 7, fig.align='center', dev = c('png', 'pdf'), fig.path = 'analyses/')
+knitr::knit_hooks$set(inline = as.character)
+options(knitr.kable.NA = '')
+
+### Libraries
+#library("influ",quietly = TRUE) # downloaded here (https://github.com/trophia/influ/releases/) after installing 'proto'
+library("cpue.rfmo")
+
+packages=c('openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','readr','plyr','dplyr','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','magrittr','rgdal','RColorBrewer','scales','tm','proto')
+sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
+invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
+```
+
+```{r prep_functions,echo=F}
+# source("./setup_regions_IO.R") # To add the stock assessment regions to each fishing operation
+# source("./dataprep_SY.R")      # To add sum of catch for a selection of species and for the 3 tropical tunas, year-quarter, tripodmonth, moon phase, CWP55
+```
+
+# Data preparation
+
+```{r read_catch_effort_dataset_raw,echo=F,cache=T}
+
+catch_effort_dataset_raw <- read.csv("./data/LL_CE_N0.csv",header=TRUE,sep=';')
+catch_effort_dataset_raw <- catch_effort_dataset_raw[catch_effort_dataset_raw$LogYear %in% 2000:2017,]
+
+### Remove fishing operation with mistake in numbers of yellowfin caught (for now)
+catch_effort_dataset_raw <- catch_effort_dataset_raw[!is.na(catch_effort_dataset_raw$LogID) & catch_effort_dataset_raw$LogID != 1079520,]
+
+### Extract species names
+species_names <- names(catch_effort_dataset_raw)[19:45]
+
+### Replace NA values by 0 in the catch
+catch_effort_dataset_raw[,species_names][is.na(catch_effort_dataset_raw[,species_names])] <- 0
+
+### Select the fields of interest
+catch_effort_dataset_raw1 <- catch_effort_dataset_raw[, c("LogYear","LogMonth","LogDay","LatDec","LonDec", "HooksR_Final",species_names,"TripHistoryID","VessHistoryID","LogID","HooksBetweenFloats")]
+
+### Define the standard names
+nms <- c("op_yr","op_mon","op_day","lat","lon","hooks",tolower(species_names),"trip_st","vessid","logbookid","hbf")
+names(catch_effort_dataset_raw1) <- nms
+
+### Melt the catch data by for each operation and species
+catch_raw_melted <- melt(catch_effort_dataset_raw1[,c('logbookid','op_yr',tolower(species_names))],id.vars = c('logbookid','op_yr'), variable.name = 'species')
+```
+
+Catch, effort and size data for both Seychelles and foreign longliners operating within the Seychelles Exclusive Economic Zone through fishing agreements are managed by the Seychelles Fishing Authority with the software FINNS (Fisheries INtegrated Statistical System) developed by the Indian Ocean Tuna Commission. The software is composed of a database engine based on Microsoft SQL Server to store and validate the data, a central management console for administrative services (e.g. data-access security levels) and some plug-in modules for data entry or editing for instance (IOTC 2005).
+
+Catch-effort data presented here cover the period `r paste(min(catch_effort_dataset_raw$LogYear,na.rm=T),max(catch_effort_dataset_raw$LogYear,na.rm=T),sep='-')` as the data for 2018 are still very partial. Fisheries logbooks are sent to SFA through emails on a monthly basis. The level of logbook return increased from about 20% during 2000-2001 to more than 70% after 2003, exceeding 95% in most years. The geographic position for most operations was checked against VMS data which have been available since the early 2000s. The effort is expressed in number of hooks deployed. Unreported hooks in the logbooks were estimated from the average number of hooks deployed by the vessel in the same month or for the whole year. Information on the number of hooks between floats has become available since 2009. The raw catch-effort data set includes a total of `r prettyNum(nrow(catch_effort_dataset_raw1),big.mark=',')` fishing operations reported from `r length(unique(catch_effort_dataset_raw1$vessid))` different longliners. The number of species to be recorded in longliners' logbooks increased over time and currently includes a minimum of 10 primary species and 13 other species (Annex II of Res. 15/01). The list of species available in the Seychelles logbooks is provided in table \ref{lab::table::species}.
+
+```{r data_design_dictionary,echo=F}
+ddd <- openxlsx::read.xlsx('./data/metadata_catch_effort_data.xlsx',sheet='DDD')
+kable(ddd,row.names = F, caption = 'Description of the contents of the raw catch-effort data set extracted from the FINNS databaase')
+```
+
+```{r species_table,echo=F}
+species_table <- openxlsx::read.xlsx('./data/metadata_catch_effort_data.xlsx',sheet='logbook_species')
+species_table$ScientificName <- paste('_',species_table$ScientificName,'_',sep='')
+kable(species_table,row.names = F, caption = '\\label{lab::table::species}Species reported in the logbooks of the Seychelles deep-water longliners during 2000-2017')
+```
+
+```{r boxplot_numbers_per_species,echo=F,fig.show='asis',fig.cap='Distribution of numbers of fish caught and reported in the logbooks by species for each fishing operation of the Seychelles deep-water longliners during',eval=F, fig.path = 'analyses/'}
+boxplot(catch_raw_melted$value~catch_raw_melted$species,las=3,cex=.5,col='lightgrey',ylab="Number of fish caught")
+```
+
+```{r boxplot_numbers_per_year,echo=F,fig.show='asis',fig.cap='Distribution of numbers of fish caught and reported in the logbooks by fishing operation for the Seychelles deep-water longliners.',eval=F, fig.path = 'analyses/', dev=c('png', 'pdf')}
+boxplot(catch_raw_melted$value~catch_raw_melted$op_yr,las=3,cex=.5,col='lightgrey',ylab="Number of fish caught")
+```
+
+```{r filter_catch_effort_dataset,echo=F,eval=TRUE}
+### Remove species with less than number_caught_min fish caught throughout the time period
+number_caught_min <- 7000
+
+species_to_remove <- names(apply(catch_effort_dataset_raw1[,tolower(species_names)],2,sum)[(apply(catch_effort_dataset_raw1[,tolower(species_names)],2,sum)<=number_caught_min)])
+
+catch_effort_dataset1 <- catch_effort_dataset_raw1[,!(names(catch_effort_dataset_raw1) %in% species_to_remove)]
+
+### Remove vessels less than number_operations_min of fishing operations throughout the time period
+number_operations_min <- 50
+
+noperations_by_vessel <- ddply(catch_effort_dataset1,'vessid',summarize,nlogbookids=length(logbookid))
+vessels_to_remove <- noperations_by_vessel[noperations_by_vessel$nlogbookids<50,'vessid']
+
+catch_effort_dataset2 <- catch_effort_dataset1[!(catch_effort_dataset1$vessid %in% vessels_to_remove),]
+
+# Replace anormalous values of HBF by NAs, i.e. HBF > hbf_max
+hbf_max <- 31
+catch_effort_dataset2[!is.na(catch_effort_dataset2$hbf) & catch_effort_dataset2$hbf> hbf_max,'hbf'] <- NA
+
+### Add some fields to the data set: lunar illumination (moon), 5° long and lat, total catch (Total), and tuna catch (Total2), year of fishing trip, unique trip identifier
+prepdat <- dataprep_SY(catch_effort_dataset2, region = "IO", splist = c("alb","bet","blm","bsh","bum","bxq","mak","mls","mzz","oil","rsk","sbf","sfa","skh","swo","yft"))
+
+### Add assessment areas ----
+dat <- setup_IO_regions(prepdat, regY=TRUE, regY1=FALSE, regY2=TRUE, regY3=TRUE, regB=TRUE, regB1=TRUE, regB2=TRUE, regB3=TRUE, regB4=TRUE, regA=FALSE, regA1=FALSE, regA2=FALSE, regA3=FALSE, regA4=FALSE, regA5=FALSE)
+
+### Save the data
+save(dat,file="./data/SYdat.RData")
+```
+
+The catch effort data set was filtered:
+
+1. By removing the `r length(species_to_remove)` species from the data set for which the total number of fish caught throughout the period was less than `r prettyNum(number_caught_min,big.mark=',')` fish, i.e. `r paste0(toupper(species_to_remove),collapse = ', ')`;
+
+2. By removing the `r length(vessels_to_remove)` vessels that conducted less than `r number_operations_min` fishing operations throughout the period. This resulted in the removal of a total of `r prettyNum(nrow(catch_effort_dataset1) - nrow(catch_effort_dataset2),big.mark=',')` records from the data set;
+
+3. By replacing by NA all values of number of hooks between floats larger than a threshold of `r hbf_max` considered to represent a maximum value used by the Seychelles longline fleet.
+
+The final data set included `r prettyNum(nrow(dat),big.mark=',')` records of fishing operations made by `r length(unique(dat$vessid))` longliners during `r paste(min(dat$op_yr),max(dat$op_yr),sep='-')`.
+
+# Clustering
+
+```{r prepare_clustering,echo=F,eval=T, fig.path = 'clustering/'}
+# Set up input variables for clustering and standardization
+# Generate a group of billfish (mls = striped marlin, bum = blue marlin, blm = black marlin, bxq = marlins nei)
+# Attempt to include in the cluster
+dat$bll <- apply(dat[,c('mls','bum','blm','bxq')],1,sum,na.rm=T)
+
+### Set up input variables for clustering and standardization
+sy_allsp <-  c("alb","bet","yft","swo","mls","bum","blm","sbf","skh","bll","oil","mzz")
+
+### Plot the mean catch per year of each species by region, to use when deciding which species to cluster
+dev.new(noRStudioGD = TRUE)
+plot_spfreqyq(indat = dat, reg_struc = "regY", splist = sy_allsp, flag = "SY", mfr = c(4,3), saveplot = FALSE)
+plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_allsp, flag = "SY", mfr = c(4,3), saveplot = FALSE)
+
+# Put chosen species here
+use_splist <- c("bet","yft","swo","oil","bll","mzz","alb")
+
+# Variables to use
+dat$hbf <- 0 # Not used for anything, but needed to make the standardization code work.
+
+allabs <- c("op_yr","op_mon","vessid","yrqtr","latlong","hooks","hbf", "tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY2","regY3","regB","regB1","regB2","regB3","regB4")
+str(dat[,allabs])
+#allabs[!(allabs %in% names(dat))]
+
+### Determine the number of clusters. Come back and edit this
+### Not including YFT regs 1 and 6
+reglist <- list()
+reglist$regY <-  list(allreg = c(2:5), ncl = c(3,4,5,4,3))
+reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,5,4,3,5,4))
+reglist$regY3 <- list(allreg = c(1), ncl = c(4))
+reglist$regB2 <- list(allreg = c(1:4), ncl = c(4,4,5,4))
+reglist$regB3 <- list(allreg = c(1,5), ncl = c(4,4,5,4,4))
+reglist$regB4 <- list(allreg = c(1), ncl = c(4))
+flag="SY"
+
+### Flag
+
+### Covariates to pass to next stage
+cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
+```
+
+```{r run_clustering,echo=F,eval=T, fig.path = 'clustering/', root.dir = clusdir}
+# RegionY
+run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf = FALSE, saveplot = FALSE)
+
+# Focus on region Y2
+run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf = FALSE, saveplot = FALSE)
+
+# Focus on region Y3
+run_clustercode_byreg(indat=dat, reg_struc = "regY3", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf = FALSE, saveplot = FALSE)
+
+# Focus on region B2
+run_clustercode_byreg(indat=dat, reg_struc = "regB2", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf = FALSE, saveplot = FALSE)
+
+# Focus on region B3
+run_clustercode_byreg(indat=dat, reg_struc = "regB3", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf = FALSE, saveplot = FALSE)
+
+# Focus on region B4
+run_clustercode_byreg(indat=dat, reg_struc = "regB4", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf = FALSE, saveplot = FALSE)
+
+# Same clusterting with hbf information
+# Subset the data
+# setwd("./hbf/")
+# dat_with_hbf <- dat[!is.na(dat$hbf),]
+# dat_with_hbf$hbf <- as.numeric(dat_with_hbf$hbf)
+#
+# # Variables to use (add hbf)
+# allabs <- c("op_yr","op_mon","vessid","yrqtr","latlong","hooks","tripidmon","moon",use_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY2","regB","regB1","regB2","hbf")
+#
+# ### Covariates to pass to next stage (add hbf)
+# cvn <- c("yrqtr","latlong","hooks","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon","hbf")
+#
+# ### Plot species frequency
+# plot_spfreqyq(indat = dat_with_hbf, reg_struc = "regY2", splist = sy_allsp, flag = "SY", mfr = c(4,3))
+#
+# ### Run the clustering with hbf
+# run_clustercode_byreg(indat=dat_with_hbf, reg_struc = "regY2", allsp=use_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf = TRUE)
+```
+
+# Standardisation
+
+```{r prepare_standardisation,echo=F,eval=F}
+# Define the clusters to be used. Will need to set this up after checking the cluster allocations
+# clkeepSY_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0))) #works fine
+clkeepSY_Y <- list("yft"=list(c(1,2,3),c(1,2,3,4),c(1,2,3),c(2),c(0),c(0)))
+clk_Y <- list(SY=clkeepSY_Y)
+
+#clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0),c(1,2,3,4)))
+clkeepSY_Y2 <- list("yft"=list(c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(1,2,3),c(1,2,3),c(0),c(1,2,3,4)))
+clk_Y2 <- list(SY=clkeepSY_Y2)
+
+### Species
+use_splist <- c("alb","bet","yft")
+
+### Standard labels
+stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")
+
+# The runpars define the approach to be used in this run
+regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
+
+runpars <- list()
+
+### Works
+#runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2:5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)   #regB3_minss in Simon's code
+
+runpars[["regY2"]] <- list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,3,5,7), addcl = TRUE, dohbf = FALSE, dohook = TRUE, cltype = "hcltrp", minss = regY2_minss)   #regB3_minss in Simon's code
+
+regstr <- "regY2"; runreg <- 2; keepd <- TRUE; doflags <- "SY"
+maxyr <- 2018
+```
+
+```{r run_standardisation,echo=F,eval=F}
+for (regstr in c("regY2")) {
+  rp <- runpars[[regstr]]
+  runsp <- rp$runsp
+  addcl <- rp$addcl
+  dohbf <- rp$dohbf
+  jdat <- data.frame()
+  for (flag in doflags) {
+    for (r in rp$doregs) {
+      load(paste0(projdir,flag,"/clustering/",paste(flag,regstr,r,sep = "_"),".RData"))
+      dataset$flag <- flag
+      dataset$qtr <- revtrunc(defactor(dataset$yrqtr))
+      jdat <- rbind(jdat,dataset[,stdlabs])
+      rm(dataset)
+    }
+  }
+  jdat <- jdat[jdat$yrqtr < maxyr,]
+  jdat$vessidx <- jdat$vessid
+  jdat$vessid <- paste0(jdat$flag,jdat$vessid)
+  jdat$vessid <- as.factor(jdat$vessid)
+
+  vars <- c("vessid","hooks","yrqtr","latlong","hbf")
+  for (runreg in rp$doregs) {
+    glmdat <- select_data_IO2(jdat,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars)
+    if (nrow(glmdat) > 60000) glmdat <- samp_strat_data(glmdat,60)
+    wtt.all   <- mk_wts(glmdat,wttype = "area")
+    fmla.oplogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = T,nhbf = 3, dohook = rp$dohook)
+    fmla.oplogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = F,addcl = F,nhbf = 3, dohook = rp$dohook)
+    fmla.boatlogn <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = T,nhbf = 3, dohook = rp$dohook)
+    fmla.boatlogn_ncl <- make_formula_IO(runsp,modtype = "logn",dohbf = dohbf,addboat = T,addcl = F,nhbf = 3, dohook = rp$dohook)
+    mn <- with(glmdat,0.1 *  mean(get(runsp)/hooks))
+
+    modlab = "lognC_novess_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
+    if (lu(glmdat$clust) > 1)
+    { model <- glm(fmla.oplogn,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() } else
+    { model <- glm(fmla.oplogn_ncl,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() }
+    summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    modlab = "lognC_boat_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
+    if (lu(glmdat$clust) > 1)
+    { model <- glm(fmla.boatlogn,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() } else
+    { model <- glm(fmla.boatlogn_ncl,data = glmdat,weights = wtt.all,family = "gaussian", model = keepd);gc() }
+    summarize_and_store(mod = model,dat = glmdat,fname,modlab,dohbf = dohbf, keepd = keepd);rm(model)
+
+    # delta lognormal
+    modlab = "dellog_novess_allyrs"; fname <- paste0("Joint_", regstr,"_R",runreg);
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = F,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = rp$dohook)
+
+    modlab = "dellog_boat_allyrs"; fname <- paste0("Joint_",regstr,"_R",runreg)
+    do_deltalog(dat = glmdat,dohbf = dohbf,addboat = T,addcl = addcl,nhbf = 3,runsp = runsp,fname = fname,modlab = modlab, keepd = keepd, dohook = rp$dohook)
+
+    graphics.off()
+  }
+}
+```

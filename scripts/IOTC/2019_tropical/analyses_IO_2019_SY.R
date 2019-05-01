@@ -1,134 +1,115 @@
 ### --- DATA PREPARATION ----
 
 ### --- Paths ----
-projdir <- "~/IOTC/2018_CPUE/"
-sydir <- paste0(projdir,"SY/")
-datadir1 <- paste0(sydir,"data/catcheffort/")
-syalysis_dir <- paste0(sydir,"analyses/")
-syfigs <- paste0(sydir, "figures/")
-Rdir <- paste0(projdir, "Rfiles/")
-clusdir <- paste0(sydir, "clustering/")
-setwd(syalysis_dir)
+projdir <- "~/IOTC/2019_CPUE_tropical/"
+natdir <- paste0(projdir, "SY/")
 
-### --- Libraries ----
-library("date",quietly = TRUE)
-library("splines",quietly = TRUE)
-library("maps",quietly = TRUE)
-library("mapdata",quietly = TRUE)
-library("maptools",quietly = TRUE)
-library("lunar",quietly = TRUE)
-library("lubridate",quietly = TRUE)
-library("readr",quietly = TRUE)
-library("plyr",quietly = TRUE)
-library("dplyr",quietly = TRUE)
-library("mgcv",quietly = TRUE)
-library("randomForest",quietly = TRUE)
-library("nFactors",quietly = TRUE)
-library("data.table",quietly = TRUE)
-library("cluster",quietly = TRUE)
-library("boot",quietly = TRUE)
-library("beanplot",quietly = TRUE)
+datadir <- paste0(natdir, "data/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
+Rdir <- paste0(projdir, "Rfiles/")
+clustdir <- paste0(natdir, "clustering/")
+dir.create(clustdir)
+
+dir.create(figdir)
+dir.create(analysis_dir)
+setwd(analysis_dir)
 
 ### install.packages("../../../../../influ_0.8.zip", repos = NULL, type = "win.binary")
 library("influ",quietly = TRUE) # downloaded here (https://github.com/trophia/influ/releases/) after installing 'proto'
-library(lubridate)   # dates management
-library(magrittr)    # for the %>% symbol used in setup_IO_regions()
 
-### Added by manu
-library(rgdal)  #readOGR for reading shapefile
-library(RColorBrewer) #color palettes with brewer.pal()
-library(scales)       #color gradient with alpha()
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
+sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
+invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
+
+# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
+# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
 
 ### Library developed by Simon
 ### Built from the github sudo R CMD build
 #install.packages("../../../../../cpue.rfmo_0.1.0.zip",repos = NULL,type = "win.binary")
 library(cpue.rfmo)
 
-# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
-# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
-
-
-### Sources functions updated through the GitHub (instead of loading the library as it needs to be built)
-# source("../../../../../R/dataclean_functions.R")
-# source("../../../../../R/dataprep_functions.R")
 
 ### Read the data set ----
-fulldataset <- read.csv(paste0(datadir1,"LL_CE_N0.csv"),sep = ",", header = TRUE)
-names(fulldataset[,19:40])  # 22 species reported
+catch_effort_dataset_raw <- read.csv("../data/LL_CE_N0.csv",header=TRUE,sep=';')
+catch_effort_dataset_raw <- catch_effort_dataset_raw[catch_effort_dataset_raw$LogYear %in% 2000:2017,]
 
-### Add TripHistoryID that is missing: Generate a new one from vesselid and year-month
-fulldataset$TripID <- paste(fulldataset$VessHistoryID, fulldataset$LogYear,fulldataset$LogMonth,sep="-")
+### Remove fishing operation with mistake in numbers of yellowfin caught (for now)
+catch_effort_dataset_raw <- catch_effort_dataset_raw[!is.na(catch_effort_dataset_raw$LogID) & catch_effort_dataset_raw$LogID != 1079520,]
 
-### Filter the data set ----
+### Extract species names
+species_names <- names(catch_effort_dataset_raw)[19:45]
 
-### Select years and remove some inconsistent vessels
-seldat1 <- fulldataset[fulldataset$LogYear %in% 2000:2016 & !(fulldataset$VesselName %in% c('ADMIRAL DE RUITER','CARINA','BOUZON')),]
+### Replace NA values by 0 in the catch
+catch_effort_dataset_raw[,species_names][is.na(catch_effort_dataset_raw[,species_names])] <- 0
 
-# Remove species with very few catch: BAR (Sphyraena spp), OCS (Carcharhinus longimanus), POR (Lamna nasus), SKJ (Katsuwonus pelamis), SSP (Tetrapturus angustirostris), THR (Alopias spp)
-seldat2 <- seldat1[, c("LogYear","LogMonth","LogDay","LatDec","LonDec", "HooksR_Final","ALB","BET","BLM","BSH","BUM","BXQ","MAK","MLS","MZZ","OIL","RSK","SBF","SFA","SKH","SWO","YFT","TripID","VessHistoryID","LogID")]
+### Select the fields of interest
+catch_effort_dataset_raw1 <- catch_effort_dataset_raw[, c("LogYear","LogMonth","LogDay","LatDec","LonDec", "HooksR_Final",species_names,"TripHistoryID","VessHistoryID","LogID","HooksBetweenFloats")]
 
 ### Define the standard names
-nms <- c("op_yr","op_mon","op_day","lat","lon","hooks","alb","bet","blm","bsh","bum","bxq","mak","mls","mzz","oil","rsk","sbf","sfa","skh","swo","yft","trip_st","vessid","logbookid")
-names(seldat2) <- nms
-head(seldat2,1)
+nms <- c("op_yr","op_mon","op_day","lat","lon","hooks",tolower(species_names),"trip_st","vessid","logbookid","hbf")
+names(catch_effort_dataset_raw1) <- nms
 
-### Clean the data ----
-clndat <- dataclean_SY(seldat2, rmssp = FALSE, splist = c("alb","bet","blm","bsh","bum","bxq","mak","mls","mzz","oil","rsk","sbf","sfa","skh","swo","yft"))
+### Melt the catch data by for each operation and species
+catch_raw_melted <- melt(catch_effort_dataset_raw1[,c('logbookid','op_yr',tolower(species_names))],id.vars = c('logbookid','op_yr'), variable.name = 'species')
+
 
 ### Prepare the data ----
+number_caught_min <- 7000
+
+species_to_remove <- names(apply(catch_effort_dataset_raw1[,tolower(species_names)],2,sum)[(apply(catch_effort_dataset_raw1[,tolower(species_names)],2,sum)<=number_caught_min)])
+
+catch_effort_dataset1 <- catch_effort_dataset_raw1[,!(names(catch_effort_dataset_raw1) %in% species_to_remove)]
+
+### Remove vessels less than number_operations_min of fishing operations throughout the time period
+number_operations_min <- 50
+
+noperations_by_vessel <- ddply(catch_effort_dataset1,'vessid',summarize,nlogbookids=length(logbookid))
+vessels_to_remove <- noperations_by_vessel[noperations_by_vessel$nlogbookids<50,'vessid']
+
+catch_effort_dataset2 <- catch_effort_dataset1[!(catch_effort_dataset1$vessid %in% vessels_to_remove),]
+
+# Replace anormalous values of HBF by NAs, i.e. HBF > hbf_max
+hbf_max <- 31
+catch_effort_dataset2[!is.na(catch_effort_dataset2$hbf) & catch_effort_dataset2$hbf> hbf_max,'hbf'] <- NA
+
 ### Add some fields to the data set: lunar illumination (moon), 5° long and lat, total catch (Total), and tuna catch (Total2), year of fishing trip, unique trip identifier
-prepdat <- dataprep_SY(clndat, region = "IO", splist = c("alb","bet","blm","bsh","bum","bxq","mak","mls","mzz","oil","rsk","sbf","sfa","skh","swo","yft"))
+prepdat <- dataprep_SY(catch_effort_dataset2, region = "IO", splist = c("alb","bet","blm","bsh","bum","bxq","mak","mls","mzz","oil","rsk","sbf","sfa","skh","swo","yft"))
 
 ### Add assessment areas ----
-dat <- setup_IO_regions(prepdat, regY=TRUE, regY1=FALSE, regY2=TRUE,regB=TRUE,regB1=TRUE, regB2=TRUE, regB3=TRUE, regA=FALSE, regA1=FALSE, regA2=FALSE, regA3=FALSE, regA4=FALSE, regA5=FALSE)
+dat <- setup_IO_regions(prepdat, regY=TRUE, regY1=FALSE, regY2=TRUE, regY3=TRUE, regB=TRUE, regB1=TRUE, regB2=TRUE, regB3=TRUE, regB4=TRUE, regA=FALSE, regA1=FALSE, regA2=FALSE, regA3=FALSE, regA4=FALSE, regA5=FALSE)
 
-### Save the data ----
-save(dat,file=paste(datadir1,"SYdatx.RData",sep=""))
+### Save the data
+save(dat,file="../data/SYdat.RData")
 
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ### DATA CLUSTERING ----
 
-projdir <- "~/IOTC/2018_CPUE/"
-sydir <- paste0(projdir, "SY/")
-datadir1 <- paste0(sydir, "data/catcheffort/")
-syalysis_dir <- paste0(sydir, "analyses/")
-syfigs <- paste0(sydir, "figures/")
+projdir <- "~/IOTC/2019_CPUE_tropical/"
+natdir <- paste0(projdir, "SY/")
+datadir1 <- paste0(natdir, "data/catcheffort/")
+analysis_dir <- paste0(natdir, "analyses/")
+figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-clusdir <- paste0(sydir, "clustering/")
+clustdir <- paste0(natdir, "clustering/")
 
-# Libraries ----
-library("date",quietly = TRUE)
-library("splines",quietly = TRUE)
-library("maps",quietly = TRUE)
-library("mapdata",quietly = TRUE)
-library("maptools",quietly = TRUE)
-library("data.table",quietly = TRUE)
-library("lunar",quietly = TRUE)
-library("lubridate",quietly = TRUE)
-library("readr",quietly = TRUE)
-library("plyr",quietly = TRUE)
-library("dplyr",quietly = TRUE)
-library("dtplyr",quietly = TRUE,warn.conflicts = FALSE)
-library("tm",quietly = TRUE)
-library(cpue.rfmo, warn.conflicts = FALSE)
+dir.create(clustdir)
 
-### Libraries for clustering
-library("randomForest",quietly=TRUE)
-library("influ",quietly=TRUE)
-library("nFactors",quietly=TRUE)
-library("cluster",quietly=TRUE)
-library("boot",quietly=TRUE)
-library("beanplot",quietly=TRUE)
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
+sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
+invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
+
+library("cpue.rfmo")
 
 ### Load the data ----
-load(file=paste0(datadir1,"SYdat.RData"))
-load(file=paste0(datadir1,"SYdatx.RData"))
+load(file=paste0(datadir,"SYdat.RData"))
 str(dat)
 
 ### Set the working directory ----
-setwd(clusdir)
+setwd(clustdir)
 
 # Set up input variables for clustering and standardization
 # Generate a group of billfish (mls = striped marlin, bum = blue marlin, blm = black marlin, bxq = marlins nei)
@@ -140,25 +121,29 @@ sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbf","skh","bxq","sfa
 
 ### Plot the mean catch per year of each species by region, to use when deciding which species to cluster
 plot_spfreqyq(indat = dat, reg_struc = "regY", splist = sy_splist, flag = "SY", mfr = c(5,4))
-plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(4,3))
+plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(5,4))
 
 # Put chosen species here
 cl_splist <- c("alb","bet","yft","swo","oil","mzz","bll")
 
 # Variables to use
 dat$hbf <- 0 # Not used for anything, but needed to make the standardization code work.
-allabs <- c("op_yr","op_mon","vessid","yrqtr","latlong","hooks","hbf","tripidmon","moon",cl_splist,"Total","dmy","lat","lon","lat5","lon5","regY","regY2","regB","regB1","regB2")
+regnames <- names(dat)[grep("reg", names(dat))]
+allabs <- c("op_yr","op_mon","vessid","yrqtr","latlong","hooks","hbf","tripidmon","moon",cl_splist,"Total","lat","lon","lat5","lon5",regnames)
 str(dat[,allabs])
 #allabs[!(allabs %in% names(dat))]
 
 ### Determine the number of clusters. Come back and edit this
 reglist <- list()
-reglist$regY <-  list(allreg = c(1,2,3,4,5), ncl = c(3,4,5,4,5))
-reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,5,4,5,5,4))
+reglist$regY <-  list(allreg = c(2:5), ncl = c(3,4,4,4,4))
+reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,5,4,3,5,4))
+reglist$regY3 <- list(allreg = c(1), ncl = c(4))
+reglist$regB2 <- list(allreg = c(1:4), ncl = c(4,4,5,4))
+reglist$regB3 <- list(allreg = c(1,5), ncl = c(4,4,5,4,4))
+reglist$regB4 <- list(allreg = c(1), ncl = c(5))
 flag="SY"
 
 ### Covariates to pass to next stage
-#cvn <- c("yrqtr","latlong","hooks",      "vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 cvn <- c("yrqtr","latlong","hooks","hbf","vessid","Total","lat","lon","lat5","lon5","moon","op_yr","op_mon")
 ### r parameter?
 r <- 4
@@ -168,11 +153,10 @@ r <- 4
 ### Read the cluster functions new version
 #source("../../../../../R/cluster_functions.R")
 
-# RegionY
-run_clustercode_byreg(indat=dat, reg_struc = "regY", allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf=F)
-
-# Region Y2
-run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl = reglist, dohbf=F)
+dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
+for (rg in dorg) {
+  run_clustercode_byreg(indat=dat, reg_struc = rg, allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+}
 
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ### %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,14 +164,14 @@ run_clustercode_byreg(indat=dat, reg_struc = "regY2", allsp=cl_splist, allabs=al
 ### CPUE STANDARDISATION ----
 
 ### --- Paths ----
-projdir <- "~/IOTC/2018_CPUE/"
-sydir <- paste0(projdir,"SY/")
-datadir1 <- paste0(sydir,"data/catcheffort/")
-syalysis_dir <- paste0(sydir,"analyses/")
-syfigs <- paste0(sydir, "figures/")
+projdir <- "~/IOTC/2019_CPUE_tropical/"
+natdir <- paste0(projdir,"SY/")
+datadir1 <- paste0(natdir,"data/catcheffort/")
+analysis_dir <- paste0(natdir,"analyses/")
+figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
-clusdir <- paste0(sydir, "clustering/")
-setwd(syalysis_dir)
+clustdir <- paste0(natdir, "clustering/")
+setwd(analysis_dir)
 
 ### Libraries ----
 library("date")
@@ -232,7 +216,7 @@ stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",us
 ## ---------------------------------------------
 
 # With clusters, and hbf
-std_dir <- paste0(sydir,"std/")
+std_dir <- paste0(natdir,"std/")
 setwd(std_dir)
 
 # The runpars define the approach to be used in this run

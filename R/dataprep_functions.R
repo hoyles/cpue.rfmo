@@ -623,6 +623,7 @@ dataprep_SY <- function(dat, region, splist) {
   # New fields
   dat$yrqtr <- dat$op_yr + floor((dat$op_mon - 1)/3)/4 + 0.125
   dat$tripidmon <- as.factor(paste(dat$vessid, dat$op_yr, dat$op_mon))  # id trip-month
+  dat$dmy <- as.Date(paste(dat$op_yr, dat$op_mon, dat$op_day, sep = "-")) # Generate dmy field
   dat$moon <- lunar.illumination(dat$dmy)                               #
 
   # geographic positions

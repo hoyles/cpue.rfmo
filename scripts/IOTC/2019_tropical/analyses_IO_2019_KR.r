@@ -557,18 +557,27 @@ Rdir <- paste0(projdir, "Rfiles/")
 clustdir <- paste0(natdir,"clustering/")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
-clkeepKR_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4), c(1:4), c(1:4)))
-clk_A4 <- list(KR=clkeepKR_A4)
-
-#clkeepKR_A5 <- list("alb"=list(c(2,3,5)))
-clkeepKR_A5 <- list("alb"=list(c(1:4)))
-clk_A5 <- list(KR=clkeepKR_A5)
+# clkeepKR_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4), c(1:4), c(1:4)))
+# clk_A4 <- list(KR=clkeepKR_A4)
+#
+# #clkeepKR_A5 <- list("alb"=list(c(2,3,5)))
+# clkeepKR_A5 <- list("alb"=list(c(1:4)))
+# clk_A5 <- list(KR=clkeepKR_A5)
 
 clkeepKR_Y <- list("yft"=list(c(1,2,3),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(1,2,3,4)))
-clk_Y <- list(KR=clkeepKR_Y)
+clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(0),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepKR_Y3 <- list("yft"=list(c(1,2,3,4)))
 
-clkeepKR_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(1,2,3,4),c(1,2,3,4),c(0),c(1,2,3,4)))
+clkeepKR_B2 <- list("bet"=list(c(1,2,3),c(1,2,3,4),c(1,2,3),c(1,2,3,4)))
+clkeepKR_B3 <- list("bet"=list(c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepKR_B4 <- list("bet"=list(c(1,2,3,4)))
+
+clk_Y <- list(KR=clkeepKR_Y)
 clk_Y2 <- list(KR=clkeepKR_Y2)
+clk_Y3 <- list(KR=clkeepKR_Y3)
+clk_B2 <- list(KR=clkeepKR_B2)
+clk_B3 <- list(KR=clkeepKR_B3)
+clk_B4 <- list(KR=clkeepKR_B4)
 
 std_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",std_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")

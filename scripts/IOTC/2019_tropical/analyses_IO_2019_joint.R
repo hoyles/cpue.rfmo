@@ -3,7 +3,7 @@
 # Remove TW before 2005
 # Joint standardization
 
-projdir <- "~/IOTC/2019_CPUE_ALB/"
+projdir <- "~/IOTC/2019_CPUE_tropical/"
 Rdir <- paste0(projdir, "Rfiles/")
 
 jpdir <- paste0(projdir, "JP/")
@@ -15,27 +15,21 @@ jointdir <- paste0(projdir, "joint/")
 jntalysis_dir <- paste0(jointdir, "analyses/")
 dir.create(jntalysis_dir)
 
-#install.packages("survival")
-#install.packages("stringr")
-library(stringr)
-library("date")
-library(splines)
-library("maps")
-library("mapdata")
-library("maptools")
-library("lunar")
-library("mgcv")
-library(randomForest)
-library(influ)
-library("nFactors")
-library(plyr)
-library(dplyr)
-library(data.table)
-library(cluster)
-library(beanplot)
-library(survival)
+### install.packages("../../../../../influ_0.8.zip", repos = NULL, type = "win.binary")
+library("influ",quietly = TRUE) # downloaded here (https://github.com/trophia/influ/releases/) after installing 'proto'
 
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
+sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
+invisible(lapply(packages, library, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
+
+# The command 'install_github("hoyles/cpue.rfmo", auth_token = 'xxxxxxxxxxxxxxxxx')' should now install cpue.rfmo succcessfully.
+# You'll need to generate your own github personal access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line. You also need to set the scope of the token to have full control of private repositories. Do this on the page where you generate the token.
+
+### Library developed by Simon
+### Built from the github sudo R CMD build
+#install.packages("../../../../../cpue.rfmo_0.1.0.zip",repos = NULL,type = "win.binary")
 library(cpue.rfmo)
+
 
 #clkeepKR_A5 <- list("alb"=list(c(2,3,5)))
 clkeepJP_A4 <- list("alb"=list(c(1,2,3,4), c(1,2,3,4,5), c(1,2,3,4), c(1,2,3,4)))

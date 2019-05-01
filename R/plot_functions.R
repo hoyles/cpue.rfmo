@@ -7,13 +7,14 @@
 #' @param ti Use in the plot filename.
 #' @param regtype Not used.
 #' @param saveplot Should be set to FALSE when working in RMarkdown.
+#' @param savedir The folder where figures are saved.
 #'
-plot_km_deviance <- function(dat, allsp, r, ti, regtype = "regY", saveplot = TRUE) {
+plot_km_deviance <- function(dat, allsp, r, ti, regtype = "regY", saveplot = TRUE, savedir = ".") {
     a <- scale(dat[, allsp])
     wss <- (nrow(a) - 1) * sum(apply(a[, allsp], 2, var))
     for (i in 2:15) wss[i] <- sum(kmeans(a[, allsp], centers = i, iter.max = 40)$withinss)
     plot(1:15, wss, type = "b", xlab = "Number of Clusters", ylab = "Within groups sum of squares", main = paste("Region", r))
-    if (saveplot) savePlot(paste0(ti, "_plot_km_deviance", ".png"), type = "png")
+    if (saveplot) savePlot(savedir, "/", paste0(ti, "_plot_km_deviance", ".png"), type = "png")
 }
 
 #' Make kmeans deviance plot at the trip level.
@@ -26,9 +27,10 @@ plot_km_deviance <- function(dat, allsp, r, ti, regtype = "regY", saveplot = TRU
 #' @param regtype Not used.
 #' @param tripid Defines the variable to use as trip identifier
 #' @param saveplot Should be set to FALSE when working in RMarkdown.
+#' @param savedir The folder where figures are saved.
 #'
 plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY",
-                                  tripid="tripidmon", saveplot = TRUE) {
+                                  tripid="tripidmon", saveplot = TRUE, savedir = ".") {
     ddd$TRIP_NUM <- ddd[,tripid]
     indat <- aggregate_by_trip(ddd, allsp)
     a <- indat[, allsp]
@@ -36,7 +38,7 @@ plot_km_deviance_trip <- function(ddd, allsp, r, ti, regtype = "regY",
     wss <- (nrow(a) - 1) * sum(apply(a[, allsp], 2, var))
     for (i in 2:15) wss[i] <- sum(kmeans(a[, allsp], centers = i, nstart = 4, iter.max = 40)$withinss)
     plot(1:15, wss, type = "b", xlab = "Number of Clusters", ylab = "Within groups sum of squares", main = paste("Region", r))
-    if (saveplot) savePlot(paste0(ti, "_plot_km_deviance_trip", ".png"), type = "png")
+    if (saveplot) savePlot(paste0(savedir, "/", ti, "_plot_km_deviance_trip", ".png"), type = "png")
 }
 
 #' Map of the Indian Ocean.

@@ -235,25 +235,35 @@ resdir <- paste0(jntalysis_dir,"trop_cl0_hb1_hk1_TW2005_discard/")
 dir.create(resdir)
 setwd(resdir)
 
-dsf <-
+disc_file <- list()
+disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="yft")
+disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="bet")
+a <- rbind(disc_file$bet[disc_file$bet$reg %in% c(1,5),],disc_file$yft[disc_file$yft$reg %in% c(1,5),])
+a <- aggregate(cbind(retain, discard) ~ flag + year + regstr, data = a, FUN = sum)
+a$rate <- a$discard / (a$discard + a$retain)
+a[a$regstr=="regB3",]$regstr <- "regB2"
+a$reg[a$regstr=="regB2"] <- 1
+a[a$regstr=="regY2",]$regstr <- "regY"
+a$reg[a$regstr=="regY"] <- 2
+discards <- rbind(disc_file$yft, disc_file$bet, a)
 
 runpars <- list()
 runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(2,5),
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
-                         dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discard = dsf)
+                         dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discards = discards)
 runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(7),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
-                          dat_lims = NA, cltype = "hcltrp", minss = regY2_minss, strsmp = 15, discard = dsf)
+                          dat_lims = NA, cltype = "hcltrp", minss = regY2_minss, strsmp = 15, discards = discards)
 runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(1,2),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
-                          dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discard = dsf)
+                          dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discards = discards)
 runpars[["regB3"]] <-list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = c(1,5),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
-                          dat_lims = NA, cltype = "hcltrp", minss = regB3_minss, strsmp = 15, discard = dsf)
+                          dat_lims = NA, cltype = "hcltrp", minss = regB3_minss, strsmp = 15, discards = discards)
 
 run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
 
@@ -272,11 +282,11 @@ runpars <- list()
 runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(3,4),
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
-                         dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discard = dsf)
+                         dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discards = discards)
 runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(3,4),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
-                          dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discard = dsf)
+                          dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discards = discards)
 
 run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
 

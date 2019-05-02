@@ -68,15 +68,15 @@ clk_B4 <- list(JP=clkeepJP_B4,KR=clkeepKR_B4,TW=clkeepTW_B4,SY=clkeepSY_B4)
 std_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",std_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
 
-## ---------------------------------------------
-# Run various standardization scenarios.
-## ---------------------------------------------
-
 # The runpars define the approach to be used in this run
 regB2_minss <- list(minq_byreg = c(5,5,5,3), minvess=c(100,100,100,60), minll=c(50,50,50,30), minyrqtr = c(50,50,50,30), minyqll = c(5,5,5,3))
 regB3_minss <- list(minq_byreg = c(5,5,5,3,5), minvess=c(100,100,100,60,100), minll=c(50,50,50,30,50), minyrqtr = c(50,50,50,30,50), minyqll = c(5,5,5,3,5))
 regY_minss <-  list(minq_byreg = c(2,5,5,2,5,2),   minvess=c(40,100,100,40,100,40),     minll=c(20,50,50,20,50,20),    minyrqtr = c(20,50,50,20,50,20),    minyqll = c(3,5,5,3,5,3))
 regY2_minss <- list(minq_byreg = c(2,5,5,2,5,2,5), minvess=c(40,100,100,40,100,40,100), minll=c(20,50,50,20,50,20,50), minyrqtr = c(20,50,50,20,50,20,50), minyqll = c(3,5,5,3,5,3,5))
+
+## ---------------------------------------------
+# Run various standardization scenarios.
+## ---------------------------------------------
 
 ######## tropical_and_temperate, with clusters, with hbf, with hooks ################
 runpars <- list()
@@ -105,7 +105,7 @@ runpars[["regB3"]] <-list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs =
 regstr <- "regY"; runreg <- 2; keepd <- TRUE; doflags <- "TW"
 maxyr <- 2019
 
-resdir <- paste0(jntalysis_dir,"cl1_hb1_hk1/")
+resdir <- paste0(jntalysis_dir,"trop_temp_cl1_hb1_hk1_TW2005/")
 dir.create(resdir)
 setwd(resdir)
 
@@ -117,6 +117,7 @@ run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB2",
 
 run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB3", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
 
+######---------------------------------------------------------------------------------
 ######## tropical, no clusters, with hbf, with hooks, all TW post-2005 ################
 resdir <- paste0(jntalysis_dir,"trop_cl0_hb1_hk1_TW2005/")
 dir.create(resdir)
@@ -127,22 +128,22 @@ runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE, do_deltalog = TRUE,
                          do_early = TRUE, do_late = TRUE, do_vessallyr = FALSE,
-                         cltype = "hcltrp", minss = regY_minss, strsmp = 10)
+                         cltype = "hcltrp", minss = regY_minss, strsmp = 15)
 runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE, do_deltalog = TRUE,
                           do_early = TRUE, do_late = TRUE, do_vessallyr = FALSE,
-                          cltype = "hcltrp", minss = regY2_minss, strsmp = 10)
+                          cltype = "hcltrp", minss = regY2_minss, strsmp = 15)
 runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(1,2),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE, do_deltalog = TRUE,
                           do_early = TRUE, do_late = TRUE, do_vessallyr = FALSE,
-                          cltype = "hcltrp", minss = regB2_minss, strsmp = 10)
+                          cltype = "hcltrp", minss = regB2_minss, strsmp = 15)
 runpars[["regB3"]] <-list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = c(1,5),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE, do_deltalog = TRUE,
                           do_early = TRUE, do_late = TRUE, do_vessallyr = FALSE,
-                          cltype = "hcltrp", minss = regB3_minss, strsmp = 10)
+                          cltype = "hcltrp", minss = regB3_minss, strsmp = 15)
 
 run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
 
@@ -162,19 +163,127 @@ runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE, do_deltalog = TRUE,
                          do_early = TRUE, do_late = TRUE, do_vessallyr = FALSE,
-                         cltype = "hcltrp", minss = regY_minss, strsmp = 10)
+                         cltype = "hcltrp", minss = regY_minss, strsmp = 15)
 runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(3,4),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE, do_deltalog = TRUE,
                           do_early = TRUE, do_late = TRUE, do_vessallyr = FALSE,
-                          cltype = "hcltrp", minss = regB2_minss, strsmp = 10)
+                          cltype = "hcltrp", minss = regB2_minss, strsmp = 15)
+
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+######---------------------------------------------------------------------------------
+######## tropical, no clusters, with hbf, with hooks, TW 2005-2016 ################
+resdir <- paste0(jntalysis_dir,"trop_cl0_hb1_hk1_TW0516/")
+dir.create(resdir)
+setwd(resdir)
+
+dat_lims <- c("a$yrqtr > 2005 | a$flag != 'TW'","a$yrqtr < 2017 | a$flag != 'TW'")
+
+runpars <- list()
+runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(2,5),
+                         addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                         do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                         dat_lims = dat_lims, cltype = "hcltrp", minss = regY_minss, strsmp = 15)
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(7),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = dat_lims, cltype = "hcltrp", minss = regY2_minss, strsmp = 15)
+runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(1,2),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = dat_lims, cltype = "hcltrp", minss = regB2_minss, strsmp = 15)
+runpars[["regB3"]] <-list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = c(1,5),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = dat_lims, cltype = "hcltrp", minss = regB3_minss, strsmp = 15)
+
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB3", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+######## temperate, no clusters, with hbf, with hooks, TW 2005-2016 ################
+resdir <- paste0(jntalysis_dir,"temp_cl0_hb1_hk1_TW0516/")
+dir.create(resdir)
+setwd(resdir)
+
+dat_lims <- data.frame(flag = "TW", yrqtr = c("> 2005", "< 2017"), reg = NA)
+
+runpars <- list()
+runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(3,4),
+                         addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                         do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                         dat_lims = dat_lims, cltype = "hcltrp", minss = regY_minss, strsmp = 15)
+runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(3,4),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = dat_lims, cltype = "hcltrp", minss = regB2_minss, strsmp = 15)
+
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+######---------------------------------------------------------------------------------
+######## tropical, no clusters, with hbf, with hooks, TW2005, discards ################
+resdir <- paste0(jntalysis_dir,"trop_cl0_hb1_hk1_TW2005_discard/")
+dir.create(resdir)
+setwd(resdir)
+
+dsf <-
+
+runpars <- list()
+runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(2,5),
+                         addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                         do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                         dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discard = dsf)
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(7),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = NA, cltype = "hcltrp", minss = regY2_minss, strsmp = 15, discard = dsf)
+runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(1,2),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discard = dsf)
+runpars[["regB3"]] <-list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = c(1,5),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = NA, cltype = "hcltrp", minss = regB3_minss, strsmp = 15, discard = dsf)
+
+run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regY2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB3", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
+
+######## temperate, no clusters, with hbf, with hooks, TW2005, discards ################
+resdir <- paste0(jntalysis_dir,"temp_cl0_hb1_hk1_TW2005_discard/")
+dir.create(resdir)
+setwd(resdir)
+
+runpars <- list()
+runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(3,4),
+                         addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                         do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                         dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discard = dsf)
+runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(3,4),
+                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
+                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
+                          dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discard = dsf)
 
 run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
 
 run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
 
 
-#################################################
+##################################################################################################
 ###### Get medians and make newdats ############
 
 flaglist <- list(jp="JP",kr="KR",tw="TW",sy="SY",all=c("JP","KR","TW","SY"))

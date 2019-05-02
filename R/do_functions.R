@@ -160,6 +160,7 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, stdlabs, projdi
 
   if(is.null(rp$ylall)) ylall <- NA else ylall <- rp$ylall
   if(is.null(rp$dat_lims)) dat_lims <- NA else dat_lims <- rp$dat_lims
+  if(is.null(rp$discards)) discards <- NA else discards <- rp$discards
   if(length(doflags)==1) onefl <- doflags else onefl <- NA
 
   jdat <- data.frame()
@@ -197,6 +198,10 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, stdlabs, projdi
       a <- a[eval(parse(text=dat_lims[dlrow])),]
     }
     jdat2 <- a
+  }
+
+  if(!is.na(discards)) {
+    jdat2 <- adjust_discards(jdat2, discards, regstr, runsp)
   }
 
   # Start of the loop through regions
@@ -287,4 +292,26 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, stdlabs, projdi
     }
     graphics.off()
   }
+}
+
+
+#' Adjust the input data for reported rates of discarding.
+#'
+#' The function takes discard rates by flag, regional structure, region and year, and divides the catch by 1 / (1 - discard rate).
+#' @param dat Input dataset
+#' @param discards Data frame containing the discards.
+#' @param regstr The current regional structure.
+#' @param runsp The species of interest.
+#' @return Modified dataset.
+#'
+adjust_discards <- function(dat, discards, regstr, runsp) {
+  datkey <- paste(dat$flag, regstr, dat$reg, floor(dat$yrqtr))
+  disckey <- paste(discards$flag, discards$regstr, discards$reg, discards$year)
+  rate <- discards$rate[match(datkey, disckey)]
+  rate[is.na(rate)] <- 0
+  adj <- 1 / (1 - rate)
+  dat$pre_disc <- dat[,runsp]
+  dat[,runsp] <- dat[,runsp] * adj
+  dat <- dat[rate < 1,]
+  return(dat)
 }

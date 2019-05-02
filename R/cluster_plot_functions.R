@@ -506,7 +506,7 @@ plot_spfreqyq <- function(indat, reg_struc, splist, flag, mfr = c(5,3), saveplot
     a <- indat[indat[,reg_struc] == r,]
     for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = toupper(sp), ylab = "Mean catch (mt)", pch = 19, cex.axis = 1.3, cex.lab = 1.3)
     title(paste(reg_struc, "Region", r ), outer = TRUE)
-    if(saveplot) savePlot(filename = paste0(savedir, "/", paste("spfreq", flag, reg_struc, "R", r, "allyrs", sep = "_"), type = "png"))
+    if(saveplot) savePlot(filename = paste0(savedir, "/", paste("spfreq", flag, reg_struc, "R", r, "allyrs", sep = "_"),".png"), type = "png")
   }
 }
 

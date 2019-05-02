@@ -12,7 +12,7 @@ setwd(analysis_dir)
 ### install.packages("../../../../../influ_0.8.zip", repos = NULL, type = "win.binary")
 library("influ",quietly = TRUE) # downloaded here (https://github.com/trophia/influ/releases/) after installing 'proto'
 
-packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','fastcluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
 sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
 invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
@@ -362,7 +362,7 @@ savePlot("Rforest yft cpue",type="png")
 # ===================================================================================
 #Clustering
 
-packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto','influ')
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','fastcluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto','influ')
 invisible(lapply(packages, library, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
 library(cpue.rfmo)
@@ -427,7 +427,7 @@ for (rg in dorg) {
 # Standardizations, Japan only
 # ========================================================
 
-packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto','influ')
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','fastcluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto','influ')
 invisible(lapply(packages, library, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
 library(cpue.rfmo)
@@ -445,12 +445,12 @@ Rdir <- paste0(projdir, "Rfiles/")
 # clkeepJP_A5 <- list("alb"=list(c(2,3,4)))
 # clk_A5 <- list(JP=clkeepJP_A5)
 
-clkeepJP_Y  <- list("yft"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
-clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(03),c(0),c(0),c(0),c(1,2,3,4)))
-clkeepJP_Y3 <- list("yft"=list(c(1,2,3,4)))
-clkeepJP_B2 <- list("bet"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_B2 <- list("bet"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,3,4), c(1,2,3,4)))
 clkeepJP_B3 <- list("bet"=list(c(1,2,3,4), c(0), c(0), c(0), c(1,2,3,4)))
-clkeepJP_B4 <- list("bet"=list(c(1,2,3,4), c(1,2,3,4), c(1,2,4), c(1,2,3), c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_B4 <- list("bet"=list(c(1,2,3,4,5)))
+clkeepJP_Y  <- list("yft"=list(c(1,2,3,4), c(1,2,3,4), c(1,3,4), c(3,4), c(1,2,3,4),c(1,2,3,4)))
+clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(03),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepJP_Y3 <- list("yft"=list(c(1,2,3,5)))
 
 clk_B2 <- list(JP=clkeepJP_B2)
 clk_B3 <- list(JP=clkeepJP_B3)

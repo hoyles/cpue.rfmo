@@ -18,7 +18,7 @@ setwd(analysis_dir)
 ### install.packages("../../../../../influ_0.8.zip", repos = NULL, type = "win.binary")
 library("influ",quietly = TRUE) # downloaded here (https://github.com/trophia/influ/releases/) after installing 'proto'
 
-packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','fastcluster,'boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
 sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
 invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
@@ -90,7 +90,7 @@ save(dat,file="../data/SYdat.RData")
 
 projdir <- "~/IOTC/2019_CPUE_tropical/"
 natdir <- paste0(projdir, "SY/")
-datadir1 <- paste0(natdir, "data/catcheffort/")
+datadir <- paste0(natdir, "data/")
 analysis_dir <- paste0(natdir, "analyses/")
 figdir <- paste0(natdir, "figures/")
 Rdir <- paste0(projdir, "Rfiles/")
@@ -98,8 +98,7 @@ clustdir <- paste0(natdir, "clustering/")
 
 dir.create(clustdir)
 
-packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto')
-sapply(packages,function(x) {if (!x %in% installed.packages()) install.packages(x,repos = 'https://pbil.univ-lyon1.fr/CRAN/')})
+packages=c('tidyverse', 'openxlsx','knitr','date','splines','maps','mapdata','maptools','lunar','lubridate','mgcv','randomForest','nFactors','data.table','cluster','fastcluster','boot','beanplot','influ','rgdal','RColorBrewer','scales','tm','proto','influ')
 invisible(lapply(packages, require, character.only=TRUE, quietly = TRUE, warn.conflicts = FALSE))
 
 library("cpue.rfmo")
@@ -121,7 +120,7 @@ sy_splist <-  c("alb","bet","yft","swo","mls","bum","blm","sbf","skh","bxq","sfa
 
 ### Plot the mean catch per year of each species by region, to use when deciding which species to cluster
 plot_spfreqyq(indat = dat, reg_struc = "regY", splist = sy_splist, flag = "SY", mfr = c(5,4))
-plot_spfreqyq(indat = dat, reg_struc = "regY2", splist = sy_splist, flag = "SY", mfr = c(5,4))
+plot_spfreqyq(indat = dat, reg_struc = "regB2", splist = sy_splist, flag = "SY", mfr = c(5,4))
 graphics.off()
 
 # Put chosen species here
@@ -136,12 +135,15 @@ str(dat[,allabs])
 
 ### Determine the number of clusters. Come back and edit this
 reglist <- list()
-reglist$regY <-  list(allreg = c(2:5), ncl = c(3,4,4,4,4))
-reglist$regY2 <- list(allreg = c(2,7), ncl = c(3,4,5,4,3,5,4))
-reglist$regY3 <- list(allreg = c(1), ncl = c(4))
 reglist$regB2 <- list(allreg = c(1:4), ncl = c(4,4,5,4))
-reglist$regB3 <- list(allreg = c(1,5), ncl = c(4,4,5,4,4))
+reglist$regB3 <- list(allreg = c(1,5), ncl = c(4,0,0,0,4))
 reglist$regB4 <- list(allreg = c(1), ncl = c(5))
+
+reglist$regY <-  list(allreg = c(1:5), ncl = c(4,4,5,4,3,4))
+reglist$regY2 <- list(allreg = c(2,7), ncl = c(0,4,0,0,0,0,4))
+reglist$regY3 <- list(allreg = c(1), ncl = c(4))
+
+
 flag="SY"
 
 ### Covariates to pass to next stage
@@ -153,6 +155,7 @@ r <- 4
 
 ### Read the cluster functions new version
 #source("../../../../../R/cluster_functions.R")
+options(error=recover)
 
 dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
 for (rg in dorg) {
@@ -194,17 +197,20 @@ library("survival")
 library("cpue.rfmo")
 
 # Define the clusters to be used. Will need to set this up after checking the cluster allocations
-clkeepSY_Y <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0)))
+clkeepSY_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,3,4,5),c(1,2,3)))
+clkeepSY_B3 <- list("bet"=list(c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepSY_B4 <- list("bet"=list(c(1,2,3,4,5)))
+clkeepSY_Y  <- list("yft"=list(c(1,2,3,4),c(1,2,3,4),c(1,2,4),c(1,4),c(1,2,3),c(0)))
+clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(0),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepSY_Y3 <- list("yft"=list(c(1,2,3)))
+
 clk_Y <- list(SY=clkeepSY_Y)
-
-clkeepSY_Y2 <- list("yft"=list(c(0),c(1,2,3,4),c(1,2,3),c(2),c(1,2,3,4),c(0),c(1,2,3,4)))
 clk_Y2 <- list(SY=clkeepSY_Y2)
+clk_Y3 <- list(SY=clkeepSY_Y3)
 
-clkeepSY_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4)))
 clk_B2 <- list(SY=clkeepSY_B2)
-
-clkeepSY_B3 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(1,2),c(1,2,4),c(1,2,3,4)))
 clk_B3 <- list(SY=clkeepSY_B3)
+clk_B4 <- list(SY=clkeepSY_B4)
 
 use_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks","moon",use_splist,"Total","lat","lon","lat5","lon5","hcltrp","reg","flag")

@@ -208,7 +208,7 @@ runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                          dat_lims = dat_lims, cltype = "hcltrp", minss = regY_minss, strsmp = 15)
-runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(7),
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                           dat_lims = dat_lims, cltype = "hcltrp", minss = regY2_minss, strsmp = 15)
@@ -294,7 +294,7 @@ runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                          dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discards = discards)
-runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(7),
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                           dat_lims = NA, cltype = "hcltrp", minss = regY2_minss, strsmp = 15, discards = discards)

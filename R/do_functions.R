@@ -159,6 +159,7 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, stdlabs, projdi
   if(is.null(rp$do_late))  do_late  <- TRUE else do_late  <- rp$do_late
 
   if(is.null(rp$ylall)) ylall <- NA else ylall <- rp$ylall
+  if(is.null(rp$dat_lims)) dat_lims <- NA else dat_lims <- rp$dat_lims
   if(length(doflags)==1) onefl <- doflags else onefl <- NA
 
   jdat <- data.frame()
@@ -183,12 +184,24 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, stdlabs, projdi
   jdat <- jdat[jdat$yrqtr > twlimit | jdat$flag != "TW",]
 
   vars <- c("vessid","hooks","yrqtr","latlong","hbf")
-  for (runreg in rp$doregs) {
-    jdat2 <- jdat[jdat$yrqtr < jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
-    if(!is.na(krlimit)) {
-      jdat2 <- jdat2[(jdat2$yrqtr > krlimit$yr[1] & jdat2$yrqtr < krlimit$yr[2]) |
+
+  # remove data as specified in runpars, with jplimit, krlimit, and the more general dat_lims
+  jdat2 <- jdat[jdat$yrqtr < jplimit$yr | !jdat$reg %in% jplimit$reg | jdat$flag != "JP",]
+  if(!is.na(krlimit)) {
+    jdat2 <- jdat2[(jdat2$yrqtr > krlimit$yr[1] & jdat2$yrqtr < krlimit$yr[2]) |
                      !jdat2$reg %in% krlimit$reg | jdat2$flag != "KR",]
+  }
+  if(!is.na(dat_lims)) {
+    a <- jdat2
+    for(dlrow in 1:length(dat_lims)) {
+      a <- a[eval(parse(text=dat_lims[dlrow])),]
     }
+    jdat2 <- a
+  }
+
+  # Start of the loop through regions
+  for (runreg in rp$doregs) {
+
     glmdat <- select_data_IO2(jdat2,runreg = runreg,runpars = rp, mt = "deltabin",vars = vars, yrlims = ylall, oneflag = onefl)
     if (!is.na(strsmp) & nrow(glmdat) > 60000)
       glmdat <- samp_strat_data(glmdat, strsmp)

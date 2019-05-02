@@ -16,19 +16,19 @@ boxplots_CL <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, lat5 =
     dev.new(width=30, height=20,noRStudioGD = TRUE)
     par(mfrow = c(2, 3), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
     wd = table(dat[, cl])
-    boxplot(dat$op_yr ~ dat[, cl], width = wd, main = "Year", outline = outL, pars = list(boxwex = 1))
+    boxplot(dat$op_yr ~ dat[, cl], width = wd, main = "Year", outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if (lat5) {
-        boxplot(dat$lat5 ~ dat[, cl], width = wd, main = "Lat", outline = outL, pars = list(boxwex = 1))
-        boxplot(dat$lon5 ~ dat[, cl], width = wd, main = "Lon", outline = outL, pars = list(boxwex = 1))
+        boxplot(dat$lat5 ~ dat[, cl], width = wd, main = "Lat", outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
+        boxplot(dat$lon5 ~ dat[, cl], width = wd, main = "Lon", outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     } else {
-        boxplot(dat$lat ~ dat[, cl], width = wd, main = "Lat", outline = outL, pars = list(boxwex = 1))
-        boxplot(dat$lon ~ dat[, cl], width = wd, main = "Lon", outline = outL, pars = list(boxwex = 1))
+        boxplot(dat$lat ~ dat[, cl], width = wd, main = "Lat", outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
+        boxplot(dat$lon ~ dat[, cl], width = wd, main = "Lon", outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     }
-    boxplot(dat$hooks ~ dat[, cl], width = wd, main = "Hooks", outline = outL, pars = list(boxwex = 1))
+    boxplot(dat$hooks ~ dat[, cl], width = wd, main = "Hooks", outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if (dohbf)
-        boxplot(dat$hbf ~ dat[, cl], width = wd, main = "HBF", outline = outL, pars = list(boxwex = 1))
+        boxplot(dat$hbf ~ dat[, cl], width = wd, main = "HBF", outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if (!is.null(dat$op_mon)) boxplot(dat$op_mon ~ dat[, cl], width = wd, main = "Months", outline = outL, pars = list(boxwex = 1))
-    title(paste(gsub("_", " ", ti), cl), outer = T, line = 1, cex.main = 1.5)
+    title(paste(gsub("_", " ", ti), cl), outer = T, line = 1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if (saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_CL", cl, ".png"), type = "png")
 }
 
@@ -50,26 +50,26 @@ boxplots_CL_bean <- function(dat, cl = "kmeans", ti = "", outL = T, dohbf = T, l
     dev.new(width = 30, height = 20, noRStudioGD = TRUE)
     par(mfrow = c(2, 3), mar = c(3, 3, 3, 3), oma = c(0, 0, 2, 0))
     wd = table(dat[, cl])
-    beanplot(dat$op_yr ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), ylim = c(min(dat$op_yr, na.rm = T) - 0.5, max(dat$op_yr, na.rm = T) + 0.5), log = "",
+    beanplot(dat$op_yr ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), ylim = c(min(dat$op_yr, na.rm = T) - 0.5, max(dat$op_yr, na.rm = T) + 0.5) ,cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0, log = "",
         main = "Year")
     if (lat5) {
         beanplot(dat$lat5 ~ dat[, cl], bw = 1.25, what = c(1, 1, 1, 0), ylim = c(min(dat$lat5, na.rm = T) - 2.5, max(dat$lat5, na.rm = T) + 2.5),
-            log = "", main = "Lat")
+            log = "", main = "Lat" ,cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         beanplot(dat$lon5 ~ dat[, cl], bw = 1.25, what = c(1, 1, 1, 0), ylim = c(min(dat$lon5, na.rm = T) - 2.5, max(dat$lon5, na.rm = T) + 2.5),
-            log = "", main = "Lon")
+            log = "", main = "Lon", cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     } else {
         beanplot(dat$lat ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), ylim = c(min(dat$lat, na.rm = T) - 0.5, max(dat$lat, na.rm = T) + 0.5), log = "",
-            main = "Lat")
+            main = "Lat", cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         beanplot(dat$lon ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), ylim = c(min(dat$lon, na.rm = T) - 0.5, max(dat$lon, na.rm = T) + 0.5), log = "",
-            main = "Lon")
+            main = "Lon", cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     }
     beanplot(dat$hooks ~ dat[, cl], bw = 50, what = c(1, 1, 1, 0), ylim = c(min(dat$hooks, na.rm = T) - 0.5, max(dat$hooks, na.rm = T) + 0.5), log = "",
-        main = "Hooks")
+        main = "Hooks", cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if (dohbf)
         beanplot(dat$hbf ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), ylim = c(min(dat$hbf, na.rm = T) - 0.5, max(dat$hbf, na.rm = T) + 0.5), log = "",
-            main = "HBF")
-    if (!is.null(dat$op_mon)) beanplot(dat$op_mon ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), log = "", main = "Months", ylim = c(0.5, 12.5))
-    title(paste(gsub("_", " ", ti), cl), outer = T, line = 1, cex.main = 1.5)
+            main = "HBF", cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
+    if (!is.null(dat$op_mon)) beanplot(dat$op_mon ~ dat[, cl], bw = 0.5, what = c(1, 1, 1, 0), log = "", main = "Months", ylim = c(0.5, 12.5), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
+    title(paste(gsub("_", " ", ti), cl), outer = T, line = 1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if(saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_CL", cl, "_bean.png"), type = "png")
 }
 
@@ -103,7 +103,7 @@ boxplots_PCA <- function(dat, nPCA = 3, ti = "", dohbf = T, lat5 = F, regtype = 
             boxplot(pp ~ (floor(hbf)), data = dat, main = "HBF")
         boxplot(pp ~ eval(100 * floor(hooks/100)), data = dat, main = "Hooks")
         boxplot(pp ~ vessid, data = dat, main = "Vessel")
-        title(paste(gsub("_", " ", ti), ppc), outer = T, line = -1, cex.main = 1.5)
+        title(paste(gsub("_", " ", ti), ppc), outer = T, line = -1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         if(saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_", ppc, ".png"), type = "png")
     }
 }
@@ -145,9 +145,9 @@ boxplots_spCL <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, regty
   }
   wd = table(dat[, cl])
     for (sp in allsp) {
-        boxplot(dat[, sp]/dat$hooks ~ dat[, cl], width = wd, main = toupper(sp), outline = outL, pars = list(boxwex = 1))
+        boxplot(dat[, sp]/dat$hooks ~ dat[, cl], width = wd, main = toupper(sp), outline = outL, pars = list(boxwex = 1), cex.main = 2.5, cex=2.5, cex.axis=2.5, cex.lab=2.5)
     }
-    title(paste(ti, cl), outer = T, line = -1, cex.main = 1.5)
+    title(paste(ti, cl), outer = T, line = -1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if(saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_spCL", cl, ".png"), type = "png")
 }
 
@@ -190,7 +190,7 @@ boxplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13, 
     for (sp in allsp) {
         boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = toupper(sp), outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
     }
-    title(paste(gsub("_", " ", ti), cl), outer = T, line = -1, cex.main = 1.5)
+    title(paste(gsub("_", " ", ti), cl), outer = T, line = -1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if(saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_spCLcomp", cl, ".png"), type = "png")
 }
 
@@ -238,7 +238,7 @@ boxplots_spPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype =
         for (sp in allsp) {
             boxplot(dat[, sp]/dat$Total ~ ppq, main = toupper(sp), outline = outL, ylim = c(0, 1))
         }
-        title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 1.5)
+        title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         if(saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_spPCA", ppc, ".png"), type = "png")
     }
 }
@@ -282,9 +282,9 @@ boxplots_spTPCA <- function(dat, nPCA = 6, ti = "", outL = T, nsp = 13, regtype 
           par(mfrow = c(3, 5), mar = c(3, 3, 3, 3))
         }
         for (sp in allsp) {
-            boxplot(dat[, sp]/dat$Total ~ ppq, main = toupper(sp), outline = outL, ylim = c(0, 1))
+            boxplot(dat[, sp]/dat$Total ~ ppq, main = toupper(sp), outline = outL, ylim = c(0, 1), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         }
-        title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 1.5)
+        title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         if(saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_spTPCA", ppc, ".png"), type = "png")
     }
 }
@@ -319,7 +319,7 @@ boxplots_TPCA <- function(dat, nPCA = 6, ti = "", dohbf = T, lat5 = F, regtype =
             boxplot(pp ~ (floor(hbf)), data = dat, main = "HBF")
         boxplot(pp ~ eval(100 * floor(hooks/100)), data = dat, main = "Hooks")
         boxplot(pp ~ vessid, data = dat, main = "Vessel")
-        title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 1.5)
+        title(paste(gsub("_", " ", ti), ppc), outer = T, line = 1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         if(saveplot) savePlot(paste0(savedir, "/", ti, "_boxplots_", ppc, ".png"), type = "png")
     }
 }
@@ -351,9 +351,9 @@ mapPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r, sa
         image(lonn, latn, pcm)
         contour(lonn, latn, pcm, add = T)
         map(database = "world", add = T)
-        title(ppc, line = -2, cex.main = 1.5)
+        title(ppc, line = -2, cex.main = 2.5)
     }
-    title(paste(gsub("_", " ", ti)), outer = T, line = -1, cex.main = 1.5)
+    title(paste(gsub("_", " ", ti)), outer = T, line = -1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if(saveplot) savePlot(paste0(savedir, "/", ti, "_map_PCs", ".png"), type = "png")
 }
 
@@ -384,9 +384,9 @@ mapTPCA <- function(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r, s
         image(lonn, latn, pcm)
         contour(lonn, latn, pcm, add = T)
         map(database = "world", add = T)
-        title(ppc, line = -2, cex.main = 1.5)
+        title(ppc, line = -2, cex.main = 2.5)
     }
-    title(paste(regtype, r, ti), outer = T, line = -1, cex.main = 1.5)
+    title(paste(regtype, r, ti), outer = T, line = -1, cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
     if(saveplot) savePlot(paste0(savedir, "/", ti, "_map_TPCs", ".png"), type = "png")
 }
 
@@ -427,10 +427,10 @@ beanplots_spCL_comp <- function(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
     }
     wd = table(dat[, cl])
     for (sp in allsp) {
-        beanplot(dat[, sp]/dat$Total ~ dat[, cl], cutmin = 0, cutmax = 1, bw = 0.01, what = c(1, 1, 1, 0), ylim = c(0, 1), log = "", main = toupper(sp))
+        beanplot(dat[, sp]/dat$Total ~ dat[, cl], cutmin = 0, cutmax = 1, bw = 0.01, what = c(1, 1, 1, 0), ylim = c(0, 1), log = "", main = toupper(sp), cex.main = 2.5, cex=1.5, cex.axis=2.0, cex.lab=2.0)
         # boxplot(dat[, sp]/dat$Total ~ dat[, cl], width = wd, main = toupper(sp), outline = outL, pars = list(boxwex = 1), ylim = c(0, 1))
     }
-    title(paste(gsub("_", " ", ti), cl), outer = T, line = -1, cex.main = 1.5)
+    title(paste(gsub("_", " ", ti), cl), outer = T, line = -1, cex.main = 2.0, cex.axis=2.5, cex.lab=2.5)
     nm <- paste0(ti, "_beanplots_spCLcomp", cl)
     if(saveplot) savePlot(paste0(savedir, "/", nm, ".png"), type = "png")
 }
@@ -481,9 +481,9 @@ map_clusters <- function(ddd, cl = "hclustcl", ti = "", lat5 = F, regtype = "reg
         } else image(lonn, latn, clm, xlim=xl, ylim = yl)
         contour(lonn, latn, clm, add = T)
         map(database = "world", add = T, fill = T)
-        title(paste(cl, clx), line = 0.5, cex.main = 1.5)
+        title(paste(cl, clx), line = 0.5, cex.main = 2.0)
     }
-    title(paste(gsub("_", " ", ti), "cluster map"), outer = T, line = -2, cex.main = 1.5)
+    title(paste(gsub("_", " ", ti), "cluster map"), outer = T, line = -2, cex.main = 1.5, cex=1.5, cex.axis=1.5, cex.lab=1.5)
     if(saveplot) savePlot(paste0(savedir, "/", ti, "_mapclust_", cl, ".png"), type = "png")
 }
 
@@ -504,7 +504,7 @@ plot_spfreqyq <- function(indat, reg_struc, splist, flag, mfr = c(5,3), saveplot
     dev.new(width = 15, height = 12, noRStudioGD = TRUE);
     par(mfrow = mfr, mar = c(3,4,2,1), oma = c(0,0,2,0))
     a <- indat[indat[,reg_struc] == r,]
-    for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = toupper(sp), ylab = "Mean catch (mt)", pch = 19, cex.axis = 1.3, cex.lab = 1.3)
+    for (sp in splist) plot(sort(unique(a$yrqtr)),tapply(a[,sp], a$yrqtr, mean), main = toupper(sp), ylab = "Mean catch (mt)", pch = 19, cex.main = 2.0, cex.axis = 1.2, cex.lab = 1.2)
     title(paste(reg_struc, "Region", r ), outer = TRUE)
     if(saveplot) savePlot(filename = paste0(savedir, "/", paste("spfreq", flag, reg_struc, "R", r, "allyrs", sep = "_"),".png"), type = "png")
   }

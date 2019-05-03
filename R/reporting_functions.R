@@ -172,7 +172,7 @@ prep_indices <- function(resdirs, reg_strs, rgl, vartypes = c("lognC","dellog"),
             dev.set(which = yrdev)
             savePlot(filename=paste0(outdir,fname,"_",vartype,"_comp_yr.png"),type="png")
             graphics.off()
-          }
+          } else graphics.off()
         }}
     }}
 }

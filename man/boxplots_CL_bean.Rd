@@ -5,7 +5,8 @@
 \title{Beanplots of set characteristics by cluster.}
 \usage{
 boxplots_CL_bean(dat, cl = "kmeans", ti = "", outL = T, dohbf = T,
-  lat5 = F, regtype = regtype, r = r)
+  lat5 = F, regtype = regtype, r = r, saveplot = TRUE,
+  savedir = ".")
 }
 \arguments{
 \item{dat}{Input dataset}
@@ -23,6 +24,10 @@ boxplots_CL_bean(dat, cl = "kmeans", ti = "", outL = T, dohbf = T,
 \item{regtype}{Deprecated, not used.}
 
 \item{r}{Deprecated, not used.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The directory to save the plot.}
 }
 \description{
 This function plots beanplots of set characteristics by cluster.

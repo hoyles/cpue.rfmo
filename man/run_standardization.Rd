@@ -4,9 +4,9 @@
 \alias{run_standardization}
 \title{Run standardization models.}
 \usage{
-run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
-  projdir, twlimit = 2005, jplimit = list(reg = 4, yr = 0),
-  keepd = TRUE, krlimit = NA)
+run_standardization(runpars, doflags, regstr, maxyr, stdlabs, projdir,
+  twlimit = 2005, jplimit = list(reg = 4, yr = 0), keepd = TRUE,
+  krlimit = NA)
 }
 \arguments{
 \item{runpars}{The 'runpars' object with all variables.}
@@ -16,8 +16,6 @@ run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
 \item{regstr}{The name of the regional structure to be run.}
 
 \item{maxyr}{Include no times after the start of this year.}
-
-\item{do_early}{If TRUE, run the additional pre-1979 and post-1979 standardizations.}
 
 \item{stdlabs}{The variables from the clustered dataset to make available to the standardization.}
 
@@ -30,6 +28,8 @@ run_standardization(runpars, doflags, regstr, maxyr, do_early, stdlabs,
 \item{keepd}{Keep data in the model object if TRUE.}
 
 \item{krlimit}{Range of data to include from Korea: list with first year, last year, and region.}
+
+\item{do_early}{If TRUE, run the additional pre-1979 and post-1979 standardizations.}
 }
 \description{
 The function runs delta lognormal models.

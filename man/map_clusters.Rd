@@ -5,7 +5,8 @@
 \title{Maps of cluster distribution.}
 \usage{
 map_clusters(ddd, cl = "hclustcl", ti = "", lat5 = F,
-  regtype = "regY", ncl, r = r)
+  regtype = "regY", ncl, r = r, xl = NA, yl = NA,
+  saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{ddd}{Input dataset}
@@ -21,6 +22,14 @@ map_clusters(ddd, cl = "hclustcl", ti = "", lat5 = F,
 \item{ncl}{Number of clusters.}
 
 \item{r}{Deprecated, not used.}
+
+\item{xl}{Longitude range.}
+
+\item{yl}{Latitude range.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{Directory to save the plot in, defaulting to current.}
 }
 \description{
 This function plots maps of cluster spatial distribution.

@@ -5,7 +5,7 @@
 \title{Boxplots of principal components by set characteristics.}
 \usage{
 boxplots_TPCA(dat, nPCA = 6, ti = "", dohbf = T, lat5 = F,
-  regtype = "regY", r = r)
+  regtype = "regY", r = r, saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{dat}{Input dataset}
@@ -21,6 +21,10 @@ boxplots_TPCA(dat, nPCA = 6, ti = "", dohbf = T, lat5 = F,
 \item{regtype}{Deprecated, not used.}
 
 \item{r}{Deprecated, not used.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The directory to save the plot.}
 }
 \description{
 This function plots boxplots of principal components by set characteristics.

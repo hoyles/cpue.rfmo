@@ -5,7 +5,7 @@
 \title{Boxplots of species composition by cluster.}
 \usage{
 boxplots_spCL_comp(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
-  regtype = regtype, r = r, allsp)
+  regtype = regtype, r = r, allsp, saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{dat}{Input dataset}
@@ -23,6 +23,10 @@ boxplots_spCL_comp(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
 \item{r}{Deprecated, not used.}
 
 \item{allsp}{Vector of species to use in the cluster plots.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The directory to save the plot.}
 }
 \description{
 This function plots boxplots of species composition by cluster.

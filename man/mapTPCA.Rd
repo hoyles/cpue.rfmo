@@ -5,7 +5,7 @@
 \title{Maps of TCPA distribution.}
 \usage{
 mapTPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY",
-  r = r)
+  r = r, saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{ddd}{Input dataset}
@@ -19,6 +19,10 @@ mapTPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY",
 \item{regtype}{Deprecated, not used.}
 
 \item{r}{Deprecated, not used.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The directory to save the plot.}
 }
 \description{
 This function plots maps of TCPA distribution.

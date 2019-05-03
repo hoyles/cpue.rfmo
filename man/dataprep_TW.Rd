@@ -6,7 +6,7 @@
 \usage{
 dataprep_TW(dat, alldat = F, region = "IO", splist = c("alb", "bet",
   "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth",
-  "pbf", "sbt"))
+  "pbf", "sbt"), nomlist = "noms1")
 }
 \arguments{
 \item{dat}{Input dataset}
@@ -15,7 +15,9 @@ dataprep_TW(dat, alldat = F, region = "IO", splist = c("alb", "bet",
 
 \item{region}{IO or AO.}
 
-\item{splist}{Define the species in the dataset}
+\item{splist}{Define the species in the dataset.}
+
+\item{nomlist}{The list of variable names to return.}
 }
 \value{
 Modified dataset.

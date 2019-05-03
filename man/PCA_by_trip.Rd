@@ -5,7 +5,8 @@
 \title{Principal components analysis of species composition by 'trip'
 Run PCA at the trip level using normalised species composition data.}
 \usage{
-PCA_by_trip(datr, Screeplotname = "screeplot set", allsp, clustid)
+PCA_by_trip(datr, Screeplotname = "screeplot set", allsp, clustid,
+  saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{datr}{The input dataset.}
@@ -15,6 +16,8 @@ PCA_by_trip(datr, Screeplotname = "screeplot set", allsp, clustid)
 \item{allsp}{Species codes / variable names to use in the PCA.}
 
 \item{clustid}{Name of variable to aggregate across for trip-level clustering.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
 }
 \value{
 A list of two objects based on standard PCA and binomial PCA.

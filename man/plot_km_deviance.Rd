@@ -4,7 +4,8 @@
 \alias{plot_km_deviance}
 \title{Make kmeans deviance plot.}
 \usage{
-plot_km_deviance(dat, allsp, r, ti, regtype = "regY")
+plot_km_deviance(dat, allsp, r, ti, regtype = "regY", saveplot = TRUE,
+  savedir = ".")
 }
 \arguments{
 \item{dat}{Dataset to cluster.}
@@ -16,6 +17,10 @@ plot_km_deviance(dat, allsp, r, ti, regtype = "regY")
 \item{ti}{Use in the plot filename.}
 
 \item{regtype}{Not used.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The folder where figures are saved.}
 }
 \description{
 Function to make kmeans deviance plot, for estimating the appropriate number of clusters.

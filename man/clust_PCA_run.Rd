@@ -9,7 +9,7 @@ clust_PCA_run(r, ddd, allsp, allabs, regtype = "regY", ncl,
   dbh = TRUE, cllist = NA, fnhead = "", ll5 = F,
   covarnames = c("yrqtr", "latlong", "hooks", "hbf", "vessid",
   "callsign", "Total", "lat", "lon", "lat5", "lon5", "moon", "op_yr",
-  "op_mon"))
+  "op_mon"), saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{r}{The region number.}
@@ -41,6 +41,10 @@ clust_PCA_run(r, ddd, allsp, allabs, regtype = "regY", ncl,
 \item{ll5}{If TRUE, ll5 variables are used instead of 1 degree versions}
 
 \item{covarnames}{Names of covariates to return with dataset.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The folder where figures are saved.}
 }
 \value{
 The original dataset with added columns for the clusters and PCAs;

@@ -4,7 +4,8 @@
 \alias{mapPCA}
 \title{Maps of PCA distribution.}
 \usage{
-mapPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r)
+mapPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r,
+  saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{ddd}{Input dataset}
@@ -18,6 +19,10 @@ mapPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r)
 \item{regtype}{Deprecated, not used.}
 
 \item{r}{Deprecated, not used.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The directory to save the plot.}
 }
 \description{
 This function plots maps of PCA spatial distribution.

@@ -5,7 +5,7 @@
 \title{Make kmeans deviance plot at the trip level.}
 \usage{
 plot_km_deviance_trip(ddd, allsp, r, ti, regtype = "regY",
-  tripid = "tripidmon")
+  tripid = "tripidmon", saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{ddd}{Dataset to cluster.}
@@ -19,6 +19,10 @@ plot_km_deviance_trip(ddd, allsp, r, ti, regtype = "regY",
 \item{regtype}{Not used.}
 
 \item{tripid}{Defines the variable to use as trip identifier}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The folder where figures are saved.}
 }
 \description{
 Function to make kmeans deviance plot, for estimating the appropriate number of clusters.

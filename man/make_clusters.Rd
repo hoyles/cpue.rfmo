@@ -6,7 +6,8 @@
 Run cluster analysis at both set and trip levels, using three methods: hclust, clara, and kmeans.}
 \usage{
 make_clusters(setdat, spp, ncl = 5, titx = "", setclust = T,
-  tripid = "tripid", fname = "", regtype = "regY")
+  tripid = "tripid", fname = "", regtype = "regY", saveplot = TRUE,
+  savedir = ".")
 }
 \arguments{
 \item{setdat}{The input dataset, at the set level.}
@@ -24,6 +25,8 @@ make_clusters(setdat, spp, ncl = 5, titx = "", setclust = T,
 \item{fname}{File name header for saving plots.}
 
 \item{regtype}{Region type code.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
 }
 \value{
 A list of four objects: d, the normalised trip-level dataset; fit, the hclust results; clarax, the clara trip level results; setdat, all the clustering results, as additional columns added to the input dataset.

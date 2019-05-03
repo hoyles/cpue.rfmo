@@ -5,7 +5,8 @@
 \title{Beanplots of species composition by cluster.}
 \usage{
 beanplots_spCL_comp(dat, cl = "kmeans", ti = "", outL = T,
-  nsp = 13, regtype = regtype, r = r, allsp)
+  nsp = 13, regtype = regtype, r = r, allsp, saveplot = TRUE,
+  savedir = ".")
 }
 \arguments{
 \item{dat}{Input dataset}
@@ -23,6 +24,10 @@ beanplots_spCL_comp(dat, cl = "kmeans", ti = "", outL = T,
 \item{r}{Deprecated, not used.}
 
 \item{allsp}{Vector of species to use in the cluster plots.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The directory to save the plot.}
 }
 \description{
 This function plots beanplots of set characteristics by cluster.

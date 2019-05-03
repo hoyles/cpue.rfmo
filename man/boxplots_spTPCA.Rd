@@ -5,7 +5,7 @@
 \title{Boxplots of species composition by principal component.}
 \usage{
 boxplots_spTPCA(dat, nPCA = 6, ti = "", outL = T, nsp = 13,
-  regtype = "regY", r = r, allsp)
+  regtype = "regY", r = r, allsp, saveplot = TRUE, savedir = ".")
 }
 \arguments{
 \item{dat}{Input dataset}
@@ -23,6 +23,10 @@ boxplots_spTPCA(dat, nPCA = 6, ti = "", outL = T, nsp = 13,
 \item{r}{Deprecated, not used.}
 
 \item{allsp}{Vector of species to use in the PCA plots.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{savedir}{The directory to save the plot.}
 }
 \description{
 This function plots boxplots of species composition by principal component.

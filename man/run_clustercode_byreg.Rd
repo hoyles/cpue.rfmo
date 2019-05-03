@@ -4,9 +4,11 @@
 \alias{run_clustercode_byreg}
 \title{Run clustering code across all regions and save the results.}
 \usage{
-run_clustercode_byreg(indat, reg_struc, allsp, allabs, ncl = "lst",
-  plotPCA = F, clustid = "tripidmon", allclust = F, flag,
-  dohbf = TRUE, cvnames, rgl)
+run_clustercode_byreg(indat, reg_struc, allsp = parent.frame()$allsp,
+  allabs = parent.frame()$allabs, ncl = "lst", plotPCA = F,
+  clustid = "tripidmon", allclust = F, flag = parent.frame()$flag,
+  dohbf = TRUE, cvnames = parent.frame()$cvn, rgl, saveplot = TRUE,
+  basedir = getwd())
 }
 \arguments{
 \item{indat}{The input dataset.}
@@ -32,6 +34,10 @@ run_clustercode_byreg(indat, reg_struc, allsp, allabs, ncl = "lst",
 \item{cvnames}{Names of covariates to return with dataset.}
 
 \item{rgl}{A list specifying, for each regional structure, the regions to run and how many clusters to select in each region.}
+
+\item{saveplot}{Should be set to FALSE when working in RMarkdown.}
+
+\item{basedir}{The folder in which to save the dataset.}
 }
 \value{
 Nothing is returned but each dataset is saved.

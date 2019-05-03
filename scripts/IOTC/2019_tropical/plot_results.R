@@ -30,7 +30,7 @@ alldirs <- c(paste0(jointdir,"analyses/temp_cl0_hb1_hk1_TW1995/"),
 
 length(alldirs)
 
-reglist <- list("regA4" = c(1:4), "regA5" = 1, "regY" = 2:5, "regY2" = c(2,7), "regB2" = 2:4, "regB3" = c(1,5))
+reglist <- list("regA4" = c(1:4), "regA5" = 1, "regY" = 2:5, "regY2" = c(2,7), "regB2" = 1:4, "regB3" = c(1,5))
 splist <- list("regA4" = "alb", "regA5" = "alb", "regB2" = "bet", "regB3" = "bet", "regY" = "yft", "regY2" = "yft")
 
 library("beanplot")
@@ -69,7 +69,7 @@ reg_strs <- c("regY","regY2","regB2","regYB3")
 
 #resdir <- alldirs[3]; mdn=4; regstr = "regB"; runreg = 1; vartype = "dellog"; # numbers for testing
 
-prep_indices(resdirs=alldirs[1:6], reg_strs=reg_strs, reglist, vartypes = c("lognC","dellog"), yr1=1952)
+prep_indices(resdirs=alldirs[1:16], reg_strs=reg_strs, reglist, vartypes = c("lognC","dellog"), yr1=1952)
 
 #prep_indices(resdirs=natdirs[2], reg_strs=c("regA4","regA5"), reglist, vartypes = c("lognC","dellog"), yr1=1952)
 

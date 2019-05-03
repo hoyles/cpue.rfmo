@@ -239,15 +239,18 @@ natdir <- paste0(projdir, "TW/")
 datadir <- paste0(natdir, "data/")
 analysis_dir <- paste0(natdir, "analyses/")
 Rdir <- paste0(projdir, "Rfiles/")
-clustdir <- paste0(natdir, "clustering/")
+clustdir <- paste0(natdir, "clustering_2005/")
+clustdir95 <- paste0(natdir, "clustering_1995/")
 dir.create(clustdir)
+dir.create(clustdir95)
 setwd(clustdir)
 load(file=paste0(analysis_dir,"TW_newdat.RData"))
 
 tw_allsp <- c("alb","bet","yft","ott","swo","mls","blm", "bum", "otb", "skj", "sha", "ot2", "sbt")
 
 # Plot the mean catch per year of each species by region, to use when deciding which species to cluster
-dat2005 <- dat[dat$op_yr > 2005,]
+dat2005 <- dat[dat$yrqtr > 2005,]
+dat1995 <- dat[dat$yrqtr > 1995,]
 plot_spfreqyq(indat = dat2005, reg_struc = "regB2", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 plot_spfreqyq(indat = dat2005, reg_struc = "regB3", splist = tw_allsp, flag = "TW", mfr = c(5,3))
 plot_spfreqyq(indat = dat2005, reg_struc = "regY", splist = tw_allsp, flag = "TW", mfr = c(5,3))
@@ -285,7 +288,7 @@ cvn <- c("yrqtr","latlong","hooks","hbf","vessid","callsign","Total","lat","lon"
 
 dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
 for (rg in dorg) {
-  run_clustercode_byreg(indat=dat, reg_struc = rg, allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+  run_clustercode_byreg(indat=dat2005, reg_struc = rg, allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
 }
 
 # clkeepTW_A4 <- list("alb"=list(c(1:4), c(1:4), c(1,2), c(1:5)))
@@ -293,10 +296,10 @@ for (rg in dorg) {
 # clkeepTW_A5 <- list("alb"=list(c(1:5)))
 # clk_A5 <- list(TW=clkeepTW_A5)
 
-clkeepTW_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(2)))
+clkeepTW_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(4)))
 # In R3 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye.
 # In R3 drop cl3, the oilfish fishery
-# In R4 drop cl1, cl3, and cl4, the albacore fishery.
+# In R4 drop cl1, cl2, and cl3, the albacore fishery.
 
 clkeepTW_B3 <- list("bet"=list(c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
 clkeepTW_B4 <- list("bet"=list(c(2,3,4)))
@@ -317,6 +320,37 @@ clk_Y3 <- list(TW=clkeepTW_Y3)
 clk_B2 <- list(TW=clkeepTW_B2)
 clk_B3 <- list(TW=clkeepTW_B3)
 clk_B4 <- list(TW=clkeepTW_B4)
+
+setwd(clustdir95)
+dorg <- c("regY", "regY2", "regY3", "regB2", "regB3", "regB4")
+for (rg in dorg) {
+  run_clustercode_byreg(indat=dat1995, reg_struc = rg, allsp=cl_splist, allabs=allabs, flag=flag, cvnames = cvn, rgl=reglist)
+}
+
+clkeepTW95_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(2,4)))
+# In R3 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye.
+# In R3 drop cl3, the oilfish fishery
+# In R4 drop cl1, cl2 the albacore fishery.
+
+clkeepTW95_B3 <- list("bet"=list(c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepTW95_B4 <- list("bet"=list(c(2,3,4)))
+# In B4 R1 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye. Will give the wrong catch rates for regional scaling.
+
+clkeepTW95_Y <- list("yft"=list(c(1,2,3,4,5), c(1,2,3,4), c(1,2), c(4), c(1,2,3,4,5), c(1,2,3,4,5)))
+# In R3 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye.
+# In R3 drop cl3, the oilfish fishery
+# In R4 drop cl1 and cl2, the albacore fishery.
+
+clkeepTW95_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
+clkeepTW95_Y3 <- list("yft"=list(c(1,2,3,4,5)))
+# In Y3 R1 drop cl1, the albacore fishery in which they may discard ~ 40% of bigeye. Will give the wrong catch rates for regional scaling.
+
+clk95_Y <- list(TW=clkeepTW95_Y)
+clk95_Y2 <- list(TW=clkeepTW95_Y2)
+clk95_Y3 <- list(TW=clkeepTW95_Y3)
+clk95_B2 <- list(TW=clkeepTW95_B2)
+clk95_B3 <- list(TW=clkeepTW95_B3)
+clk95_B4 <- list(TW=clkeepTW95_B4)
 
 # ========================================================
 # Standardizations, TW only

@@ -51,12 +51,19 @@ clkeepJP_Y  <- list("yft"=list(c(1,2,3,4), c(1,2,3,4), c(1,3,4), c(3,4), c(1,2,3
 clkeepJP_Y2 <- list("yft"=list(c(0),c(1,2,3,4,5),c(03),c(0),c(0),c(0),c(1,2,3,4)))
 clkeepJP_Y3 <- list("yft"=list(c(1,2,3,5)))
 
-clkeepTW_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(2)))
+clkeepTW_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(4)))
 clkeepTW_B3 <- list("bet"=list(c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
 clkeepTW_B4 <- list("bet"=list(c(2,3,4)))
 clkeepTW_Y <- list("yft"=list(c(1,2,3,4,5), c(1,2,3,4), c(2), c(3,4), c(1,2,3,4,5), c(1,2,3,4,5)))
 clkeepTW_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
 clkeepTW_Y3 <- list("yft"=list(c(1,2,3,4,5)))
+
+clkeepTW95_B2 <- list("bet"=list(c(1,2,3,4),c(1,2,3,4),c(2),c(2,4)))
+clkeepTW95_B3 <- list("bet"=list(c(1,2,3,4),c(0),c(0),c(0),c(1,2,3,4)))
+clkeepTW95_B4 <- list("bet"=list(c(2,3,4)))
+clkeepTW95_Y  <- list("yft"=list(c(1,2,3,4,5), c(1,2,3,4), c(1,2), c(4), c(1,2,3,4,5), c(1,2,3,4,5)))
+clkeepTW95_Y2 <- list("yft"=list(c(0), c(1,2,3,4),c(0), c(0), c(0), c(0), c(1,2,3,4)))
+clkeepTW95_Y3 <- list("yft"=list(c(1,2,3,4,5)))
 
 clk_Y  <- list(JP=clkeepJP_Y, KR=clkeepKR_Y, TW=clkeepTW_Y, SY=clkeepSY_Y)
 clk_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW_Y2,SY=clkeepSY_Y2)
@@ -64,6 +71,13 @@ clk_Y3 <- list(JP=clkeepJP_Y3,KR=clkeepKR_Y3,TW=clkeepTW_Y3,SY=clkeepSY_Y3)
 clk_B2 <- list(JP=clkeepJP_B2,KR=clkeepKR_B2,TW=clkeepTW_B2,SY=clkeepSY_B2)
 clk_B3 <- list(JP=clkeepJP_B3,KR=clkeepKR_B3,TW=clkeepTW_B3,SY=clkeepSY_B3)
 clk_B4 <- list(JP=clkeepJP_B4,KR=clkeepKR_B4,TW=clkeepTW_B4,SY=clkeepSY_B4)
+
+clk95_Y  <- list(JP=clkeepJP_Y, KR=clkeepKR_Y, TW=clkeepTW95_Y, SY=clkeepSY_Y)
+clk95_Y2 <- list(JP=clkeepJP_Y2,KR=clkeepKR_Y2,TW=clkeepTW95_Y2,SY=clkeepSY_Y2)
+clk95_Y3 <- list(JP=clkeepJP_Y3,KR=clkeepKR_Y3,TW=clkeepTW95_Y3,SY=clkeepSY_Y3)
+clk95_B2 <- list(JP=clkeepJP_B2,KR=clkeepKR_B2,TW=clkeepTW95_B2,SY=clkeepSY_B2)
+clk95_B3 <- list(JP=clkeepJP_B3,KR=clkeepKR_B3,TW=clkeepTW95_B3,SY=clkeepSY_B3)
+clk95_B4 <- list(JP=clkeepJP_B4,KR=clkeepKR_B4,TW=clkeepTW95_B4,SY=clkeepSY_B4)
 
 std_splist <- c("alb","bet","yft")
 stdlabs <- c("vessid","yrqtr","latlong","op_yr","op_mon","hbf","hooks",std_splist,"lat","lon","lat5","lon5","reg","hcltrp","flag")
@@ -109,6 +123,14 @@ resdir <- paste0(jntalysis_dir,"trop_temp_cl1_hb1_hk1_TW2005/")
 dir.create(resdir)
 setwd(resdir)
 
+# Set up the 2005 TW files
+rmfl <- list.files(paste0(twdir, "clustering/"), full.names = TRUE)
+file.remove(rmfl)
+cpfl <- list.files(paste0(twdir, "clustering_2005/"), full.names = TRUE)
+file.copy(from = cpfl, to = paste0(twdir, "clustering/"), recursive = TRUE)
+
+
+
 run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
 
 run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regY2", maxyr = 2019, stdlabs = stdlabs, projdir = projdir, twlimit=2005 , jplimit = list(reg=2, yr=3005))
@@ -122,6 +144,12 @@ run_standardization(runpars, doflags = c("JP","KR","TW"), regstr = "regB3", maxy
 resdir <- paste0(jntalysis_dir,"trop_cl0_hb1_hk1_TW2005/")
 dir.create(resdir)
 setwd(resdir)
+
+# Set up the 2005 TW files
+rmfl <- list.files(paste0(twdir, "clustering/"), full.names = TRUE)
+file.remove(rmfl)
+cpfl <- list.files(paste0(twdir, "clustering_2005/"), full.names = TRUE)
+file.copy(from = cpfl, to = paste0(twdir, "clustering/"), recursive = TRUE)
 
 runpars <- list()
 runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(2,5),
@@ -201,6 +229,12 @@ resdir <- paste0(jntalysis_dir,"trop_cl0_hb1_hk1_TW1995_discards/")
 dir.create(resdir)
 setwd(resdir)
 
+# Set up the 1995 TW files
+rmfl <- list.files(paste0(twdir, "clustering/"), full.names = TRUE)
+file.remove(rmfl)
+cpfl <- list.files(paste0(twdir, "clustering_1995/"), full.names = TRUE)
+file.copy(from = cpfl, to = paste0(twdir, "clustering/"), recursive = TRUE)
+
 disc_file <- list()
 disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="yft")
 disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="bet")
@@ -223,19 +257,19 @@ discards <- rbind(disc_file$yft, disc_file$bet, a)
 #dat_lims <- c("a$yrqtr > 1995 | a$flag != 'TW'","a$yrqtr < 2017 | a$flag != 'TW'")
 
 runpars <- list()
-runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(2,5),
+runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk95_Y, doregs = c(2,5),
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                          dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discards = discards)
-runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk_Y2, doregs = c(2,7),
+runpars[["regY2"]] <-list(runsp = "yft", regtype2 = "Y2", clk = clk95_Y2, doregs = c(2,7),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                           dat_lims = NA, cltype = "hcltrp", minss = regY2_minss, strsmp = 15, discards = discards)
-runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(1,2),
+runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk95_B2, doregs = c(1,2),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                           dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discards = discards)
-runpars[["regB3"]] <-list(runsp = "bet", regtype2 = "B3", clk = clk_B3, doregs = c(1,5),
+runpars[["regB3"]] <-list(runsp = "bet", regtype2 = "B3", clk = clk95_B3, doregs = c(1,5),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                           dat_lims = NA, cltype = "hcltrp", minss = regB3_minss, strsmp = 15, discards = discards)
@@ -256,11 +290,11 @@ setwd(resdir)
 #dat_lims <- c("a$yrqtr > 1995 | a$flag != 'TW'","a$yrqtr < 2017 | a$flag != 'TW'")
 
 runpars <- list()
-runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(3,4),
+runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk95_Y, doregs = c(3,4),
                          addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                          dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discards = discards)
-runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(3,4),
+runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk95_B2, doregs = c(3,4),
                           addcl = FALSE, dohbf = TRUE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                           dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discards = discards)
@@ -277,11 +311,11 @@ setwd(resdir)
 #dat_lims <- c("a$yrqtr > 1995 | a$flag != 'TW'","a$yrqtr < 2017 | a$flag != 'TW'")
 
 runpars <- list()
-runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk_Y, doregs = c(3,4),
+runpars[["regY"]] <-list(runsp = "yft", regtype2 = "Y", clk = clk95_Y, doregs = c(3,4),
                          addcl = TRUE, dohbf = FALSE, dohook = TRUE,
                          do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                          dat_lims = NA, cltype = "hcltrp", minss = regY_minss, strsmp = 15, discards = discards)
-runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk_B2, doregs = c(3,4),
+runpars[["regB2"]] <-list(runsp = "bet", regtype2 = "B2", clk = clk95_B2, doregs = c(3,4),
                           addcl = TRUE, dohbf = FALSE, dohook = TRUE,
                           do_lognC = TRUE,do_deltalog=TRUE,do_early=TRUE,do_late=TRUE,do_vessallyr=FALSE,
                           dat_lims = NA, cltype = "hcltrp", minss = regB2_minss, strsmp = 15, discards = discards)
@@ -385,6 +419,12 @@ run_standardization(runpars, doflags = c("JP","KR","TW","SY"), regstr = "regB2",
 resdir <- paste0(jntalysis_dir,"trop_cl0_hb1_hk1_TW2005_discard2/")
 dir.create(resdir)
 setwd(resdir)
+
+# Set up the 2005 TW files
+rmfl <- list.files(paste0(twdir, "clustering/"), full.names = TRUE)
+file.remove(rmfl)
+cpfl <- list.files(paste0(twdir, "clustering_2005/"), full.names = TRUE)
+file.copy(from = cpfl, to = paste0(twdir, "clustering/"), recursive = TRUE)
 
 disc_file <- list()
 disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion_2.xlsx", sheet="yft")

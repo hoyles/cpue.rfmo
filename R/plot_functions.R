@@ -583,15 +583,17 @@ plot_slope_ratio2 <- function(coefs1, coefs2, yr1, yr2, titl) {
 #' @param bgc Background color of the plot, defaults to grey.
 #' @param maptype Set to world, world2, or EPO.
 #'
-plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", bgc = "grey", maptype = "world2") {
+plot_catchmap <- function(indat, vbl, dcd, latlim = c(-40, 20), lonlim = c(20, 130), brk = seq(0, 1, 0.05), brk2 = seq(0, 1, 0.1), ti = "", delta = 1, bgc = "grey", maptype = "world2") {
   if(maptype=="EPO") doxax <- "n" else doxax <- "s"
   plot(1:5, 1:5, ylim = latlim, xlim = lonlim, type = "n", xlab = "Longitude", ylab = "Latitude",xaxt=doxax)
-    indat <- cbind(indat, vbl)
-#    indat <- indat[indat$lon <= 140, ]
-    a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lon, lat), sum))
-    usr <- par('usr')
-    rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
-    image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
+  indat <- cbind(indat, vbl)
+  #   indat <- indat[indat$lon <= 140, ]
+  indat$lo <- factor(indat$lon, levels = seq(min(indat$lon, na.rm = T), max(indat$lon, na.rm = T), delta))
+  indat$la <- factor(indat$lat, levels = seq(min(indat$lat, na.rm = T), max(indat$lat, na.rm = T), delta))
+  a1 <- with(indat[indat$decade == dcd, ], tapply(vbl, list(lo, la), sum))
+  usr <- par('usr')
+  rect(usr[1], usr[3], usr[2], usr[4], col = bgc)
+  image(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, col = heat.colors(length(brk) - 1), breaks = brk)
     contour(as.numeric(rownames(a1)), as.numeric(colnames(a1)), a1, add = T, levels = brk2)
     if(maptype %in% c("world2", "world")) {
       maps::map(database = maptype, add = T, interior = F, fill = T)

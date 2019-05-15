@@ -251,9 +251,10 @@ select_data_JointIO <- function(indat, runreg, clk = NA, runsp, mt, vars, minqtr
 #' @param vars Default variables to include in the dataset.
 #' @param yrlims Bounding years for the analysis. Use integer values, because yrqtrs use 0.125 to 0.875.
 #' @param oneflag If not NA, the flag to use in the analysis. Otherwise flags JP, KR, SY, TW are used.
+#' @param dovessid Defaults to TRUE. If FALSE all vessel ids are made the same, which switches off data selection based on vessel ID.
 #' @return Modified dataset.
 #'
-select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, oneflag = NA) {
+select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, oneflag = NA, dovessid = TRUE) {
   clk <- runpars$clk
   minss <- runpars$minss
   minqtrs <- minss$minq_byreg[runreg]
@@ -292,6 +293,7 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
     gdat$clust <- as.factor(paste0(gdat$flag, gdat$clust))
     vars <- c(vars, "clust")
   }
+
   if (dim(gdat)[1] > 0) {
     if(rm_hbfna) {
       if (sum(is.na(gdat$hbf)) > 0)
@@ -311,6 +313,8 @@ select_data_IO2 <- function(indat, runreg, runpars, mt, vars, yrlims = NA, onefl
       gdat <- gdat[gdat[, runsp] > 0, ]
 
     # Data cleaning
+    if (dovessid == FALSE) gdat$vessid <- gdat$vessid[1]
+
     yqll <- paste(gdat$yrqtr, gdat$latlong)
     a <- table(yqll)
     a <- a[a >= minyqll]

@@ -4,9 +4,9 @@
 #' @param res Fitted model for diagnostics.
 #' @param ti Titles for the plots.
 #'
-plotdiags <- function(res, ti = "") {
-  hist(res, nclass = 200, freq = F, xlab = "Residuals", main = ti)
-  lines((-30:30)/10, dnorm((-30:30)/10, sd = sd(res)), col = 2)
+plotdiags <- function(res, ti = "", ...) {
+  hist(res, nclass = 200, freq = F, xlab = "Residuals", main = ti, ...)
+  lines(-300:300, dnorm(-300:300, sd = sd(res)), col = 2)
   sdres <- res/sd(res)
   qqDist(sdres, add.median = T)
 }

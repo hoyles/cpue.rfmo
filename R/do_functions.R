@@ -214,7 +214,7 @@ run_standardization <- function(runpars, doflags, regstr, maxyr, stdlabs, projdi
     glmdat$.wtt   <- mk_wts(glmdat,wttype = "area")
 
     if (do_early) {
-      glmdat5279 <- select_data_IO2(jdat2,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1952,1980), oneflag = onefl)
+      glmdat5279 <- select_data_IO2(jdat2,runreg = runreg, runpars = rp, mt = "deltabin",vars = vars, yrlims=c(1952,1980), oneflag = onefl, dovessid = FALSE)
       if (!is.na(strsmp) & nrow(glmdat5279) > 60000)
         glmdat5279 <- samp_strat_data(glmdat5279, strsmp)
 

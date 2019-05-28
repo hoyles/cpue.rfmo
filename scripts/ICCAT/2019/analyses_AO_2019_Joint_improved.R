@@ -88,7 +88,7 @@ regstr <- "regY1"; runreg <- 2; keepd <- TRUE; doflags <- "TW"
 maxyr <- 2019
 
 # with clusters, hooks, hbf
-resdir <- paste0(jntalysis_dir,"cl1_hb1_hk1/")
+resdir <- paste0(jntalysis_dir,"cl1_hb1_hk1_test/")
 dir.create(resdir)
 setwd(resdir)
 

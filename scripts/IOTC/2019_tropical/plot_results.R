@@ -3,6 +3,7 @@
 ########################################
 # Joint standardization
 projdir <- "~/IOTC/2019_CPUE_tropical/"
+projdir <- "~/../OneDrive_personal/OneDrive/Consulting/IOTC/2019_CPUE_tropical/"
 
 jointdir <- paste0(projdir, "joint/")
 JPdir <- paste0(projdir, "JP/")
@@ -598,7 +599,125 @@ for (resdir in alldirs) {
 
 ############ Start of comparison plots ##############
 
+projdir <- "~/IOTC/2019_CPUE_tropical/"
+projdir <- "~/../OneDrive_personal/OneDrive/Consulting/IOTC/2019_CPUE_tropical/"
+
+jointdir <- paste0(projdir, "joint/")
+JPdir <- paste0(projdir, "JP/")
+KRdir <- paste0(projdir, "KR/")
+#SYdir <- paste0(projdir, "SY/")
+TWdir <- paste0(projdir, "TW/")
+
+
+alldirs <- c("temp_cl0_hb1_hk1_TW1995/",
+             "temp_cl0_hb1_hk1_TW2005/",
+             "temp_cl1_hb0_hk1_TW1995/",
+             "temp_cl1_hb0_hk1_TW2005/",
+             "trop_cl0_hb1_hk1_TW1995/",
+             "trop_cl0_hb1_hk1_TW2005/",
+             "temp_cl0_hb1_hk1_TW1995_discard/",
+             "temp_cl0_hb1_hk1_TW2005_discard/",
+             "temp_cl0_hb1_hk1_TW2005_discard2/",
+             "temp_cl1_hb0_hk1_TW1995_discard/",
+             "temp_cl1_hb0_hk1_TW2005_discard/",
+             "temp_cl1_hb0_hk1_TW2005_discard2/",
+             "trop_cl0_hb1_hk1_TW2005_discard2/",
+             "trop_cl0_hb1_hk1_TW1995_discards/",
+             "trop_cl0_hb1_hk1_TW2005_discard/",
+             "trop_temp_cl1_hb1_hk1_TW2005/")
+
+length(alldirs)
+
+reglist <- list("regA4" = c(1:4), "regA5" = 1, "regY" = 2:5, "regY2" = c(2,7), "regB2" = 1:4, "regB3" = c(1,5))
+splist <- list("regA4" = "alb", "regA5" = "alb", "regB2" = "bet", "regB3" = "bet", "regY" = "yft", "regY2" = "yft")
+
+library("cpue.rfmo")
+
+mdtn <- "novess_allyrs"
+mdtv <- "boat_allyrs"
+md5279 <- "novess_5279"
+md79nd <- "vessid_79nd"
+keepd <- TRUE
+yr1 = 1952
+
+mdt_all <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")
+mdti_all <- c(paste0(yr1,"-present no vessid"),paste0(yr1,"-present vessid"),paste0(yr1,"-1979 no vessid"),"1979-present vessid")
+reg_strs <- c("regY","regY2","regB2","regYB3")
+
 library(readxl)
+# make a list of result files
+
+#### Discards
+
+dodirs_hbf <- c("temp_cl0_hb1_hk1_TW2005/",
+            "trop_cl0_hb1_hk1_TW2005/",
+            "temp_cl0_hb1_hk1_TW2005_discard/",
+            "trop_cl0_hb1_hk1_TW2005_discard/",
+            "temp_cl0_hb1_hk1_TW2005_discard2/",
+            "trop_cl0_hb1_hk1_TW2005_discard2/")
+
+dodirs_cl <-  c("temp_cl1_hb0_hk1_TW2005/",
+             "temp_cl1_hb0_hk1_TW2005_discard/",
+             "temp_cl1_hb0_hk1_TW2005_discard2/")
+
+dodirs_95 <- c("temp_cl0_hb1_hk1_TW1995/",
+              "temp_cl0_hb1_hk1_TW2005/",
+             "temp_cl1_hb0_hk1_TW1995/",
+             "temp_cl1_hb0_hk1_TW2005/",
+             "trop_cl0_hb1_hk1_TW1995/",
+             "trop_cl0_hb1_hk1_TW2005/")
+
+for (tgt in c("hbf", "cl", "95")) {
+  for (regtype in c("regY", "regY2", "regB2", "regB3")) {
+    reslist <- list()
+    for (rr in as.character(1:7)) {
+      for (dd in get(paste0("dodirs_", tgt))) {
+        ff <- paste0(jointdir,"analyses/",dd,"outputs/Joint_", regtype, "_R", rr, "_dellog_vessid_79nd_yr.csv")
+        if(file.exists(ff)) reslist[[rr]][[dd]] <- read.csv(ff)
+      }
+    }
+
+    for (rr in as.character(1:7)) {
+      donames <- gsub("/", "", substring(names(reslist[[rr]]), 18))
+      if(length(donames) > 1) {
+        windows()
+        plot(1:10,1:10, type = "n", xlab = "Year", ylab = "Relative catch rate",
+             xlim = c(1979, 2018), ylim = c(0,3), main = paste0("R", rr))
+        i = 0
+        for (dd in names(reslist[[rr]])) {
+          i <- i + 1
+          dat <- reslist[[rr]][[dd]]
+          lines(dat$yr, dat$pr, type = "b", lty = i, pch = i, col = i)
+        }
+        legend("topright", legend = donames, pch = 1:i, lty = 1:i, col = 1:i, ncol = 1, cex = 1)
+        fname <- paste0(jointdir, "Discard runs ", tgt, " ", regtype, " R", rr, ".png")
+        savePlot(fname, type = "png")
+
+        windows()
+        plot(1:10,1:10, type = "n", xlab = "Year", ylab = "Relative catch rate",
+             xlim = c(1979, 2018), ylim = c(0,3), main = paste0("R", rr))
+        i = 1
+        dat0 <- reslist[[rr]][[names(reslist[[rr]])[1]]]
+        for (dd in names(reslist[[rr]])[-1]) {
+          i <- i + 1
+          dat <- reslist[[rr]][[dd]]
+          lines(dat$yr, dat$pr / dat0$pr, type = "b", lty = i, pch = i, col = i)
+        }
+        legend("topright", legend = donames[-1], pch = 2:i, lty = 2:i, col = 2:i, ncol = 1, cex = 1)
+        fname <- paste0(jointdir, "Discard runs ratios ", tgt, " ", regtype, " R", rr, ".png")
+        savePlot(fname, type = "png")
+      }
+    }
+  }
+  graphics.off()
+}
+
+
+
+
+
+
+
 a <- excel_sheets("~/../Google Drive/My papers/IOTC/WPTT/2015-17/IOTC-2015-WPTT17-DATA03 - std_cpue_JP_LL_yft_2015.xlsx")
 dat <- read_excel("~/../Google Drive/My papers/IOTC/WPTT/2015-17/IOTC-2015-WPTT17-DATA03 - std_cpue_JP_LL_yft_2015.xlsx",sheet=4)
 dat$yrqtr <- dat$yr + dat$qt/4 - 0.125

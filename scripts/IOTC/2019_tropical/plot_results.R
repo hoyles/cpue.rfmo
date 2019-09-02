@@ -660,14 +660,15 @@ dodirs_cl <-  c("temp_cl1_hb0_hk1_TW2005/",
              "temp_cl1_hb0_hk1_TW2005_discard/",
              "temp_cl1_hb0_hk1_TW2005_discard2/")
 
-dodirs_95 <- c("temp_cl0_hb1_hk1_TW1995/",
-              "temp_cl0_hb1_hk1_TW2005/",
-             "temp_cl1_hb0_hk1_TW1995/",
-             "temp_cl1_hb0_hk1_TW2005/",
-             "trop_cl0_hb1_hk1_TW1995/",
-             "trop_cl0_hb1_hk1_TW2005/")
+dodirs_hbf_95 <- c("temp_cl0_hb1_hk1_TW2005/",
+                   "temp_cl0_hb1_hk1_TW1995/",
+                   "trop_cl0_hb1_hk1_TW2005/",
+                   "trop_cl0_hb1_hk1_TW1995/")
 
-for (tgt in c("hbf", "cl", "95")) {
+dodirs_cl_95 <-  c("temp_cl1_hb0_hk1_TW2005/",
+                   "temp_cl1_hb0_hk1_TW1995/")
+
+for (tgt in c("hbf", "cl", "hbf_95", "cl_95")) {
   for (regtype in c("regY", "regY2", "regB2", "regB3")) {
     reslist <- list()
     for (rr in as.character(1:7)) {
@@ -682,11 +683,12 @@ for (tgt in c("hbf", "cl", "95")) {
       if(length(donames) > 1) {
         windows()
         plot(1:10,1:10, type = "n", xlab = "Year", ylab = "Relative catch rate",
-             xlim = c(1979, 2018), ylim = c(0,3), main = paste0("R", rr))
+             xlim = c(1979, 2018), ylim = c(0,3), main = paste0(regtype, " R", rr))
         i = 0
         for (dd in names(reslist[[rr]])) {
           i <- i + 1
           dat <- reslist[[rr]][[dd]]
+          dat$pr <- dat$pr / mean(dat$pr)
           lines(dat$yr, dat$pr, type = "b", lty = i, pch = i, col = i)
         }
         legend("topright", legend = donames, pch = 1:i, lty = 1:i, col = 1:i, ncol = 1, cex = 1)
@@ -695,15 +697,17 @@ for (tgt in c("hbf", "cl", "95")) {
 
         windows()
         plot(1:10,1:10, type = "n", xlab = "Year", ylab = "Relative catch rate",
-             xlim = c(1979, 2018), ylim = c(0,3), main = paste0("R", rr))
+             xlim = c(1979, 2018), ylim = c(0,3), main = paste0(regtype, " R", rr))
         i = 1
         dat0 <- reslist[[rr]][[names(reslist[[rr]])[1]]]
+        dat0$pr <- dat0$pr / mean(dat0$pr)
         for (dd in names(reslist[[rr]])[-1]) {
           i <- i + 1
           dat <- reslist[[rr]][[dd]]
+          dat$pr <- dat$pr / mean(dat$pr)
           lines(dat$yr, dat$pr / dat0$pr, type = "b", lty = i, pch = i, col = i)
         }
-        legend("topright", legend = donames[-1], pch = 2:i, lty = 2:i, col = 2:i, ncol = 1, cex = 1)
+        if (i > 2) legend("topright", legend = donames[-1], pch = 2:i, lty = 2:i, col = 2:i, ncol = 1, cex = 1)
         fname <- paste0(jointdir, "Discard runs ratios ", tgt, " ", regtype, " R", rr, ".png")
         savePlot(fname, type = "png")
       }
@@ -711,8 +715,6 @@ for (tgt in c("hbf", "cl", "95")) {
   }
   graphics.off()
 }
-
-
 
 
 

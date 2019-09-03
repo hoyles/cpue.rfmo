@@ -236,8 +236,8 @@ cpfl <- list.files(paste0(twdir, "clustering_1995/"), full.names = TRUE)
 file.copy(from = cpfl, to = paste0(twdir, "clustering/"), recursive = TRUE)
 
 disc_file <- list()
-disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="yft")
-disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="bet")
+disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="yft", range = 'A1:E86')
+disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="bet", range = 'A1:E86')
 names(disc_file$yft) <- names(disc_file$bet) <- c("year","reg","retain","discard","rate")
 disc_file$yft$regstr <- "regY2"
 disc_file$bet$regstr <- "regB3"
@@ -331,8 +331,8 @@ dir.create(resdir)
 setwd(resdir)
 
 disc_file <- list()
-disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="yft")
-disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="bet")
+disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="yft", range = 'A1:E86')
+disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion.xlsx", sheet="bet", range = 'A1:E86')
 names(disc_file$yft) <- names(disc_file$bet) <- c("year","reg","retain","discard","rate")
 disc_file$yft$regstr <- "regY2"
 disc_file$bet$regstr <- "regB3"
@@ -427,8 +427,8 @@ cpfl <- list.files(paste0(twdir, "clustering_2005/"), full.names = TRUE)
 file.copy(from = cpfl, to = paste0(twdir, "clustering/"), recursive = TRUE)
 
 disc_file <- list()
-disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion_2.xlsx", sheet="yft")
-disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion_2.xlsx", sheet="bet")
+disc_file$yft <- readxl::read_xlsx("../../../docs/TW_discards_byregion_2.xlsx", sheet="yft", range = 'A1:E86')
+disc_file$bet <- readxl::read_xlsx("../../../docs/TW_discards_byregion_2.xlsx", sheet="bet", range = 'A1:E86')
 names(disc_file$yft) <- names(disc_file$bet) <- c("year","reg","retain","discard","rate")
 disc_file$yft$regstr <- "regY2"
 disc_file$bet$regstr <- "regB3"

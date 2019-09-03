@@ -705,9 +705,14 @@ for (tgt in c("hbf", "cl", "hbf_95", "cl_95")) {
           i <- i + 1
           dat <- reslist[[rr]][[dd]]
           dat$pr <- dat$pr / mean(dat$pr)
-          lines(dat$yr, dat$pr / dat0$pr, type = "b", lty = i, pch = i, col = i)
+          lines(dat$yr, dat$pr / dat0$pr, type = "b", lty = i, pch = i, col = i-1)
+          lin1 <- lm(dat$pr / dat0$pr ~ dat$yr)
+
+          tt <- paste(prettyNum(100 * lin1$coefficients[2], digits = 2, format = "f"), "% \u00B1 ", prettyNum(100 * summary(lin1)$coefficients[2, 2], digits = 2, format = "f"), ", p = ", prettyNum(summary(lin1)$coefficients[2, 4], digits = 2, format = "f"), sep = "")
+          if (i == 2) text(dat$yr[10], 1.6, tt, font = 2, col = 1, cex = 1.1)
+          if (i == 3) text(dat$yr[10], 1.8, tt, font = 2, col = 2, cex = 1.1)
         }
-        if (i > 2) legend("topright", legend = donames[-1], pch = 2:i, lty = 2:i, col = 2:i, ncol = 1, cex = 1)
+        if (i > 2) legend("topright", legend = donames[-1], pch = 2:i, lty = 2:i, col = 1:(i-1), ncol = 1, cex = 1)
         fname <- paste0(jointdir, "Discard runs ratios ", tgt, " ", regtype, " R", rr, ".png")
         savePlot(fname, type = "png")
       }

@@ -243,8 +243,7 @@ reg_strs <- c("regY1")
 for (resdir in alldirs) {
   for (regstr in reg_strs) {
     for (r in reglist[[regstr]]) {
- #     for (r in reglist[[regstr]]) {
-      outdir <- paste0(resdir,"diags/")
+      outdir <- paste0(resdir,"spat_temp/")
       dir.create(outdir)
       runreg <- r
       mdn <- 4
@@ -254,81 +253,134 @@ for (resdir in alldirs) {
       vartype <- c("lognC")
       modtype <- paste(vartype,mdt,sep="_")
       fname <- paste0("Joint_",regstr,"_R",runreg)
-      load(paste0(resdir,fname,"_",modtype,"_model.RData"))
-      a <- mod$data
-      b <- mod$residuals
-      #for (fl in sort(unique(a$flag))) {
-      #  loc <- as.character(a$flag)==fl
-      loc <- TRUE
-      ll <- as.numeric(unlist(strsplit(as.character(a$latlong),"_")))
-      a$lat <- ll[seq(1,length(ll),2)]
-      a$lon <- ll[seq(2,length(ll),2)]
-      bb <- tapply(b[loc],list(as.character(a$lat[loc]), a$yrqtr),median)
-      str(bb)
-      yq <- sort(unique(a$yrqtr))
-      lats <- sort(as.numeric(dimnames(bb)[[1]]))
-      ncl <- length(lats)
-      mf <- c(5,5)
-      if (ncl <= 20) mf <- c(5,4)
-      if (ncl <= 16) mf <- c(4,4)
-      if (ncl <= 9) mf <- c(3,3)
-      if (ncl <= 4) mf <- c(2,2)
-      if (ncl == 1) mf <- c(1,1)
-      windows(18,14);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
-      for (lat in rev(lats)) {
-        i <- match(lat, as.numeric(dimnames(bb)[[1]]))
-        plot(yq, bb[i,], main = lat)
-        mtext(paste(fname,modtype),side=3,outer=T,line=0)
-      }
-      savePlot(paste0(outdir,fname,"_lats.png"),type="png")
+      loadfile <- paste0(resdir,fname,"_",modtype,"_model.RData")
+      if (file.exists(loadfile)) {
+        load(loadfile)
+        a <- mod$data
+        b <- mod$residuals
+        #for (fl in sort(unique(a$flag))) {
+        #  loc <- as.character(a$flag)==fl
+        loc <- TRUE
+        ll <- as.numeric(unlist(strsplit(as.character(a$latlong),"_")))
+        a$lat <- ll[seq(1,length(ll),2)]
+        a$lon <- ll[seq(2,length(ll),2)]
+        bb <- tapply(b[loc],list(as.character(a$lat[loc]), a$yrqtr),median)
+        str(bb)
+        yq <- sort(unique(a$yrqtr))
+        lats <- sort(as.numeric(dimnames(bb)[[1]]))
+        ncl <- length(lats)
+        mf <- c(5,5)
+        if (ncl <= 20) mf <- c(5,4)
+        if (ncl <= 16) mf <- c(4,4)
+        if (ncl <= 9) mf <- c(3,3)
+        if (ncl <= 4) mf <- c(2,2)
+        if (ncl == 1) mf <- c(1,1)
+        windows(18,14);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
+        for (lat in rev(lats)) {
+          i <- match(lat, as.numeric(dimnames(bb)[[1]]))
+          plot(yq, bb[i,], main = lat)
+          mtext(paste(fname,modtype),side=3,outer=T,line=0)
+        }
+        savePlot(paste0(outdir,fname,"_lats.png"),type="png")
 
-      bb <- tapply(b[loc],list(as.character(a$lon[loc]), a$yrqtr),median)
-      lons <- sort(as.numeric(dimnames(bb)[[1]]))
-      ncl <- length(lons)
-      mf <- c(6,6)
-      if (ncl <= 25) mf <- c(5,5)
-      if (ncl <= 16) mf <- c(4,4)
-      if (ncl <= 9) mf <- c(3,3)
-      if (ncl <= 4) mf <- c(2,2)
-      windows(18,14);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
-      for (lon in (lons)) {
-        i <- match(lon, as.numeric(dimnames(bb)[[1]]))
-        plot(yq, bb[i,], main = lon)
-        mtext(paste(fname,modtype),side=3,outer=T,line=0)
-      }
-      savePlot(paste0(outdir,fname,"_lons.png"),type="png")
+        bb <- tapply(b[loc],list(as.character(a$lon[loc]), a$yrqtr),median)
+        lons <- sort(as.numeric(dimnames(bb)[[1]]))
+        ncl <- length(lons)
+        mf <- c(6,6)
+        if (ncl <= 25) mf <- c(5,5)
+        if (ncl <= 16) mf <- c(4,4)
+        if (ncl <= 9) mf <- c(3,3)
+        if (ncl <= 4) mf <- c(2,2)
+        windows(18,14);par(mfrow=mf,mar=c(2,2,2,0),oma=c(0,0,2,0))
+        for (lon in (lons)) {
+          i <- match(lon, as.numeric(dimnames(bb)[[1]]))
+          plot(yq, bb[i,], main = lon)
+          mtext(paste(fname,modtype),side=3,outer=T,line=0)
+        }
+        savePlot(paste0(outdir,fname,"_lons.png"),type="png")
 
-      bb <- tapply(b[loc],list(as.character(a$latlong[loc]), a$yrqtr),median)
-      latlons <- dimnames(bb)[[1]]
-      res <- data.frame(ll = latlons)
-      res$est <- NA
-      for (i in 1:length(latlons)) {
-        bb2 <- bb[i,]
-        bbg <- bb2[!is.na(bb2)]
-        yqe <- as.numeric(names(bbg))
-        res$est[i] <- glm(bbg ~ yqe)$coefficients[2]
-      }
-      ll <- as.numeric(unlist(strsplit(as.character(res$ll),"_")))
-      res$lat <- ll[seq(1,length(ll),2)]
-      res$lon <- ll[seq(2,length(ll),2)]
-      bb3 <- tapply(res$est,list(res$lon,res$lat),mean)
-      windows(width = 18, height = 14)
-      image(sort(unique(res$lon)),sort(unique(res$lat)),bb3,xlab="Lon",ylab="Lat",main=paste0(fname," Residual trends by cell"),breaks = seq(-0.07, 0.075, length.out = 31), col=heat.colors(30))
-      contour(sort(unique(res$lon)),sort(unique(res$lat)),100*bb3,add=T,levels=seq(-10,10,length.out=41))
-      map(add=TRUE,fill=TRUE)
-      savePlot(paste0(outdir,fname,"_Res trends.png"), type = "png")
-      # Table of strata sample sizes
+        bb <- tapply(b[loc],list(as.character(a$latlong[loc]), a$yrqtr),median)
+        latlons <- dimnames(bb)[[1]]
+        res <- data.frame(ll = latlons)
+        res$est <- NA
+        for (i in 1:length(latlons)) {
+          bb2 <- bb[i,]
+          bbg <- bb2[!is.na(bb2)]
+          yqe <- as.numeric(names(bbg))
+          res$est[i] <- glm(bbg ~ yqe)$coefficients[2]
+        }
+        ll <- as.numeric(unlist(strsplit(as.character(res$ll),"_")))
+        res$lat <- ll[seq(1,length(ll),2)]
+        res$lon <- ll[seq(2,length(ll),2)]
+        bb3 <- tapply(res$est,list(res$lon,res$lat),mean)
+        windows(width = 18, height = 14)
+        image(sort(unique(res$lon)),sort(unique(res$lat)),bb3,xlab="Lon",ylab="Lat",main=paste0(fname," Residual trends by cell"),breaks = seq(-0.07, 0.075, length.out = 31), col=heat.colors(30))
+        contour(sort(unique(res$lon)),sort(unique(res$lat)),100*bb3,add=T,levels=seq(-10,10,length.out=41))
+        map(add=TRUE,fill=TRUE)
+        savePlot(paste0(outdir,fname,"_Res trends.png"), type = "png")
+        # Table of strata sample sizes
 
-      a <- mod$data
-      samps <- tapply(a$latlong, list(a$latlong, a$yrqtr), length)
-      windows()
-      table(samps)
-      hist(samps, breaks = seq(0, 1000, 1), xlim = c(0, max(samps, na.rm = TRUE)), main = paste0(fname," Histogram of sample sizes by stratum"))
-      savePlot(paste0(outdir,fname,"ss_by_stratum_R", r, ".png"), type = "png")
+        a <- mod$data
+        samps <- tapply(a$latlong, list(a$latlong, a$yrqtr), length)
+        windows()
+        table(samps)
+        hist(samps, breaks = seq(0, 1000, 1), xlim = c(0, max(samps, na.rm = TRUE)), main = paste0(fname," Histogram of sample sizes by stratum"))
+        savePlot(paste0(outdir,fname,"ss_by_stratum_R", r, ".png"), type = "png")
+      }
       graphics.off()
     }
   }
 }
+
+for (resdir in alldirs) {
+  for (regstr in reg_strs) {
+    for (r in reglist[[regstr]]) {
+      outdir <- paste0(resdir,"spat_temp/")
+      dir.create(outdir)
+      runreg <- r
+      mdn <- 4
+      mdt <- c("novess_allyrs","boat_allyrs","novess_5279","vessid_79nd")[mdn]
+      mdti <- c("1952-present no vessid","1952-present vessid","1952-1979 no vessid")[mdn]
+      sp <- splist[[regstr]]
+      vartype <- c("lognC")
+      modtype <- paste(vartype,mdt,sep="_")
+      fname <- paste0("Joint_",regstr,"_R",runreg)
+      loadfile <- paste0(resdir,fname,"_",modtype,"_model.RData")
+      if (file.exists(loadfile)) {
+        load(loadfile)
+        a <- mod$coefficients
+        a <- a[grep("latlong", names(a))]
+        lln <- names(a)
+        lln <- gsub("latlong", "", lln)
+        requireNamespace("maps")
+
+        ll <- as.numeric(unlist(strsplit(lln,"_")))
+        lats <- ll[seq(1,length(ll),2)]
+        lons <- ll[seq(2,length(ll),2)]
+        bb <- data.frame(lats = lats, lons = lons)
+        bb$coef <- a
+        bb$expco <- exp(bb$coef)
+
+        library(maps)
+        library(maptools)
+        bb2 <- with(bb, tapply(expco,list(lons, lats),median))
+        lt1 <- sort(as.numeric(unique(bb$lats)))
+        ln1 <- sort(as.numeric(unique(bb$lons)))
+        ltx <- c(lt1 - 2.5, 25)
+        lnx <- c(ln1 - 2.5, 15)
+
+        windows(width = 14, height = 10)
+        dim(bb2)
+        image(ln1, lt1, bb2, ylab = "Lat", xlab = "Long", main = paste("Relative density in Region", substring(mr, 2)))
+        contour(ln1, lt1, bb2, levels = seq(0,3,.2), add = TRUE, col = 4, labcex = 1)
+        map(add = TRUE, fill = TRUE)
+        savePlot(paste0(outdir, fname, "_Relative density.png"), type = "png")
+      }
+      graphics.off()
+    }
+  }
+}
+
 
 #########################################################
 # Replaced by the more efficient code above.
@@ -737,15 +789,26 @@ savePlot(paste0(basedir,"BET_2015_ratio.png"),type="png")
 ########################################
 
 # Plot surface
-load(paste0(alldirs[1], paste0("Joint_regY1_R", 1, "_lognC_vessid_79nd_model.RData")))
-m1 <- mod
-load(paste0(alldirs[1], paste0("Joint_regY1_R", 2, "_lognC_vessid_79nd_model.RData")))
-m2 <- mod
-load(paste0(alldirs[1], paste0("Joint_regY1_R", 3, "_lognC_vessid_79nd_model.RData")))
-m3 <- mod
+load(paste0(alldirs[15], paste0("Joint_regY_R", 2, "_lognC_vessid_79nd_model.RData")))
+y2 <- mod
+load(paste0(alldirs[15], paste0("Joint_regY_R", 5, "_lognC_vessid_79nd_model.RData")))
+y5 <- mod
+load(paste0(alldirs[8], paste0("Joint_regY_R", 3, "_lognC_vessid_79nd_model.RData")))
+y3 <- mod
+load(paste0(alldirs[8], paste0("Joint_regY_R", 4, "_lognC_vessid_79nd_model.RData")))
+y4 <- mod
 
-for (r in 1:3) {
-  mx <- get(paste0("m", r))
+load(paste0(alldirs[15], paste0("Joint_regB2_R", 1, "_lognC_vessid_79nd_model.RData")))
+b1 <- mod
+load(paste0(alldirs[15], paste0("Joint_regB2_R", 2, "_lognC_vessid_79nd_model.RData")))
+b2 <- mod
+load(paste0(alldirs[8],  paste0("Joint_regB2_R", 3, "_lognC_vessid_79nd_model.RData")))
+b3 <- mod
+load(paste0(alldirs[8],  paste0("Joint_regB2_R", 4, "_lognC_vessid_79nd_model.RData")))
+b4 <- mod
+
+for (mr in c("y2","y3","y4","y5","b1","b2","b3","b4")) {
+  mx <- get(mr)
   a <- mx$coefficients
   a <- a[grep("latlong", names(a))]
   lln <- names(a)
@@ -769,10 +832,41 @@ for (r in 1:3) {
 
   windows(width = 14, height = 10)
   dim(bb2)
-  image(ln1, lt1, bb2, ylab = "Lat", xlab = "Long", main = paste("Relative density in Region", r))
-  contour(ln1, lt1, bb2, levels = seq(0,3,.2), add = TRUE, col = 4)
+  image(ln1, lt1, bb2, ylab = "Lat", xlab = "Long", main = paste("Relative density in Region", substring(mr, 2)))
+  contour(ln1, lt1, bb2, levels = seq(0,3,.2), add = TRUE, col = 4, labcex = 1)
   map(add = TRUE, fill = TRUE)
-  savePlot(paste0(jointdir, "Relative density R",r, ".png"), type = "png")
+  savePlot(paste0(jointdir, "Relative density ",mr, ".png"), type = "png")
+}
+
+for (mr in c("y2","y3","y4","y5","b1","b2","b3","b4")) {
+  mx <- get(mr)
+  a <- mx$coefficients
+  a <- a[grep("latlong", names(a))]
+  lln <- names(a)
+  lln <- gsub("latlong", "", lln)
+  requireNamespace("maps")
+
+  ll <- as.numeric(unlist(strsplit(lln,"_")))
+  lats <- ll[seq(1,length(ll),2)]
+  lons <- ll[seq(2,length(ll),2)]
+  bb <- data.frame(lats = lats, lons = lons)
+  bb$coef <- a
+  bb$expco <- exp(bb$coef)
+
+  library(maps)
+  library(maptools)
+  bb2 <- with(bb, tapply(expco,list(lons, lats),median))
+  lt1 <- sort(as.numeric(unique(bb$lats)))
+  ln1 <- sort(as.numeric(unique(bb$lons)))
+  ltx <- c(lt1 - 2.5, 25)
+  lnx <- c(ln1 - 2.5, 15)
+
+  windows(width = 14, height = 10)
+  dim(bb2)
+  image(ln1, lt1, bb2, ylab = "Lat", xlab = "Long", main = paste("Relative density in Region", substring(mr, 2)))
+  contour(ln1, lt1, bb2, levels = seq(0,3,.2), add = TRUE, col = 4, labcex = 1)
+  map(add = TRUE, fill = TRUE)
+  savePlot(paste0(jointdir, "Relative density ",mr, ".png"), type = "png")
 }
 
 # Joined-up model

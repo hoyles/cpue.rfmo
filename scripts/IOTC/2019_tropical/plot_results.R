@@ -126,7 +126,7 @@ prep_indices(resdirs=alldirs[1:16], reg_strs=reg_strs, reglist, vartypes = c("lo
   ## -----------------------------------
 
 
-fl = c("jnt","jnt","jnt")
+fl = rep("jnt",16)
 for(dirnum in 1:16) {
   outdir <- paste0(alldirs[dirnum],"./influence/")
   dir.create(outdir)

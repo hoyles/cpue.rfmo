@@ -4,10 +4,24 @@
 \alias{setup_IO_regions}
 \title{Set up Indian Ocean regions}
 \usage{
-setup_IO_regions(dat, regY = F, regY1 = F, regY2 = F, regY3 = F,
-  regB = F, regB1 = F, regB2 = F, regB3 = F, regB4 = F,
-  regA = F, regA1 = F, regA2 = F, regA3 = F, regA4 = F,
-  regA5 = F)
+setup_IO_regions(
+  dat,
+  regY = F,
+  regY1 = F,
+  regY2 = F,
+  regY3 = F,
+  regB = F,
+  regB1 = F,
+  regB2 = F,
+  regB3 = F,
+  regB4 = F,
+  regA = F,
+  regA1 = F,
+  regA2 = F,
+  regA3 = F,
+  regA4 = F,
+  regA5 = F
+)
 }
 \arguments{
 \item{dat}{Input dataset}

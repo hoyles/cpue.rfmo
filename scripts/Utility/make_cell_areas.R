@@ -1,4 +1,6 @@
-# Generate table of cell areas
+# Code to generate a table of cell areas
+# Simon Hoyle 2019
+
 library(dismo)
 library(scales)
 library(rgeos)
@@ -58,15 +60,19 @@ make_cell_areas <- function(cell_locs, m, EEZ = NA) {
   return(cell_locs)
 }
 
+# You can download the marine regions shapefile from https://www.marineregions.org/. 
+# Marine Regions’ data is licensed under CC-By-NC-SA (https://creativecommons.org/licenses/by-nc-sa/4.0/).
 EEZ_dir <- "~/../OneDrive_personal/OneDrive/Data/World EEZs"
 EEZ_shape_sf <- read_sf(dsn = EEZ_dir, layer = "World_EEZ_v10_2018_0_360") # Load the shapefile for all international
 EEZ_shape_sf2 <- as(EEZ_shape_sf, "Spatial")  # convert to spatial polygon format
 crs.geo <- CRS("+init=EPSG:4326")  # geographical, datum WGS84
 
-grid_edges <- list(xlim=c(0, 360), ylim = c(-50, 50)) # Define the space in which to estimate cell areas
-grid_edges <- list(xlim=c(100, 120), ylim = c(-55, -30)) # Define the space in which to estimate cell areas
+#grid_edges <- list(xlim=c(100, 120), ylim = c(-55, -30)) # This version for testing
+#grid_edges <- list(xlim=c(-180, 180), ylim = c(-50, 50)) # This version for a nicer 'map' with the worldHires database
+grid_edges <- list(xlim=c(0, 360), ylim = c(-50, 50)) # Define the space in which to estimate cell areas. This version for creating the cell_areas. 
 windows()
-m <- map(database = "world2Hires", fill = TRUE, xlim=grid_edges$xlim, ylim = grid_edges$ylim)  # This is the old way, the world without EEZs.
+m <- map(database = "worldHires", fill = TRUE, xlim=grid_edges$xlim, ylim = grid_edges$ylim)  # The old way, without EEZs.
+m <- map(database = "world2Hires", fill = TRUE, xlim=grid_edges$xlim, ylim = grid_edges$ylim)  # The old way, without EEZs.
 # define the boundaries used to clip the space out of the EEZ shapefile
 clp <- with(grid_edges, paste("POLYGON((",
                               xlim[1], ylim[1], ",",
@@ -89,7 +95,7 @@ save(cell_areas, file = "cell_areas")
 
 
 ########-------------------------------------------------------
-# Development and testing
+# Development and testing - you can safelyignore the code below here
 EEZ_dir <- "~/../OneDrive_personal/OneDrive/Data/World EEZs"
 #EEZ_dir <- "~/../OneDrive/Data/World EEZs"
 EEZ_shape_sf <- read_sf(dsn = EEZ_dir, layer = "World_EEZ_v10_2018_0_360") # Load the shapefile for all international EEZs plus land

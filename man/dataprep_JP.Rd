@@ -4,8 +4,13 @@
 \alias{dataprep_JP}
 \title{Prepare Japanese longline data.}
 \usage{
-dataprep_JP(dat, alldat = T, region = "IO", splist = c("bft", "sbt",
-  "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha"))
+dataprep_JP(
+  dat,
+  alldat = T,
+  region = "IO",
+  splist = c("bft", "sbt", "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas",
+    "sha")
+)
 }
 \arguments{
 \item{dat}{Input dataset}

@@ -4,8 +4,7 @@
 \alias{ls.objects}
 \title{List objects in the workspace and their characteristics.}
 \usage{
-ls.objects(pos = 1, pattern, order.by, decreasing = FALSE,
-  head = FALSE, n = 5)
+ls.objects(pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE, n = 5)
 }
 \arguments{
 \item{pos}{Search level.}

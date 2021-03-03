@@ -4,9 +4,21 @@
 \alias{summarize_and_store_dlx}
 \title{Summarize and store GLM results for delta lognormal, with time area interactions.}
 \usage{
-summarize_and_store_dlx(modb1, modb2, modp1, modp2, dat, datpos, fname,
-  modlab, dohbf = dohbf, addcl = addcl, keepd = TRUE, bcorr,
-  cell_areas)
+summarize_and_store_dlx(
+  modb1,
+  modb2,
+  modp1,
+  modp2,
+  dat,
+  datpos,
+  fname,
+  modlab,
+  dohbf = dohbf,
+  addcl = addcl,
+  keepd = TRUE,
+  bcorr,
+  cell_areas
+)
 }
 \arguments{
 \item{modb1}{The model result file from the binomial glm with interactions.}

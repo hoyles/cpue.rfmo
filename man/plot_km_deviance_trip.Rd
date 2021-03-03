@@ -4,8 +4,16 @@
 \alias{plot_km_deviance_trip}
 \title{Make kmeans deviance plot at the trip level.}
 \usage{
-plot_km_deviance_trip(ddd, allsp, r, ti, regtype = "regY",
-  tripid = "tripidmon", saveplot = TRUE, savedir = ".")
+plot_km_deviance_trip(
+  ddd,
+  allsp,
+  r,
+  ti,
+  regtype = "regY",
+  tripid = "tripidmon",
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{ddd}{Dataset to cluster.}

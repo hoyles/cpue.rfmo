@@ -4,8 +4,15 @@
 \alias{plot_effects_IO_old}
 \title{Make effects plot for a glm object.}
 \usage{
-plot_effects_IO_old(model, indat, dovess = T, addcl = F, addpca = F,
-  ti = "", dohbf = T)
+plot_effects_IO_old(
+  model,
+  indat,
+  dovess = T,
+  addcl = F,
+  addpca = F,
+  ti = "",
+  dohbf = T
+)
 }
 \arguments{
 \item{model}{glm object to plot.}

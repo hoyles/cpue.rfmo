@@ -4,8 +4,15 @@
 \alias{plot_spfreqyq}
 \title{Use this plot when deciding which species to cluster.}
 \usage{
-plot_spfreqyq(indat, reg_struc, splist, flag, mfr = c(5, 3),
-  saveplot = TRUE, savedir = ".")
+plot_spfreqyq(
+  indat,
+  reg_struc,
+  splist,
+  flag,
+  mfr = c(5, 3),
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{indat}{Input dataset}

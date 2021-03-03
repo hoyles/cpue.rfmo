@@ -5,9 +5,18 @@
 \title{Cluster dataset based on species composition.
 Run cluster analysis at both set and trip levels, using three methods: hclust, clara, and kmeans.}
 \usage{
-make_clusters(setdat, spp, ncl = 5, titx = "", setclust = T,
-  tripid = "tripid", fname = "", regtype = "regY", saveplot = TRUE,
-  savedir = ".")
+make_clusters(
+  setdat,
+  spp,
+  ncl = 5,
+  titx = "",
+  setclust = T,
+  tripid = "tripid",
+  fname = "",
+  regtype = "regY",
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{setdat}{The input dataset, at the set level.}

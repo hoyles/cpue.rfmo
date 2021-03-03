@@ -4,11 +4,22 @@
 \alias{run_clustercode_byreg}
 \title{Run clustering code across all regions and save the results.}
 \usage{
-run_clustercode_byreg(indat, reg_struc, allsp = parent.frame()$allsp,
-  allabs = parent.frame()$allabs, ncl = "lst", plotPCA = F,
-  clustid = "tripidmon", allclust = F, flag = parent.frame()$flag,
-  dohbf = TRUE, cvnames = parent.frame()$cvn, rgl, saveplot = TRUE,
-  basedir = getwd())
+run_clustercode_byreg(
+  indat,
+  reg_struc,
+  allsp = parent.frame()$allsp,
+  allabs = parent.frame()$allabs,
+  ncl = "lst",
+  plotPCA = F,
+  clustid = "tripidmon",
+  allclust = F,
+  flag = parent.frame()$flag,
+  dohbf = TRUE,
+  cvnames = parent.frame()$cvn,
+  rgl,
+  saveplot = TRUE,
+  basedir = getwd()
+)
 }
 \arguments{
 \item{indat}{The input dataset.}

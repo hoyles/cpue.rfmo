@@ -4,9 +4,18 @@
 \alias{run_standardization}
 \title{Run standardization models.}
 \usage{
-run_standardization(runpars, doflags, regstr, maxyr, stdlabs, projdir,
-  twlimit = 2005, jplimit = list(reg = 4, yr = 0), keepd = TRUE,
-  krlimit = NA)
+run_standardization(
+  runpars,
+  doflags,
+  regstr,
+  maxyr,
+  stdlabs,
+  projdir,
+  twlimit = 2005,
+  jplimit = list(reg = 4, yr = 0),
+  keepd = TRUE,
+  krlimit = NA
+)
 }
 \arguments{
 \item{runpars}{The 'runpars' object with all variables.}

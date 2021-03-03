@@ -4,8 +4,13 @@
 \alias{dataclean_CNIO}
 \title{Clean data.}
 \usage{
-dataclean_CNIO(dat, checktg = F, allHBF = F, splist = c("bft", "sbt",
-  "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha"))
+dataclean_CNIO(
+  dat,
+  checktg = F,
+  allHBF = F,
+  splist = c("bft", "sbt", "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas",
+    "sha")
+)
 }
 \arguments{
 \item{dat}{Input dataset}

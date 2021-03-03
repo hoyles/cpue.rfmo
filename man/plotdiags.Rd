@@ -4,7 +4,7 @@
 \alias{plotdiags}
 \title{Diagnostic plots for Gaussian glm.}
 \usage{
-plotdiags(res, ti = "")
+plotdiags(res, ti = "", ...)
 }
 \arguments{
 \item{res}{Fitted model for diagnostics.}

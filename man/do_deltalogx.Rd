@@ -4,9 +4,21 @@
 \alias{do_deltalogx}
 \title{Run delta lognormal models with interactions.}
 \usage{
-do_deltalogx(dat, dohbf = F, addboat = F, addcl = addcl, nhbf = 3,
-  runsp, fname, modlab, keepd = TRUE, lat5xqtr = T, lat5xyr = T,
-  bcorr = FALSE, cell_areas)
+do_deltalogx(
+  dat,
+  dohbf = F,
+  addboat = F,
+  addcl = addcl,
+  nhbf = 3,
+  runsp,
+  fname,
+  modlab,
+  keepd = TRUE,
+  lat5xqtr = T,
+  lat5xyr = T,
+  bcorr = FALSE,
+  cell_areas
+)
 }
 \arguments{
 \item{dat}{Input dataset.}

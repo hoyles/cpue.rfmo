@@ -4,8 +4,15 @@
 \alias{plot_km_deviance}
 \title{Make kmeans deviance plot.}
 \usage{
-plot_km_deviance(dat, allsp, r, ti, regtype = "regY", saveplot = TRUE,
-  savedir = ".")
+plot_km_deviance(
+  dat,
+  allsp,
+  r,
+  ti,
+  regtype = "regY",
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{dat}{Dataset to cluster.}

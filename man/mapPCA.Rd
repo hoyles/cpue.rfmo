@@ -4,8 +4,16 @@
 \alias{mapPCA}
 \title{Maps of PCA distribution.}
 \usage{
-mapPCA(ddd, nPCA = 6, ti = "", lat5 = F, regtype = "regY", r = r,
-  saveplot = TRUE, savedir = ".")
+mapPCA(
+  ddd,
+  nPCA = 6,
+  ti = "",
+  lat5 = F,
+  regtype = "regY",
+  r = r,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{ddd}{Input dataset}

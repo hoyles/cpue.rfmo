@@ -4,8 +4,15 @@
 \alias{plot_pacific}
 \title{Map of the Pacific Ocean.}
 \usage{
-plot_pacific(plot_title = "", uselims = c(-100, 30, -50, 60),
-  sp = "BET", newm = T, lwdm = 3, axes = T, tcol = "red")
+plot_pacific(
+  plot_title = "",
+  uselims = c(-100, 30, -50, 60),
+  sp = "BET",
+  newm = T,
+  lwdm = 3,
+  axes = T,
+  tcol = "red"
+)
 }
 \arguments{
 \item{plot_title}{Plot title.}

@@ -4,9 +4,13 @@
 \alias{dataprep_TW_EPO}
 \title{Prepare Taiwanese longline data for the EPO.}
 \usage{
-dataprep_TW_EPO(dat, alldat = F, region = "EPO", splist = c("alb",
-  "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha",
-  "oth"))
+dataprep_TW_EPO(
+  dat,
+  alldat = F,
+  region = "EPO",
+  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj",
+    "sha", "oth")
+)
 }
 \arguments{
 \item{dat}{Input dataset}

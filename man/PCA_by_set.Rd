@@ -5,8 +5,13 @@
 \title{Principal components analysis of species composition by 'set'.
 Run PCA at the set level using normalised species composition data.}
 \usage{
-PCA_by_set(datr, Screeplotname = "screeplot set", allsp,
-  saveplot = TRUE, savedir = ".")
+PCA_by_set(
+  datr,
+  Screeplotname = "screeplot set",
+  allsp,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{datr}{The input dataset.}

@@ -4,8 +4,18 @@
 \alias{make_formula_IOx}
 \title{Create formula object to use in the glm, with interactions.}
 \usage{
-make_formula_IOx(runsp, modtype, addboat, dohbf = T, splitboat = F,
-  addcl = F, addpca = NA, nhbf = 6, lat5xqtr = F, lat5xyr = F)
+make_formula_IOx(
+  runsp,
+  modtype,
+  addboat,
+  dohbf = T,
+  splitboat = F,
+  addcl = F,
+  addpca = NA,
+  nhbf = 6,
+  lat5xqtr = F,
+  lat5xyr = F
+)
 }
 \arguments{
 \item{runsp}{Species of interest.}

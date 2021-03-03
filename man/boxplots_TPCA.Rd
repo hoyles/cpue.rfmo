@@ -4,8 +4,17 @@
 \alias{boxplots_TPCA}
 \title{Boxplots of principal components by set characteristics.}
 \usage{
-boxplots_TPCA(dat, nPCA = 6, ti = "", dohbf = T, lat5 = F,
-  regtype = "regY", r = r, saveplot = TRUE, savedir = ".")
+boxplots_TPCA(
+  dat,
+  nPCA = 6,
+  ti = "",
+  dohbf = T,
+  lat5 = F,
+  regtype = "regY",
+  r = r,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{dat}{Input dataset}

@@ -4,8 +4,15 @@
 \alias{plot_effects}
 \title{Make effects plot for a glm object.}
 \usage{
-plot_effects(model, indat, addmain = F, addbranch = F, addalb = F,
-  addother = F, ti = "")
+plot_effects(
+  model,
+  indat,
+  addmain = F,
+  addbranch = F,
+  addalb = F,
+  addother = F,
+  ti = ""
+)
 }
 \arguments{
 \item{model}{glm object to plot.}

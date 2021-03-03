@@ -4,8 +4,12 @@
 \alias{dataclean_TW_EPO}
 \title{Clean TW data.}
 \usage{
-dataclean_TW_EPO(dat1, rmssp = F, splist = c("alb", "bet", "yft",
-  "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha", "oth"))
+dataclean_TW_EPO(
+  dat1,
+  rmssp = F,
+  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj",
+    "sha", "oth")
+)
 }
 \arguments{
 \item{dat1}{Input dataset}

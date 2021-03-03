@@ -4,8 +4,18 @@
 \alias{boxplots_spPCA}
 \title{Boxplots of species composition by principal component.}
 \usage{
-boxplots_spPCA(dat, nPCA = 6, ti = "", outL = T, nsp = 13,
-  regtype = "regY", r = r, allsp, saveplot = TRUE, savedir = ".")
+boxplots_spPCA(
+  dat,
+  nPCA = 6,
+  ti = "",
+  outL = T,
+  nsp = 13,
+  regtype = "regY",
+  r = r,
+  allsp,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{dat}{Input dataset}

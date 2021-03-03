@@ -4,8 +4,15 @@
 \alias{plot_effects_IOx}
 \title{Make effects plot for a glm object with interactions.}
 \usage{
-plot_effects_IOx(model, indat, dovess = T, addcl = F, addpca = F,
-  ti = "", dohbf = T)
+plot_effects_IOx(
+  model,
+  indat,
+  dovess = T,
+  addcl = F,
+  addpca = F,
+  ti = "",
+  dohbf = T
+)
 }
 \arguments{
 \item{model}{glm object to plot.}

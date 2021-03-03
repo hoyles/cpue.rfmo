@@ -4,8 +4,13 @@
 \alias{dataclean_JPIO}
 \title{Clean data.}
 \usage{
-dataclean_JPIO(dat, checktg = F, allHBF = F, splist = c("bft", "sbt",
-  "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha"))
+dataclean_JPIO(
+  dat,
+  checktg = F,
+  allHBF = F,
+  splist = c("bft", "sbt", "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas",
+    "sha")
+)
 }
 \arguments{
 \item{dat}{Input dataset}

@@ -4,9 +4,17 @@
 \alias{plot_IO}
 \title{Map of the Indian Ocean.}
 \usage{
-plot_IO(plot_title = "", uselims = c(20, 130, -50, 25), sp = "YFT",
-  newm = T, lwdm = 3, axes = T, tcol = "red", mapfill = TRUE,
-  bgc = "lightblue")
+plot_IO(
+  plot_title = "",
+  uselims = c(20, 130, -50, 25),
+  sp = "YFT",
+  newm = T,
+  lwdm = 3,
+  axes = T,
+  tcol = "red",
+  mapfill = TRUE,
+  bgc = "lightblue"
+)
 }
 \arguments{
 \item{plot_title}{Plot title.}

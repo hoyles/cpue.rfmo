@@ -4,8 +4,10 @@
 \alias{dataclean_USAO}
 \title{Clean US data.}
 \usage{
-dataclean_USAO(dat, splist = c("bft", "alb", "bet", "yft", "swo", "mls",
-  "bum", "bsh", "sma", "por"))
+dataclean_USAO(
+  dat,
+  splist = c("bft", "alb", "bet", "yft", "swo", "mls", "bum", "bsh", "sma", "por")
+)
 }
 \arguments{
 \item{dat}{Input dataset}

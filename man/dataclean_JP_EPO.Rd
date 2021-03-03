@@ -4,8 +4,12 @@
 \alias{dataclean_JP_EPO}
 \title{Clean data.}
 \usage{
-dataclean_JP_EPO(dat, checktg = F, splist = c("alb", "bet", "yft",
-  "swo", "mls", "bum", "blm", "sas", "sha", "sfa", "ssp"))
+dataclean_JP_EPO(
+  dat,
+  checktg = F,
+  splist = c("alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha", "sfa",
+    "ssp")
+)
 }
 \arguments{
 \item{dat}{Input dataset}

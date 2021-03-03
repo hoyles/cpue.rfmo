@@ -4,8 +4,17 @@
 \alias{boxplots_PCA}
 \title{Boxplots of PCA by set characteristics.}
 \usage{
-boxplots_PCA(dat, nPCA = 3, ti = "", dohbf = T, lat5 = F,
-  regtype = "regY", r = r, saveplot = TRUE, savedir = ".")
+boxplots_PCA(
+  dat,
+  nPCA = 3,
+  ti = "",
+  dohbf = T,
+  lat5 = F,
+  regtype = "regY",
+  r = r,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{dat}{Input dataset}

@@ -4,9 +4,21 @@
 \alias{select_data_TW}
 \title{Select TW data for the GLM.}
 \usage{
-select_data_TW(indat, runreg, runsp, mt, minqtrs = 2, maxqtrs = 500,
-  addmain = F, addother = F, addalb = F, fc = "both",
-  bait = "no23", llstrat = 5, doboth = F)
+select_data_TW(
+  indat,
+  runreg,
+  runsp,
+  mt,
+  minqtrs = 2,
+  maxqtrs = 500,
+  addmain = F,
+  addother = F,
+  addalb = F,
+  fc = "both",
+  bait = "no23",
+  llstrat = 5,
+  doboth = F
+)
 }
 \arguments{
 \item{indat}{Input dataset}

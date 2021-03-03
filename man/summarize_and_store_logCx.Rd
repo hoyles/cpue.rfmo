@@ -4,8 +4,19 @@
 \alias{summarize_and_store_logCx}
 \title{Summarize and store GLM results for lognormal constant glm, with time area interactions.}
 \usage{
-summarize_and_store_logCx(mod1, mod2, dat, fname, modlab, addcl = addcl,
-  dohbf = dohbf, keepd = TRUE, mn, bcorr = FALSE, cell_areas)
+summarize_and_store_logCx(
+  mod1,
+  mod2,
+  dat,
+  fname,
+  modlab,
+  addcl = addcl,
+  dohbf = dohbf,
+  keepd = TRUE,
+  mn,
+  bcorr = FALSE,
+  cell_areas
+)
 }
 \arguments{
 \item{mod1}{The model result file from the lognormal constant glm with interactions.}

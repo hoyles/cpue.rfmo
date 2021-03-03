@@ -4,9 +4,19 @@
 \alias{map_clusters}
 \title{Maps of cluster distribution.}
 \usage{
-map_clusters(ddd, cl = "hclustcl", ti = "", lat5 = F,
-  regtype = "regY", ncl, r = r, xl = NA, yl = NA,
-  saveplot = TRUE, savedir = ".")
+map_clusters(
+  ddd,
+  cl = "hclustcl",
+  ti = "",
+  lat5 = F,
+  regtype = "regY",
+  ncl,
+  r = r,
+  xl = NA,
+  yl = NA,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{ddd}{Input dataset}

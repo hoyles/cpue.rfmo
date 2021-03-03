@@ -4,10 +4,25 @@
 \alias{select_data_IO}
 \title{Select data for the GLM.}
 \usage{
-select_data_IO(indat, runreg, clk = NA, runsp, mt, vars, minqtrs = 2,
-  maxqtrs = 500, minvess = 100, minll = 100, minyrqtr = 100,
-  llstrat = 5, addcl = F, cltype = NA, addpca = NA, samp = NA,
-  strsmp = 30)
+select_data_IO(
+  indat,
+  runreg,
+  clk = NA,
+  runsp,
+  mt,
+  vars,
+  minqtrs = 2,
+  maxqtrs = 500,
+  minvess = 100,
+  minll = 100,
+  minyrqtr = 100,
+  llstrat = 5,
+  addcl = F,
+  cltype = NA,
+  addpca = NA,
+  samp = NA,
+  strsmp = 30
+)
 }
 \arguments{
 \item{indat}{Input dataset}

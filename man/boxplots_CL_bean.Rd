@@ -4,9 +4,18 @@
 \alias{boxplots_CL_bean}
 \title{Beanplots of set characteristics by cluster.}
 \usage{
-boxplots_CL_bean(dat, cl = "kmeans", ti = "", outL = T, dohbf = T,
-  lat5 = F, regtype = regtype, r = r, saveplot = TRUE,
-  savedir = ".")
+boxplots_CL_bean(
+  dat,
+  cl = "kmeans",
+  ti = "",
+  outL = T,
+  dohbf = T,
+  lat5 = F,
+  regtype = regtype,
+  r = r,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{dat}{Input dataset}

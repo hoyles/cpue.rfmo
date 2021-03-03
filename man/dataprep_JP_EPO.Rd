@@ -4,8 +4,12 @@
 \alias{dataprep_JP_EPO}
 \title{Prepare Japanese longline data for the eastern and western Pacific, IATTC 2019.}
 \usage{
-dataprep_JP_EPO(dat, alldat = T, splist = c("alb", "bet", "yft", "swo",
-  "mls", "bum", "blm", "sas", "sha", "sai", "spf"))
+dataprep_JP_EPO(
+  dat,
+  alldat = T,
+  splist = c("alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha", "sai",
+    "spf")
+)
 }
 \arguments{
 \item{dat}{Input dataset}

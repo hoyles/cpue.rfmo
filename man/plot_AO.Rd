@@ -4,8 +4,15 @@
 \alias{plot_AO}
 \title{Map of the Atlantic Ocean.}
 \usage{
-plot_AO(plot_title = "", uselims = c(-100, 30, -50, 60), sp = "BET",
-  newm = T, lwdm = 3, axes = T, tcol = "red")
+plot_AO(
+  plot_title = "",
+  uselims = c(-100, 30, -50, 60),
+  sp = "BET",
+  newm = T,
+  lwdm = 3,
+  axes = T,
+  tcol = "red"
+)
 }
 \arguments{
 \item{plot_title}{Plot title.}

@@ -4,8 +4,18 @@
 \alias{boxplots_spCL}
 \title{Boxplots of species CPUE by cluster.}
 \usage{
-boxplots_spCL(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
-  regtype = regtype, r = r, allsp, saveplot = TRUE, savedir = ".")
+boxplots_spCL(
+  dat,
+  cl = "kmeans",
+  ti = "",
+  outL = T,
+  nsp = 13,
+  regtype = regtype,
+  r = r,
+  allsp,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{dat}{Input dataset}

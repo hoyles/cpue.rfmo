@@ -4,8 +4,18 @@
 \alias{boxplots_spCL_comp}
 \title{Boxplots of species composition by cluster.}
 \usage{
-boxplots_spCL_comp(dat, cl = "kmeans", ti = "", outL = T, nsp = 13,
-  regtype = regtype, r = r, allsp, saveplot = TRUE, savedir = ".")
+boxplots_spCL_comp(
+  dat,
+  cl = "kmeans",
+  ti = "",
+  outL = T,
+  nsp = 13,
+  regtype = regtype,
+  r = r,
+  allsp,
+  saveplot = TRUE,
+  savedir = "."
+)
 }
 \arguments{
 \item{dat}{Input dataset}

@@ -4,8 +4,17 @@
 \alias{plot_agg_slope_ratio}
 \title{Make slope ratio plot for two sets of coefficients.}
 \usage{
-plot_agg_slope_ratio(coefs1, coefs2, aggyr, opyr, titl, lab1 = "coefs1",
-  lab2 = "coefs2", fname = NULL, addrate = T)
+plot_agg_slope_ratio(
+  coefs1,
+  coefs2,
+  aggyr,
+  opyr,
+  titl,
+  lab1 = "coefs1",
+  lab2 = "coefs2",
+  fname = NULL,
+  addrate = T
+)
 }
 \arguments{
 \item{coefs1}{Coefficients for model 1.}

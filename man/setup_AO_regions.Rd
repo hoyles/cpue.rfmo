@@ -4,8 +4,7 @@
 \alias{setup_AO_regions}
 \title{Set up Atlantic Ocean regions}
 \usage{
-setup_AO_regions(dat, regB = F, regB1 = F, regY = F, regY1 = F,
-  regY2 = F)
+setup_AO_regions(dat, regB = F, regB1 = F, regY = F, regY1 = F, regY2 = F)
 }
 \arguments{
 \item{dat}{Input dataset}

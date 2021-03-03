@@ -4,8 +4,17 @@
 \alias{make_formula_IO}
 \title{Create formula object to use in the glm.}
 \usage{
-make_formula_IO(runsp, modtype, addboat, dohbf = T, splitboat = F,
-  addcl = F, addpca = NA, nhbf = 6, dohook = TRUE)
+make_formula_IO(
+  runsp,
+  modtype,
+  addboat,
+  dohbf = T,
+  splitboat = F,
+  addcl = F,
+  addpca = NA,
+  nhbf = 6,
+  dohook = TRUE
+)
 }
 \arguments{
 \item{runsp}{Species of interest.}

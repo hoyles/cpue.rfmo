@@ -4,8 +4,16 @@
 \alias{select_data_IO2}
 \title{Select joint data for the GLM, updated 2018.}
 \usage{
-select_data_IO2(indat, runreg, runpars, mt, vars, yrlims = NA,
-  oneflag = NA)
+select_data_IO2(
+  indat,
+  runreg,
+  runpars,
+  mt,
+  vars,
+  yrlims = NA,
+  oneflag = NA,
+  dovessid = TRUE
+)
 }
 \arguments{
 \item{indat}{Input dataset}
@@ -21,6 +29,8 @@ select_data_IO2(indat, runreg, runpars, mt, vars, yrlims = NA,
 \item{yrlims}{Bounding years for the analysis. Use integer values, because yrqtrs use 0.125 to 0.875.}
 
 \item{oneflag}{If not NA, the flag to use in the analysis. Otherwise flags JP, KR, SY, TW are used.}
+
+\item{dovessid}{Defaults to TRUE. If FALSE all vessel ids are made the same, which switches off data selection based on vessel ID.}
 }
 \value{
 Modified dataset.

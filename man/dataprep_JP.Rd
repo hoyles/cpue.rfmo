@@ -8,8 +8,7 @@ dataprep_JP(
   dat,
   alldat = T,
   region = "IO",
-  splist = c("bft", "sbt", "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas",
-    "sha")
+  splist = c("bft", "sbt", "alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha")
 )
 }
 \arguments{

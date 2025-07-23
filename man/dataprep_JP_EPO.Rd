@@ -7,8 +7,7 @@
 dataprep_JP_EPO(
   dat,
   alldat = T,
-  splist = c("alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha", "sai",
-    "spf")
+  splist = c("alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha", "sai", "spf")
 )
 }
 \arguments{

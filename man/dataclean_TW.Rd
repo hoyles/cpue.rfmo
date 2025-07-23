@@ -7,8 +7,8 @@
 dataclean_TW(
   dat1,
   rmssp = F,
-  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj",
-    "sha", "oth", "sbt")
+  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha",
+    "oth", "sbt")
 )
 }
 \arguments{

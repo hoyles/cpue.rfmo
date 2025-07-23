@@ -146,8 +146,8 @@ library(nFactors)
 The package supports multiple regional stratification schemes:
 
 - **Indian Ocean regions**: regY, regY1, regY2, regB, regB1, regB2, regB3, regA, regA1-regA5
-- **Atlantic Ocean regions**: regB, regB1 (bigeye regions), regY, regY1, regY2 (yellowfin regions)
-- **Eastern Pacific Ocean regions**: regBall, regBepo, regBwcpo
+- **Atlantic Ocean regions**: regB (bigeye regions)
+- **Pacific Ocean regions**: Various EPO regional structures
 
 ## File Structure
 
@@ -190,7 +190,7 @@ citation("cpue.rfmo")
 
 ## License
 
-This package is distributed under the GNU General Public License. You are free to use, modify, and distribute the software under the terms of the GPL.
+This package is distributed under the GNU GENERAL PUBLIC LICENSE (Version 3, 29 June 2007). You are free to use, modify, and distribute the software under the terms of the GPL.
 
 ## Contact
 

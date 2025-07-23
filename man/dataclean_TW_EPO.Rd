@@ -7,8 +7,8 @@
 dataclean_TW_EPO(
   dat1,
   rmssp = F,
-  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj",
-    "sha", "oth")
+  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha",
+    "oth")
 )
 }
 \arguments{

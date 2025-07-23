@@ -8,8 +8,8 @@ dataprep_TW_EPO(
   dat,
   alldat = F,
   region = "EPO",
-  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj",
-    "sha", "oth")
+  splist = c("alb", "bet", "yft", "ott", "swo", "mls", "bum", "blm", "otb", "skj", "sha",
+    "oth")
 )
 }
 \arguments{

@@ -6,8 +6,7 @@
 \usage{
 dataprep_JP_EPO2(
   dat,
-  splist = c("alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha", "sfa",
-    "ssp")
+  splist = c("alb", "bet", "yft", "swo", "mls", "bum", "blm", "sas", "sha", "sfa", "ssp")
 )
 }
 \arguments{

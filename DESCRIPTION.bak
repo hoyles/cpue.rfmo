@@ -2,7 +2,7 @@ Package: cpue.rfmo
 Type: Package
 Title: Functions for Analysing RFMO CPUE Data  
 Version: 0.1.0
-Authors@R: person("Simon", "Hoyle", email = "simon.hoyle@gmail.com", role = c("aut","cre"), comment = c(ORCID = "0000-0002-1787-6565"))
+Authors@R: person("Simon", "Hoyle", email = "simon.hoyle@gmail.com", role = c("aut","cre"))
 Description: Implements GLM-based CPUE standardization methods for fisheries stock assessment, with support for multiple fleets,
     spatiotemporal modeling, and comprehensive diagnostics. Optimised for tuna longline CPUE data for RFMOs such as the IOTC. 
 Depends: R (>= 3.5.0)

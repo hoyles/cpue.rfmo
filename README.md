@@ -178,6 +178,8 @@ This package is developed for scientific research in fisheries management. If yo
 
 ## Citation
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16346847.svg)](https://doi.org/10.5281/zenodo.16346847)
+
 To cite the **cpue.rfmo** package in publications, please use:
 
 Hoyle, S.D. (2025). *cpue.rfmo: An R Package for CPUE Standardization in Regional Fisheries Management Organizations*. R package version 0.1.0. Available at: https://github.com/hoyles/cpue.rfmo

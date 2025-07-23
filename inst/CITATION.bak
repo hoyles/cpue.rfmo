@@ -6,12 +6,10 @@ citEntry(
   author   = "Simon D. Hoyle",
   year     = "2025",
   note     = "R package version 0.1.0",
-  doi      = "10.5281/zenodo.16346847", 
   url      = "https://github.com/hoyles/cpue.rfmo",
   
   textVersion = paste("Hoyle, S.D. (2025).",
                       "cpue.rfmo: An R Package for CPUE Standardization in Regional Fisheries Management Organizations.",
                       "R package version 0.1.0.",
-					  "doi:10.5281/zenodo.16346847",
                       "Available at: https://github.com/hoyles/cpue.rfmo")
 )
